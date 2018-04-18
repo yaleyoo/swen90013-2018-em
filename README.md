@@ -7,7 +7,7 @@ Welcome to Bushfire Prediction Simulator
 
 #### Setting up the environment
 
-Install Unity from https://unity3d.com/get-unity/download/archive, be sure to select Mac and Windows build support. If you are using Windows this will also install Visual Studio as an IDE. Visual Studio is not available for Mac so it is best to MonoDevelop which is the built in unity IDE.
+Install Unity from https://unity3d.com/get-unity/download/archive, be sure to select Mac and Windows build support. 
 
 Clone the repo from the following link https://bitbucket.cis.unimelb.edu.au:8445/projects/SWEN90013/repos/swen90013-2018-em
 

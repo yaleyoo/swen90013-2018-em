@@ -65,7 +65,7 @@ public class LeafGenerator : MonoBehaviour {
         // Add the default leaves and set their ratios (irrelevant in the case on one leaf)
         this.sizesAndRatios = new Dictionary<LeafShape, int>();
         this.sizesAndRatios.Add(AcaciaMelanoxylon, 1);
-        //this.sizesAndRatios.Add(BurchardiaUmbellata, 1);
+        this.sizesAndRatios.Add(BurchardiaUmbellata, 1);
 
         // Update the ratio weights sum, used for selecting the next leaf with right probability
         calcTotalRatioWeight();

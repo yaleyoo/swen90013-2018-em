@@ -6,6 +6,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class LeafGenerator : MonoBehaviour {
     // Public struct to store the details of a leaf shape
@@ -41,8 +42,8 @@ public class LeafGenerator : MonoBehaviour {
         this.height = 100;
         this.dropAreaX = 100;
         this.dropAreaY = 100;
-        this.stopAtLeafLimit = true;
-        this.leafNumberLimit = 1000;
+        this.stopAtLeafLimit = LeafLimit.IfHasLimit();
+        this.leafNumberLimit = LeafLimit.GetLimit();
         this.listOfLeaves = new List<GameObject>();
 
         // Default leaves defined here
@@ -203,22 +204,6 @@ public class LeafGenerator : MonoBehaviour {
         calcTotalRatioWeight();
     }
 
-
-    // Set the number of maximum leaves for the simulation to stop at
-    public void SetLeafNumberLimit(int leafNumberLimit)
-    {
-        this.leafNumberLimit = leafNumberLimit;
-        this.stopAtLeafLimit = true;
-    }
-
-
-    // Remove the maximum number of leaves limit, and let the simulation run until call to stop method
-    public void RemoveLeafNumberLimit()
-    {
-        this.stopAtLeafLimit = false;
-    }
-
-
     // Set a new drop height for the lewaves to be dropped from
     public void SetDropHeight(float height)
     {
@@ -231,5 +216,9 @@ public class LeafGenerator : MonoBehaviour {
     {
         this.dropAreaX = x;
         this.dropAreaY = y;
+    }
+
+    public void ChangeLeafSettings() {
+        SceneManager.LoadScene("Leaf Select");
     }
 }

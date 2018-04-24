@@ -7,6 +7,9 @@ public class LeafSelection : MonoBehaviour {
     public InputField leafNumField;
     // Limit of leaf to be set
     private int leafNum;
+    // Whether or not to stop generating leaves at some maximum number
+    //private bool stopAtLeafLimit = true;
+    //private int leafNumberLimit = 1000;
 
     // Actions when click submit button
     public void Submit() {
@@ -16,7 +19,10 @@ public class LeafSelection : MonoBehaviour {
             if (leafNum >= 0) {
                 Debug.Log("You selected " + leafNum + " leafs.");
                 // Change limit
+                //this.GetComponent<LeafGenerator>().SetLeafNumberLimit(leafNum);
                 LeafLimit.SetLeafNumberLimit(leafNum);
+                //LeafLimit.FindGenerator().SetLeafNumberLimit(leafNum);
+                //SetLeafNumberLimit(leafNum);
                 SceneManager.LoadScene("Main");
             } else {
                 Debug.Log("Invalid number.");
@@ -28,9 +34,15 @@ public class LeafSelection : MonoBehaviour {
 
     // Actions when click unlimited button
     public void Unlimited() {
+        //this.GetComponent<LeafGenerator>().RemoveLeafNumberLimit();
         LeafLimit.RemoveLeafNumberLimit();
+        //RemoveLeafNumberLimit();
         Debug.Log("Leaf limit set to unlimited.");
         SceneManager.LoadScene("Main");
+    }
+
+    public int GetLeafLimit() {
+        return leafNum;
     }
 
 }

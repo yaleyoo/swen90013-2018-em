@@ -221,4 +221,31 @@ public class LeafGenerator : MonoBehaviour {
     public void ChangeLeafSettings() {
         SceneManager.LoadScene("Leaf Select");
     }
+
+    // Set the number of maximum leaves for the simulation to stop at
+    public void SetLeafNumberLimit(int numberLimit)
+    {
+        leafNumberLimit = numberLimit;
+        stopAtLeafLimit = true;
+    }
+
+
+    // Remove the maximum number of leaves limit, and let the simulation run until call to stop method
+    public void RemoveLeafNumberLimit()
+    {
+        stopAtLeafLimit = false;
+    }
+
+    public bool IfHasLimit()
+    {
+        return stopAtLeafLimit;
+    }
+
+    public int GetLimit()
+    {
+        return leafNumberLimit;
+    }
+
+
+
 }

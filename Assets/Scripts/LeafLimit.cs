@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections;
 
 public static class LeafLimit {
+    // Default values
     private static bool stopAtLeafLimit = true;
     private static int leafNumberLimit = 1000;
 

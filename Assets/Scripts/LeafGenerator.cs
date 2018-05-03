@@ -148,9 +148,6 @@ public class LeafGenerator : MonoBehaviour {
     // Using the ratio of leave to drop choose at random, in the right proportions, the next leaf to drop
     private LeafShape getLeafSize()
     {
-        // Instantiate chosen leaf to nothing to stop warnings, there should always be one found
-        LeafShape selectedLeaf = new LeafShape();
-
         // use the cumulative sum of the ratios, and a random number between 0 and the total ratio sum to choose the next leaf
         int cumulativeSum = 0;
         float randomNumber = Random.Range(0, this.totalRatioWeights);
@@ -159,13 +156,13 @@ public class LeafGenerator : MonoBehaviour {
             cumulativeSum += this.sizesAndRatios[leafShape];
             if (randomNumber < cumulativeSum)
             {
-                selectedLeaf = leafShape;
-                break;
+                // Return the chosen next leaf
+                return leafShape;
             }
         }
 
-        // Return the chosen next leaf
-        return selectedLeaf;
+        // Return the default next leaf
+        return new LeafShape();
     }
 
 
@@ -221,4 +218,29 @@ public class LeafGenerator : MonoBehaviour {
     public void ChangeLeafSettings() {
         SceneManager.LoadScene("Leaf Select");
     }
+
+    // Set the number of maximum leaves for the simulation to stop at
+    public void SetLeafNumberLimit(int numberLimit)
+    {
+        leafNumberLimit = numberLimit;
+        stopAtLeafLimit = true;
+    }
+
+
+    // Remove the maximum number of leaves limit, and let the simulation run until call to stop method
+    public void RemoveLeafNumberLimit()
+    {
+        stopAtLeafLimit = false;
+    }
+
+    public bool IfHasLimit()
+    {
+        return stopAtLeafLimit;
+    }
+
+    public int GetLimit()
+    {
+        return leafNumberLimit;
+    }
+    
 }

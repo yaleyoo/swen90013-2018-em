@@ -17,8 +17,13 @@ public class Leaf : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		
-	}
+        // Keep track of the position and destroy anything
+        // that drops below the ground
+        if (GetPosition().y < -5)
+        {
+            Destroy(this.gameObject);
+        }
+    }
 
     // Set the name of a leaf
     public void SetName(string leafName) {

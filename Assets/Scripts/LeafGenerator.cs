@@ -5,6 +5,7 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 public class LeafGenerator : MonoBehaviour {
@@ -39,6 +40,7 @@ public class LeafGenerator : MonoBehaviour {
     void Start () {
         // Initial values for simulation
         this.height = 100;
+        //this.dropAreaX = 100;
         this.dropAreaX = 100;
         this.dropAreaY = 100;
         this.stopAtLeafLimit = true;
@@ -73,11 +75,10 @@ public class LeafGenerator : MonoBehaviour {
         // Automatically begin the simulation on start
         BeginSim(0.01f);
     }
-	
 
 	// Update is called once per frame
 	void Update () {
-		
+        //print(FindObjectsOfType(typeof(Leaf)).Length);
 	}
 
 

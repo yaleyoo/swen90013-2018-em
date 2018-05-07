@@ -39,7 +39,7 @@ public class Leaf : MonoBehaviour
             if ((transform.position - position_i).sqrMagnitude < 0.5 && delta < 0.5f)
             {
                 this.GetComponent<Rigidbody>().isKinematic = true;
-                this.GetComponent<Renderer>().material.color = Color.blue;
+                //this.GetComponent<Renderer>().material.color = Color.blue;
                 tick++;
             }
             else

@@ -147,9 +147,6 @@ public class LeafGenerator : MonoBehaviour {
     // Using the ratio of leave to drop choose at random, in the right proportions, the next leaf to drop
     private LeafShape getLeafSize()
     {
-        // Instantiate chosen leaf to nothing to stop warnings, there should always be one found
-        LeafShape selectedLeaf = new LeafShape();
-
         // use the cumulative sum of the ratios, and a random number between 0 and the total ratio sum to choose the next leaf
         int cumulativeSum = 0;
         float randomNumber = Random.Range(0, this.totalRatioWeights);
@@ -158,13 +155,13 @@ public class LeafGenerator : MonoBehaviour {
             cumulativeSum += this.sizesAndRatios[leafShape];
             if (randomNumber < cumulativeSum)
             {
-                selectedLeaf = leafShape;
-                break;
+                // Return the chosen next leaf
+                return leafShape;
             }
         }
 
-        // Return the chosen next leaf
-        return selectedLeaf;
+        // Return the default next leaf
+        return new LeafShape();
     }
 
 
@@ -231,5 +228,11 @@ public class LeafGenerator : MonoBehaviour {
     {
         this.dropAreaX = x;
         this.dropAreaY = y;
+    }
+
+    // Returns the list of all leaves that are spawned at the moment
+    public List<GameObject> GetListOfLeaves()
+    {
+        return this.listOfLeaves;
     }
 }

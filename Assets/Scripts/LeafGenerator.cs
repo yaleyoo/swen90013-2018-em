@@ -229,4 +229,10 @@ public class LeafGenerator : MonoBehaviour {
         this.dropAreaX = x;
         this.dropAreaY = y;
     }
+
+    // Returns the list of all leaves that are spawned at the moment
+    public List<GameObject> GetListOfLeaves()
+    {
+        return this.listOfLeaves;
+    }
 }

@@ -47,7 +47,7 @@ public class LeafGenerator : MonoBehaviour {
         this.stopAtLeafLimit = true;
         this.leafNumberLimit = 1000;
         this.listOfLeaves = new List<GameObject>();
-        this.isVisualize = StaticValue.GetIsVisualize(); // Set visualization for simulation
+        this.isVisualize = MenuSettings.GetIsVisualize(); // Set visualization for simulation
 
         // Default leaves defined here
         LeafShape AcaciaMelanoxylon = new LeafShape();

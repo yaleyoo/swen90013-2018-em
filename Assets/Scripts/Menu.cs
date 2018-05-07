@@ -16,13 +16,13 @@ public class Menu : MonoBehaviour {
         // If visualization toggle is choosen
         if (toggle.isOn)
         {
-            StaticValue.SetIsVisualize(true);
+            MenuSettings.SetIsVisualize(true);
             SceneManager.LoadScene("Main");
         }
         // If visualization toggle is not choosen
         else
         {
-            StaticValue.SetIsVisualize(false);
+            MenuSettings.SetIsVisualize(false);
             SceneManager.LoadScene("Main");
 
         }

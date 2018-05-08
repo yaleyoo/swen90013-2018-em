@@ -40,7 +40,6 @@ public class LeafGenerator : MonoBehaviour {
     void Start () {
         // Initial values for simulation
         this.height = 100;
-        //this.dropAreaX = 100;
         this.dropAreaX = 100;
         this.dropAreaY = 100;
         this.stopAtLeafLimit = true;

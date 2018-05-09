@@ -229,4 +229,10 @@ public class LeafGenerator : MonoBehaviour {
         this.dropAreaX = x;
         this.dropAreaY = y;
     }
+
+	// Return the list of leaves, for testing
+	public List<GameObject> GetListOfLeaves()
+	{	
+		return this.listOfLeaves;
+	}
 }

@@ -75,8 +75,10 @@ public class DensityCalculator : MonoBehaviour {
 		}
 		float averHeight = sumOfHeight / listOfLeaves.Count;
 
-		// Calculate the surface area of unit circle
-		float surArea = 3.1415926f * 60f * 60f;
+		// Calculate the surface area of ground
+		float surArea = 200f * 200f;
+
+		// Return the surface area of ground
 		return averHeight * surArea;
 	}
 

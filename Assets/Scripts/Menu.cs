@@ -1,5 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿/*
+ * Created by Yuanyu Guo.
+ * User interface for select visualization
+ */
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -8,20 +10,25 @@ public class Menu : MonoBehaviour {
 
     public Toggle toggle;
 
+    // Invoke when Start button clicked
     public void ClickStart()
     {
+        // If visualization toggle is choosen
         if (toggle.isOn)
         {
+            MenuSettings.SetIsVisualize(true);
             SceneManager.LoadScene("Main");
         }
+        // If visualization toggle is not choosen
         else
         {
-            //TODO
-            Debug.Log("Invoke simulator directly from here");
-            
+            MenuSettings.SetIsVisualize(false);
+            SceneManager.LoadScene("Main");
+
         }
     }
 
+    // Invoke when Quit button clicked
     public void ClickQuit()
     {
         Debug.Log("quit");

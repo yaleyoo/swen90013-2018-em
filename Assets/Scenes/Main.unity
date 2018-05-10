@@ -586,7 +586,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Calculate Density
+  m_Text: Calculate Volume Ratio
 --- !u!222 &2091960544
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -606,7 +606,7 @@ GameObject:
   - component: {fileID: 2107185821}
   - component: {fileID: 2107185820}
   m_Layer: 5
-  m_Name: Button_CalcDensity
+  m_Name: Button_CalcRatio
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -639,11 +639,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 2107185818}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 86fb888f1bd403b4a99f6b7455f8ba9d, type: 3}
+  m_Script: {fileID: 11500000, guid: 0a13289048c6df841aa4b8153f26ca53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  listOfLeaves: []
-  bulkDensity: 0
+  volumeRatio: 0
 --- !u!114 &2107185821
 MonoBehaviour:
   m_ObjectHideFlags: 0

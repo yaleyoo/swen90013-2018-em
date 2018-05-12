@@ -19,6 +19,9 @@ public class Leaf : MonoBehaviour
     private Vector3 position_i;
     private Quaternion rotation_i;
 
+	// height of the top leaf
+	private static float height = 0;
+
     // Use this for initialization
     void Start()
     {
@@ -40,6 +43,11 @@ public class Leaf : MonoBehaviour
             {
                 this.GetComponent<Rigidbody>().isKinematic = true;
                 //this.GetComponent<Renderer>().material.color = Color.blue;
+				// If this object is highest, log the y value when turn on the Kinematic
+				if (transform.position.y > Leaf.height)
+				{
+					Leaf.height = transform.position.y;
+				}
                 tick++;
             }
             else
@@ -104,4 +112,10 @@ public class Leaf : MonoBehaviour
     {
         return this.transform.position;
     }
+
+	// Get the height of the top leaf
+	public float GetHeight()
+	{
+		return Leaf.height;
+	}
 }

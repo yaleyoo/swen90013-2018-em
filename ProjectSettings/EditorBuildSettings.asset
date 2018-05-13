@@ -4,10 +4,4 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes:
-  - enabled: 1
-    path: Assets/Scenes/Leaf Select.unity
-    guid: a8238156030a24f79945e3bde5e9cd1f
-  - enabled: 1
-    path: Assets/Scenes/Main.unity
-    guid: 9d52482a40c295b47b13531aa80fb170
+  m_Scenes: []

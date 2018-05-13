@@ -35,6 +35,9 @@ public class LeafGenerator : MonoBehaviour {
     // Dictionary of leaf shapes, and their ratio in the current leaves to be dropped
     private Dictionary<LeafShape, int> sizesAndRatios;
     private int totalRatioWeights;
+
+    // Is visualization?
+    private bool isVisualize;
     
     // Use this for initialization
     void Start () {
@@ -45,6 +48,7 @@ public class LeafGenerator : MonoBehaviour {
         this.stopAtLeafLimit = LeafLimit.IfHasLimit();
         this.leafNumberLimit = LeafLimit.GetLimit();
         this.listOfLeaves = new List<GameObject>();
+        this.isVisualize = MenuSettings.GetIsVisualize(); // Set visualization for simulation
 
         // Default leaves defined here
         LeafShape AcaciaMelanoxylon = new LeafShape();
@@ -74,10 +78,9 @@ public class LeafGenerator : MonoBehaviour {
         // Automatically begin the simulation on start
         BeginSim(0.01f);
     }
-	
 
-	// Update is called once per frame
-	void Update () {
+    // Update is called once per frame
+    void Update () {
 		
 	}
 
@@ -134,7 +137,13 @@ public class LeafGenerator : MonoBehaviour {
 
         // Rotate the leaf object randomly after it's spawn
         leafCopy.GetComponent<Leaf>().SetRotation(Random.Range(0f, 360f), Random.Range(0f, 360f), Random.Range(0f, 360f));
-        
+
+        // In case of no visualization, turn off the renderer for leaves
+        if (!this.isVisualize)
+        {
+            leafCopy.GetComponent<Renderer>().enabled = false;
+        }
+
         // Add the new leaf to the list of existing leaves
         this.listOfLeaves.Add(leafCopy);
         
@@ -242,5 +251,10 @@ public class LeafGenerator : MonoBehaviour {
     {
         return leafNumberLimit;
     }
-    
+
+    // Returns the list of all leaves that are spawned at the moment
+    public List<GameObject> GetListOfLeaves()
+    {
+        return this.listOfLeaves;
+    }
 }

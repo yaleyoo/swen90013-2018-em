@@ -8,16 +8,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class LeafGenerator : MonoBehaviour {
-    // Public struct to store the details of a leaf shape
-    public struct LeafShape
-    {
-        public float thicknessMean;
-        public float thicknessRange;
-        public float widthMean;
-        public float widthRange;
-        public float lengthMean;
-        public float lengthRange;
-    }
 
     // Area to generate leaves in
     private float height;
@@ -49,32 +39,36 @@ public class LeafGenerator : MonoBehaviour {
         this.listOfLeaves = new List<GameObject>();
         this.isVisualize = MenuSettings.GetIsVisualize(); // Set visualization for simulation
 
-        // Default leaves defined here
-        LeafShape AcaciaMelanoxylon = new LeafShape();
-        AcaciaMelanoxylon.thicknessMean = 0.021f;
-        AcaciaMelanoxylon.thicknessRange = 0.01f;
-        AcaciaMelanoxylon.widthMean = 1.8f;
-        AcaciaMelanoxylon.widthRange = 1.2f;
-        AcaciaMelanoxylon.lengthMean = 10f;
-        AcaciaMelanoxylon.lengthRange = 4f;
+        // TEMP Default leaves defined here - remove when simulation is not started automatically
+        LeafShape AcaciaMelanoxylon = new LeafShape(
+            "Acacia Melanoxylon", 
+            "flat",
+            0.021f,
+            0.01f,
+            1.8f,
+            1.2f,
+            10f,
+            4f);
 
-        LeafShape BurchardiaUmbellata = new LeafShape();
-        BurchardiaUmbellata.thicknessMean = 0.02f;
-        BurchardiaUmbellata.thicknessRange = 0.008f;
-        BurchardiaUmbellata.widthMean = 0.9f;
-        BurchardiaUmbellata.widthRange = 0.3f;
-        BurchardiaUmbellata.lengthMean = 20f;
-        BurchardiaUmbellata.lengthRange = 10f;
+        LeafShape BurchardiaUmbellata = new LeafShape(
+            "Burchardia Umbellata", 
+            "flat",
+            0.02f,
+            0.008f,
+            0.9f,
+            0.3f,
+            20f,
+            10f);
 
-        // Add the default leaves and set their ratios (irrelevant in the case on one leaf)
+        // TEMP Add the default leaves and set their ratios (irrelevant in the case on one leaf)
         this.sizesAndRatios = new Dictionary<LeafShape, int>();
         this.sizesAndRatios.Add(AcaciaMelanoxylon, 1);
         this.sizesAndRatios.Add(BurchardiaUmbellata, 1);
 
-        // Update the ratio weights sum, used for selecting the next leaf with right probability
+        // TEMP Update the ratio weights sum, used for selecting the next leaf with right probability
         calcTotalRatioWeight();
 
-        // Automatically begin the simulation on start
+        // TEMP Automatically begin the simulation on start
         BeginSim(0.01f);
     }
 
@@ -178,12 +172,12 @@ public class LeafGenerator : MonoBehaviour {
     private Vector3 getConcreteLeafSize(LeafShape leafShape)
     {
         // Three dimensions of the leaf
-        float thickness = Random.Range(leafShape.thicknessMean - leafShape.thicknessRange / 2,
-                                        leafShape.thicknessMean + leafShape.thicknessRange / 2);
-        float width = Random.Range(leafShape.widthMean - leafShape.widthRange / 2,
-                                        leafShape.widthMean + leafShape.widthRange / 2);
-        float length = Random.Range(leafShape.lengthMean - leafShape.lengthRange / 2,
-                                        leafShape.lengthMean + leafShape.lengthRange / 2);
+        float thickness = Random.Range(leafShape.ThicknessMean - leafShape.ThicknessRange / 2,
+                                        leafShape.ThicknessMean + leafShape.ThicknessRange / 2);
+        float width = Random.Range(leafShape.WidthMean - leafShape.WidthRange / 2,
+                                        leafShape.WidthMean + leafShape.WidthRange / 2);
+        float length = Random.Range(leafShape.LengthMean - leafShape.LengthRange / 2,
+                                        leafShape.LengthMean + leafShape.LengthRange / 2);
 
         // Return as a vector for simplicity
         return new Vector3(thickness, width, length);

@@ -30,7 +30,7 @@ public class Menu : MonoBehaviour {
     private string tempText;
 
     // Button to confirm the type and ratio
-    private Button addButton;
+    private Button confirmButton;
 
     // Dictionary to save the type-ratio value pair
     private Dictionary<string, int> typeWithRatio;
@@ -52,7 +52,10 @@ public class Menu : MonoBehaviour {
     private Button unlimitedButton;
 
     // The total number of selected leaves must be smaller than leafNum
-    int total_num;
+    public static int total_ratio;
+
+    // The flag whether the user click the un limited button
+    private bool flag_unlimited;
 
     // Invoke when Start button clicked
     public void ClickStart()
@@ -61,53 +64,56 @@ public class Menu : MonoBehaviour {
         // Get the LeafShap based on the leaf name
         GetLeafShape(typeWithRatio);
 
-      
-
         // Actions to submit the number of leaves
         // Check if input leaf limit is valid
         if (System.Int32.TryParse(leafNumField.text, out leafNum))
         {
             // Check if inputed leaf number is greater than 0
-            if (leafNum >= 0 && total_num == leafNum)
+            if (leafNum >= 0 && total_ratio == 100)
             {
                 Debug.Log("You selected " + leafNum + " leafs.");
-                // Change limit
-                //this.GetComponent<LeafGenerator>().SetLeafNumberLimit(leafNum);
                 LeafLimit.SetLeafNumberLimit(leafNum);
-                //LeafLimit.FindGenerator().SetLeafNumberLimit(leafNum);
-                //SetLeafNumberLimit(leafNum);
-                //SceneManager.LoadScene("Main");
 
-               
-
-                // If visualization toggle is choosen
-                if (toggle.isOn)
-                {
-                    MenuSettings.SetIsVisualize(true);
-                    SceneManager.LoadScene("Main");
-                }
-                // If visualization toggle is not choosen
-                else
-                {
-                    MenuSettings.SetIsVisualize(false);
-                    SceneManager.LoadScene("Main");
-
-                }
+                ChangeScene();
             }
-            else if(total_num != leafNum)
+            else if(total_ratio != 100)
             {
-                Debug.Log("Wrong input, please check the ratios.\n"
-                    + "The ratio will be delete, please input again.");
-                ResetButtonClick();
+                Debug.Log("Wrong input, please click the REST button and input agian.\n" +
+                    "The sume of ratios must be 100.\n");
+                //ResetButtonClick();
             }
-            else
+            else 
             {
                 Debug.Log("Invalid number.");
             }
         }
+        // Click the unlimited button, nothing in input field
+        else if(flag_unlimited == true)
+        {
+            ChangeScene();
+        }
         else
         {
-            Debug.Log("Invalid input.");
+            Debug.Log("Invalid input.\n"
+                + "Please check the leaf quantity. ");
+        }
+    }
+
+    // Load Main scene
+    private void ChangeScene()
+    {
+        // If visualization toggle is choosen
+        if (toggle.isOn)
+        {
+            MenuSettings.SetIsVisualize(true);
+            SceneManager.LoadScene("Main");
+        }
+        // If visualization toggle is not choosen
+        else
+        {
+            MenuSettings.SetIsVisualize(false);
+            SceneManager.LoadScene("Main");
+
         }
     }
 
@@ -129,8 +135,8 @@ public class Menu : MonoBehaviour {
         // Get the input field to input the ratio
         inputRatio = GameObject.Find("RatioInput").GetComponent<InputField>();
 
-        // Get the component - AddButton
-        addButton = GameObject.Find("AddButton").GetComponent<Button>();
+        // Get the component - ConfirmButton
+        confirmButton = GameObject.Find("ConfirmButton").GetComponent<Button>();
 
         // Get the component - DisplayText
         showText = GameObject.Find("DisplayText").GetComponent<Text>();
@@ -144,16 +150,18 @@ public class Menu : MonoBehaviour {
 
         unlimitedButton = GameObject.Find("Unlimited").GetComponent<Button>();
 
-        total_num = 0;
+        total_ratio = 0;
+
+        flag_unlimited = false;
     }
 
     private void Start()
     {
         // Listen to the add Button
-        addButton.onClick.AddListener(
+        confirmButton.onClick.AddListener(
             delegate ()
             {
-                AddButtonClick();
+                ConfirmButtonClick();
             }    
         );
 
@@ -177,49 +185,69 @@ public class Menu : MonoBehaviour {
         AddType();
         UpdateDropdownView(type);
     }
-
-    
+ 
     /* 
      * The response of clicking add button.
      * Deisplay the selected type with ratio 
      *      and add to the dictionary which just save the name and ratio.
      */
-    private void AddButtonClick()
+    private void ConfirmButtonClick()
     {
+        // The int number to save the ratio of each type
+        int ratioInt = 0;
         // Type conversion, string to int
-        int ratioInt = int.Parse(inputRatio.text);
-        string typeString = selectedType.captionText.text;
-
-        typeWithRatio.Add(typeString, ratioInt);
-
-        tempText = "";
-        total_num = 0;
-        foreach (KeyValuePair<string, int> pair in typeWithRatio)
+        if (System.Int32.TryParse(inputRatio.text, out ratioInt))
         {
-            tempText = tempText + pair.Key + ", " + pair.Value.ToString() + "\n";
-            total_num += pair.Value;
-        }
+            if (ratioInt > 100)
+            {
+                Debug.Log("The ratio cannot be larger than 100.");
+            }
+            else
+            {
+                string typeString = selectedType.captionText.text;
 
-        showText.text = "The Type of Leaves, Ratio\n" + tempText;  
+                typeWithRatio.Add(typeString, ratioInt);
+
+                tempText = "";
+                total_ratio = 0;
+                foreach (KeyValuePair<string, int> pair in typeWithRatio)
+                {
+                    tempText = tempText + pair.Key + ", " + pair.Value.ToString() + "%\n";
+                    total_ratio += pair.Value;
+                }
+
+                showText.text = "The Type of Leaves, Ratio\n" + tempText;
+            }
+           
+        }
+        else
+        {
+            Debug.Log("Please check the ratio.");
+        }
+        
     }
 
     /*
      * The response of clicking reset button.
+     * Reset all setting
      * Clear the dictionary typeWithRatio and the display text
      */
      private void ResetButtonClick()
     {
         typeWithRatio.Clear();
         showText.text = "The Type of Leaves, Ratio\n";
+        inputRatio.text = "";
+        leafNumField.text = "";
+        flag_unlimited = false;
+        //leafNum = 0;
     }
 
     // Actions when click unlimited button
     private void UnlimitedButtonClick()
     {
+        flag_unlimited = true;
         LeafLimit.RemoveLeafNumberLimit();
-        //RemoveLeafNumberLimit();
         Debug.Log("Leaf limit set to unlimited.");
-        //SceneManager.LoadScene("Main");
     }
 
     // Read leaf name from csv and add them to the dropdown menu

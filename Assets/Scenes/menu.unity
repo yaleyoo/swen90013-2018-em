@@ -637,7 +637,7 @@ RectTransform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 129391947}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -160, y: 125, z: 6.685089}
+  m_LocalPosition: {x: 168, y: -64, z: 6.685089}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 76427168}
@@ -647,7 +647,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -160, y: 125}
+  m_AnchoredPosition: {x: 168, y: -64}
   m_SizeDelta: {x: 160, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &129391949
@@ -1132,7 +1132,7 @@ RectTransform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 323393365}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 130, y: -203, z: 0}
+  m_LocalPosition: {x: 111, y: -165, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 926327942}
@@ -1141,7 +1141,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 130, y: -203}
+  m_AnchoredPosition: {x: 111, y: -165}
   m_SizeDelta: {x: 80.8, y: 34.36}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &323393367
@@ -1659,7 +1659,7 @@ GameObject:
   - component: {fileID: 648908702}
   - component: {fileID: 648908701}
   m_Layer: 0
-  m_Name: AddButton
+  m_Name: ConfirmButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3082,7 +3082,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Set the ratio
+  m_Text: e.g. 23 = 23%
 --- !u!222 &1457251484
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3488,7 +3488,7 @@ RectTransform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1770319367}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 130, y: -150, z: 0}
+  m_LocalPosition: {x: 111, y: -124.99999, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 2128124623}
@@ -3497,7 +3497,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 130, y: -150}
+  m_AnchoredPosition: {x: 111, y: -125}
   m_SizeDelta: {x: 80.8, y: 34.36}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1770319369
@@ -3666,7 +3666,11 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: The Type of Leaves, Ratio
+  m_Text: 'To add the types with ratio
+
+    Please click the confirm button
+
+    All types with ratio will be show here'
 --- !u!222 &1806871870
 CanvasRenderer:
   m_ObjectHideFlags: 0

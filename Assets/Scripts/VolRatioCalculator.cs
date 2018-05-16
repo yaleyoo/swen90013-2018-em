@@ -1,7 +1,8 @@
-﻿/* Created by Jing Bi
-   Script of calculating the volume ratio of 
-   sum of leaf volume to ground volume
-*/
+﻿/* 
+ * Created by Jing Bi
+ * Script of calculating the volume ratio of 
+ * sum of leaf volume to ground volume
+ */
 
 using System.Collections;
 using System.Collections.Generic;
@@ -9,92 +10,173 @@ using UnityEngine;
 
 public class VolRatioCalculator : MonoBehaviour {
 
+	// The result that we need
+	public float volumeRatio;
+
+	// Number of generated leaf, the default value is 1000
+	public int numOfLeaf = 1000;
 
 	// List of leaf objects 
 	protected List<GameObject> listOfLeaves;
 
-	// The result that we need
-	public float volumeRatio;
+	// Used for delay update() 
+	private int tick = 0;
 
-	// Use this for initialization
+	// Sum of all ticks
+	private int countTick = 0;
+
+	// Tick interval for checking whether all leaves are stopped  
+	private int checkInterval = 50;
+
+	// Label for showing whether volume ratio has been calculated
+	private bool isCalculated = false;
+
+	// Start this script
 	void Start () {
 		
 	}
-	
-	// Update is called once per frame
+
+	// Update once per frame
 	void Update () {
-		
-	}
-		
-	// Calculate the leaf volume ratio when click the button
-	public void Click(){
 
-		// Initialise the value of leaf list
-		this.listOfLeaves = GameObject.Find ("Ground").
-			GetComponent<LeafGenerator> ().GetListOfLeaves();
+		// Check if volume ratio has been calculated
+		if (isCalculated == false) {
+			
+			// Initialise the value of leaf list
+			this.listOfLeaves = GameObject.Find ("Ground").
+				GetComponent<LeafGenerator> ().GetListOfLeaves ();
 
-		// Ratio should be 0 if there is no leaf in simulation
-		if (listOfLeaves.Count == 0) {
+			// Check whether all leaves are stopped every checkInterval
+			if (tick == checkInterval) {
 
-			volumeRatio = 0f;
-		} else {
+				// Check if all leaves have been stopped, if they are,
+				// calculate the volume ratio; if they are not, keep updating
+				// unless it ticks more than 1500 times
+				if (CheckIfStopped (listOfLeaves) || countTick >= 1500) {
 
-			volumeRatio = 
-				this.CalcVolRatio (CalcSumOfLeafVolume (listOfLeaves), 
-				CalcGroundVolume (listOfLeaves));
+					// Calculate the volume ratio now
+					volumeRatio = 
+						this.CalcVolRatio (CalcSumOfLeafVolume (listOfLeaves),
+						CalcBulkVolume (listOfLeaves));
+
+					// Set the isCalculated label as true
+					isCalculated = true;
+				}
+				tick = 0;
+				countTick++;
+
+				// Test output
+				Debug.Log (volumeRatio);
+			} else {
+				tick++;	
+				countTick++;
+			}
 		}
 	}
-	// Calculate the sum of leaf volume
+		
+	/// <summary>
+	/// Checks if all leaves have been stopped
+	/// </summary>
+	/// <param name="listOfLeaves"> GameObject type list of all leaves </param>
+	/// <returns> are all leaves stopped </returns>
+	public bool CheckIfStopped(List<GameObject> listOfLeaves){
+
+		foreach (var leaf in listOfLeaves) {
+			
+			// To avoid leaf being destroyed
+			if (leaf) {
+				// If there is a leaf which is still moving, return false
+				if (leaf.GetComponent<Rigidbody> ().isKinematic == false)
+					return false;
+
+				// If the last leaf is stopped, return true
+				else if (listOfLeaves.IndexOf (leaf) + 1 == listOfLeaves.Count)
+					return true;
+			}
+		}
+		// Default return true if there is destroyed leaf at last
+		return true;
+	}
+
+	/// <summary>
+	/// Calculate the sum of leaf volume 
+	/// </summary>
+	/// <param name="listOfLeaves"> GameObject type list of all leaves </param>
+	/// <returns> sum of all leaves volume </returns>
 	public float CalcSumOfLeafVolume(List<GameObject> listOfLeaves){
 
 		// Initialise the sum of leaf volume
 		float sumOfVolume = 0f;
-		foreach (var leaf in this.listOfLeaves) {
 
-			// For each leaf, get the size info from the list
-			Vector3 sizeOfLeaf = leaf.GetComponent<Leaf> ().GetSize();
-			sumOfVolume += sizeOfLeaf.x * sizeOfLeaf.y * sizeOfLeaf.z;
+		// sizeOfLeaf is a temporary variable to store current leaf size
+		Vector3 sizeOfLeaf = new Vector3();
+		foreach (var leaf in this.listOfLeaves) {
+			
+			// To avoid leaf being destroyed
+			if (leaf) {
+				// For each leaf, get its length, width and thickness 
+				sizeOfLeaf = leaf.GetComponent<Leaf> ().GetSize ();
+				sumOfVolume += sizeOfLeaf.x * sizeOfLeaf.y * sizeOfLeaf.z;
+			} 
 		}
 		return sumOfVolume;
 	}
 
-	/* Considering the area as a cylinder, approximately calculate 
-	   the volume by 
-	   V = h(Average height of Leaves) * S (Surface area of ground),
-	   S(for square) = length * width
-	*/
-	public float CalcGroundVolume(List<GameObject> listOfLeaves){
+	/// <summary> Considering the area as a cylinder, approximately calculate 
+	/// the volume by Volume = h(average height of Leaves) * 
+	/// S (surface area of ground), S(for square) = length * width 
+	/// </summary>
+	/// <param name="listOfLeaves"> GameObject type list of all leaves </param>
+	/// <returns> bulk volume </returns>
+	public float CalcBulkVolume(List<GameObject> listOfLeaves){
 
 		// Initialise the sum of leaf height
 		float sumOfHeight = 0f;
+
+		// Set a temporary variable to store current leaf position
+		Vector3 positionOfLeaf = new Vector3 ();
 		foreach (var leaf in this.listOfLeaves){
+			
+			// To avoid leaf being destroyed
+			if (leaf) {
+				positionOfLeaf = 
+					leaf.GetComponent<Leaf> ().transform.position;
 
-			Vector3 positionOfLeaf = 
-				leaf.GetComponent<Leaf> ().transform.position;
-
-			// Height of leaf can be calculated as
-			// height of leaf - height of ground(=0)
-			sumOfHeight = sumOfHeight + positionOfLeaf.y;
+				// Height of leaf can be calculated as
+				// height of leaf - height of ground(=0)
+				sumOfHeight = sumOfHeight + positionOfLeaf.y;
+			}
 		}
+		if (listOfLeaves.Count == 0)
+			return 0;
 		// Calculate the average height of all leaves
 		float averHeight = sumOfHeight / listOfLeaves.Count;
 
 		// Calculate the surface area of ground
-		float surArea = 200f * 200f;
+		Vector3 scaleOfGround = GameObject.Find("Ground").transform.localScale;
+		float surArea = scaleOfGround.x * scaleOfGround.z;
 
 		// Return the surface area of ground
 		return averHeight * surArea;
 	}
 
-	// Calculate the volume ratio by
-	// (sum of leaf volume) / (ground volume)
-	public float CalcVolRatio(float sumOfLeafVolume, float groundVolume){
+	/// <summary> Calculate the volume ratio by 
+	/// (sum of leaf volume) / (bulk volume) 
+	/// </summary>
+	/// <param name="sumOfLeafVolume"> sum of all leaves volume </param>
+	/// <param name="bulkVolume"> bulk volume </param>
+	/// <returns> leaf volume ratio </returns>
+	public float CalcVolRatio(float sumOfLeafVolume, float bulkVolume){
 
-		float volumeRatio = sumOfLeafVolume/groundVolume;
+		if (bulkVolume == 0)
+			return 0;
+		float volumeRatio = sumOfLeafVolume/bulkVolume;
 		return volumeRatio;
 	}
 
-	// Get the current value of volume ratio
+	/// <summary>
+	/// Get the current value of volume ratio
+	/// </summary>
 	public float GetVolumeRatio(){
 		
 		return this.volumeRatio;

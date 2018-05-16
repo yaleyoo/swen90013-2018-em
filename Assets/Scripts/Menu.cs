@@ -288,6 +288,7 @@ public class Menu : MonoBehaviour {
         {
             temp = CsvImporter.Leaves.Find((LeafShape l) => l.Name == pair.Key);
             leavesAndRatios.Add(temp, pair.Value);
+            Debug.Log(temp.Name + ":" + pair.Value);
         }
     }
 }

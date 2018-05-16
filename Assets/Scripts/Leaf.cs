@@ -1,4 +1,3 @@
-<<<<<<< .merge_file_WxXDfy
 ﻿/** Created by Chao Li 
  * Script for leaf object
 ﻿/** Created by Chao Li 

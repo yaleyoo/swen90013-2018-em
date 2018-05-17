@@ -19,8 +19,7 @@ public class CsvImporter {
     public static List<LeafShape> Leaves { get; set; }
 
     // Method to read leaf trait csv into LeafShape array, and return it
-    public static List<LeafShape> ReadCsv()
-    {
+    public static List<LeafShape> ReadCsv() {
         // Initialise leaf list, this will also reset the list if being called again to re-load from csv
         CsvImporter.Leaves = new List<LeafShape>();
 
@@ -29,12 +28,10 @@ public class CsvImporter {
         string[] lines = data.text.Split('\n');
 
         // For each line except first (header) parse individual sections, and add a new leaf shape to the list
-        foreach (string line in lines.Skip(1))
-        {
+        foreach (string line in lines.Skip(1)) {
             string[] parts = line.Split(',');
             // Last line may be treated as more info due to line ending encoding, if parts not right length, ignore it
-            if (parts.Length != 8)
-            {
+            if (parts.Length != 8) {
                 continue;
             }
             CsvImporter.Leaves.Add(new LeafShape(
@@ -62,10 +59,8 @@ public class CsvImporter {
     }
 
     // Debugging method to print all leaves in list on seperate lines
-    public static void PrintLeaves()
-    {
-        foreach (LeafShape l in CsvImporter.Leaves)
-        {
+    public static void PrintLeaves() {
+        foreach (LeafShape l in CsvImporter.Leaves) {
             Debug.Log(string.Format("{0} - {1} - {2} {3} {4} {5} {6} {7}", 
                                     l.Name, 
                                     l.LeafForm, 

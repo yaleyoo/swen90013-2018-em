@@ -28,8 +28,7 @@ public class LeafShape {
                     float widthMean,
                     float widthRange, 
                     float lengthMean, 
-                    float lengthRange)
-    {
+                    float lengthRange) {
         this.Name = name;
         this.LeafForm = leafForm;
         this.ThicknessMean = thicknessMean;
@@ -41,8 +40,7 @@ public class LeafShape {
     }
 
     // Empty contructor that creates default leaf
-    public LeafShape()
-    {
+    public LeafShape() {
         this.Name = "";
         this.LeafForm = "";
         this.ThicknessMean = 1;

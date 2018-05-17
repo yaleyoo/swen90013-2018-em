@@ -298,7 +298,7 @@ public class Menu : MonoBehaviour {
         flag_unlimited = true;
         LeafLimit.RemoveLeafNumberLimit();
         Debug.Log("Leaf limit set to unlimited.");
-        leafNumField.text = "Set as Unlimited.";
+        leafNumField.text = "Set as Unlimited";
     }
 
     // Read leaf name from csv and add them to the dropdown menu

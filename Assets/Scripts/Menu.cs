@@ -57,6 +57,15 @@ public class Menu : MonoBehaviour {
     // The flag whether the user click the un limited button
     private bool flag_unlimited;
 
+
+    // Component for message box
+    // String to save the warning message
+    private string message;
+    private Image box;
+    private Button okButton;
+    private Text boxConent;
+    //private bool flag_box;    // whether the message box is shown
+
     // Invoke when Start button clicked
     public void ClickStart()
     {
@@ -76,26 +85,47 @@ public class Menu : MonoBehaviour {
 
                 ChangeScene();
             }
-            else if(total_ratio != 100)
+            else if(leafNum >= 0 && total_ratio != 100)
             {
                 Debug.Log("Wrong input, please click the REST button and input agian.\n" +
                     "The sume of ratios must be 100.\n");
-                //ResetButtonClick();
+                
+                message = "Wrong input, please click the REST button and input agian.\n" +
+                    "The sume of ratios must be 100.\n";
+                MessageBox(message);
             }
             else 
             {
                 Debug.Log("Invalid number.");
+
+                message = "Invalid number. Please check the leaf quantity.";
+                MessageBox(message);
             }
         }
         // Click the unlimited button, nothing in input field
         else if(flag_unlimited == true)
         {
-            ChangeScene();
+            if (total_ratio != 100)
+            {
+                Debug.Log("Wrong input, please click the REST button and input agian.\n" +
+                   "The sume of ratios must be 100.\n");
+
+                message = "Wrong input, please click the REST button and input agian.\n" +
+                   "The sume of ratios must be 100.\n";
+                MessageBox(message);
+            }
+            else
+            {
+                ChangeScene();
+            }
         }
         else
         {
             Debug.Log("Invalid input.\n"
                 + "Please check the leaf quantity. ");
+
+            message = "Invalid number. Please check the leaf quantity.";
+            MessageBox(message);
         }
     }
 
@@ -153,6 +183,13 @@ public class Menu : MonoBehaviour {
         total_ratio = 0;
 
         flag_unlimited = false;
+
+        box = GameObject.Find("MessageBox").GetComponent<Image>();
+        okButton = GameObject.Find("OKButton").GetComponent<Button>();
+        boxConent = GameObject.Find("content_box").GetComponent<Text>();
+        box.gameObject.SetActive(false);
+        //flag_box = false;
+        message = "";
     }
 
     private void Start()
@@ -181,6 +218,15 @@ public class Menu : MonoBehaviour {
             }    
         );
 
+        // There is a message box, listen to the ok button
+        okButton.onClick.AddListener(
+                delegate ()
+                {
+                    OKButtonClick();
+                }
+
+            );
+
         // Add the type to the dropdown menu
         AddType();
         UpdateDropdownView(type);
@@ -201,6 +247,8 @@ public class Menu : MonoBehaviour {
             if (ratioInt > 100)
             {
                 Debug.Log("The ratio cannot be larger than 100.");
+                message = "The ratio cannot be larger than 100.";
+                MessageBox(message);
             }
             else
             {
@@ -223,6 +271,8 @@ public class Menu : MonoBehaviour {
         else
         {
             Debug.Log("Please check the ratio.");
+            message = "Please check the ratio.";
+            MessageBox(message);
         }
         
     }
@@ -248,6 +298,7 @@ public class Menu : MonoBehaviour {
         flag_unlimited = true;
         LeafLimit.RemoveLeafNumberLimit();
         Debug.Log("Leaf limit set to unlimited.");
+        leafNumField.text = "Set as Unlimited.";
     }
 
     // Read leaf name from csv and add them to the dropdown menu
@@ -260,6 +311,12 @@ public class Menu : MonoBehaviour {
         {
             type.Add(l.Name);
         }
+    }
+
+    private void OKButtonClick()
+    {
+        box.gameObject.SetActive(false);
+        Debug.Log("Click OK button");
     }
 
     // Display the name on the dropdown menu
@@ -290,5 +347,14 @@ public class Menu : MonoBehaviour {
             leavesAndRatios.Add(temp, pair.Value);
             Debug.Log(temp.Name + ":" + pair.Value);
         }
+    }
+
+    // The method to disaplay the message box
+    private void MessageBox(string str)
+    {
+        box.gameObject.SetActive(true);
+        // Bring the components to front
+        box.gameObject.transform.SetAsLastSibling();
+        boxConent.text = str;
     }
 }

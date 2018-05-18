@@ -7,6 +7,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class VolRatioCalculator : MonoBehaviour {
 
@@ -61,6 +62,9 @@ public class VolRatioCalculator : MonoBehaviour {
 
 					// Set the isCalculated label as true
 					isCalculated = true;
+
+					// Log volume ratio as static value
+					MenuSettings.SetVolumeRatio(volumeRatio);
 				}
 				tick = 0;
 				countTick++;
@@ -71,6 +75,10 @@ public class VolRatioCalculator : MonoBehaviour {
 				tick++;	
 				countTick++;
 			}
+		} 
+		else {
+			// Show the result
+			SceneManager.LoadScene("Result");
 		}
 	}
 		

@@ -6,6 +6,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class LeafGenerator : MonoBehaviour {
 
@@ -237,5 +238,11 @@ public class LeafGenerator : MonoBehaviour {
     public List<GameObject> GetListOfLeaves()
     {
         return this.listOfLeaves;
+    }
+
+    // Click the button and load the menu scene
+    public void ChangeLeafSettings() 
+    {
+        SceneManager.LoadScene("menu");
     }
 }

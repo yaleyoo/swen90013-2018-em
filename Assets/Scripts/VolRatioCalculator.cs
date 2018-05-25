@@ -12,7 +12,7 @@ using UnityEngine.SceneManagement;
 public class VolRatioCalculator : MonoBehaviour {
 
 	// The result that we need
-	public float volumeRatio;
+	public static float volumeRatio;
 
 	// Number of generated leaf, the default value is 1000
 	public int numOfLeaf = 1000;
@@ -185,8 +185,8 @@ public class VolRatioCalculator : MonoBehaviour {
 	/// <summary>
 	/// Get the current value of volume ratio
 	/// </summary>
-	public float GetVolumeRatio(){
+	public static float GetVolumeRatio(){
 		
-		return this.volumeRatio;
+		return volumeRatio;
 	}
 }

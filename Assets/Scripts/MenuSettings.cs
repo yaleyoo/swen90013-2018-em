@@ -7,6 +7,8 @@ public class MenuSettings {
     private static bool isVisualize;// Get visualization value from user input
     //private static int leafLimitation;
 
+	private static float volumeRatio;// Density of the simulation
+
     // Public method to set isVisualize
     public static void SetIsVisualize(bool isVisualize)
     {
@@ -18,5 +20,15 @@ public class MenuSettings {
     {
         return MenuSettings.isVisualize;
     }
+
+	public static void SetVolumeRatio(float volumeRatio)
+	{
+		MenuSettings.volumeRatio = volumeRatio;
+	}
+
+	public static float GetVolumeRatio()
+	{
+		return MenuSettings.volumeRatio;
+	}
 
 }

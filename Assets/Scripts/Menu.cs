@@ -5,7 +5,7 @@
  * User interface to select the type of leaf
  *      and set the ratio of leaves
  *      
- *  User interface to select number of leaves to drop
+ * User interface to select number of leaves to drop
  */
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -88,10 +88,10 @@ public class Menu : MonoBehaviour {
             else if(leafNum >= 0 && total_ratio != 100)
             {
                 Debug.Log("Wrong input, please click the REST button and input agian.\n" +
-                    "The sume of ratios must be 100.\n");
+                    "The sum of ratios must be 100.\n");
                 
                 message = "Wrong input, please click the REST button and input agian.\n" +
-                    "The sume of ratios must be 100.\n";
+                    "The sum of ratios must be 100.\n";
                 MessageBox(message);
             }
             else 
@@ -108,10 +108,10 @@ public class Menu : MonoBehaviour {
             if (total_ratio != 100)
             {
                 Debug.Log("Wrong input, please click the REST button and input agian.\n" +
-                   "The sume of ratios must be 100.\n");
+                   "The sum of ratios must be 100.\n");
 
                 message = "Wrong input, please click the REST button and input agian.\n" +
-                   "The sume of ratios must be 100.\n";
+                   "The sum of ratios must be 100.\n";
                 MessageBox(message);
             }
             else
@@ -254,7 +254,16 @@ public class Menu : MonoBehaviour {
             {
                 string typeString = selectedType.captionText.text;
 
-                typeWithRatio.Add(typeString, ratioInt);
+                // Check if the same leaf tyep is selected
+                if (typeWithRatio.ContainsKey(typeString))
+                {
+                    message = "You have already chosen this type of leaf.\nPlease check your selection.";
+                    MessageBox(message);
+                }
+                else
+                {
+                    typeWithRatio.Add(typeString, ratioInt);
+                }  
 
                 tempText = "";
                 total_ratio = 0;

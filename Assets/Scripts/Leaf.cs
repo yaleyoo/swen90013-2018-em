@@ -1,5 +1,7 @@
 ﻿/** Created by Chao Li 
  * Script for leaf object
+﻿/** Created by Chao Li 
+ * Script for leaf object
 **/
 
 using UnityEngine;
@@ -19,6 +21,8 @@ public class Leaf : MonoBehaviour {
 
     private int tick = 0;
 
+    // height of the top leaf
+    private static float height = 0;
 
     // Use this for initialization
     void Start() {
@@ -35,6 +39,11 @@ public class Leaf : MonoBehaviour {
             // If the leaf is not moving disable physics movement
             if (!CheckIfMoving(speed, angularVelocity)) {
                 this.GetComponent<Rigidbody>().isKinematic = true;
+                // If this object is highest, log the y value when turn on the Kinematic
+                if (transform.position.y > Leaf.height)
+                {
+                    Leaf.height = transform.position.y;
+                }
             }
             tick = 0;
         }
@@ -91,5 +100,11 @@ public class Leaf : MonoBehaviour {
     // Get the current position of this leaf
     public Vector3 GetPosition() {
         return this.transform.position;
+    }
+
+    // Get the height of the top leaf
+    public float GetHeight()
+    {
+        return Leaf.height;
     }
 }

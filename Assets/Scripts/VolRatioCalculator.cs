@@ -7,11 +7,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class VolRatioCalculator : MonoBehaviour {
 
 	// The result that we need
-	public float volumeRatio;
+	public static float volumeRatio;
 
 	// List of leaf objects 
 	protected List<GameObject> listOfLeaves;
@@ -171,8 +172,8 @@ public class VolRatioCalculator : MonoBehaviour {
 	/// <summary>
 	/// Get the current value of volume ratio
 	/// </summary>
-	public float GetVolumeRatio(){
+	public static float GetVolumeRatio(){
 		
-		return this.volumeRatio;
+		return volumeRatio;
 	}
 }

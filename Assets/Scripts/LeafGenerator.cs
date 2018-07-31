@@ -6,6 +6,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class LeafGenerator : MonoBehaviour {
 
@@ -238,7 +239,7 @@ public class LeafGenerator : MonoBehaviour {
     {
         return this.listOfLeaves;
     }
-
+		
 	// Return the height of leaves will fall
 	public float getHeight()
 	{
@@ -250,4 +251,11 @@ public class LeafGenerator : MonoBehaviour {
 	{
 		return this.leafNumberLimit;
 	}
+
+    // Click the button and load the menu scene
+    public void ChangeLeafSettings() 
+    {
+        SceneManager.LoadScene("menu");
+    }
+
 }

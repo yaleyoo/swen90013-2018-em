@@ -13,6 +13,7 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 using System;
+using UnityEditor;
 
 public class Menu : MonoBehaviour {
 
@@ -290,9 +291,12 @@ public class Menu : MonoBehaviour {
 
     private void LeafButtonClick(GameObject button, String typeString, int ratioInt)
     {
-        Destroy(button);
-        typeWithRatio.Remove(typeString);
-        total_ratio = total_ratio - ratioInt;
+        if(EditorUtility.DisplayDialog("Delete warning", "Are you sure to delete?", "Yes", "No"))
+        {
+            Destroy(button);
+            typeWithRatio.Remove(typeString);
+            total_ratio = total_ratio - ratioInt;
+        }               
     }
 
     /*

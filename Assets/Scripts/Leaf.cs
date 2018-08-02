@@ -40,8 +40,7 @@ public class Leaf : MonoBehaviour {
             if (!CheckIfMoving(speed, angularVelocity)) {
                 this.GetComponent<Rigidbody>().isKinematic = true;
                 // If this object is highest, log the y value when turn on the Kinematic
-                if (transform.position.y > Leaf.height)
-                {
+                if (transform.position.y > Leaf.height) {
                     Leaf.height = transform.position.y;
                 }
             }
@@ -78,8 +77,17 @@ public class Leaf : MonoBehaviour {
     // Set the thichness, width and lenth of a leaf, set the mass based on size
     public void SetSize(float thickness, float width, float length) {
         this.transform.localScale = new Vector3(width, thickness, length);
+
+        // Calculate the mass of the leaf
         // assume density is 1 for all leaves
-        this.GetComponent<Rigidbody>().mass = width * thickness * length * 1000 / GRAVITY;
+
+        // The leaf has a cylinder shape
+        if (this.GetComponent<CapsuleCollider>()) {
+            this.GetComponent<Rigidbody>().mass = Mathf.PI * width * thickness * length * 1000 / GRAVITY;
+        }
+        else {
+            this.GetComponent<Rigidbody>().mass = width * thickness * length * 1000 / GRAVITY;
+        }        
     }
 
     // Set the rotation of a leaf

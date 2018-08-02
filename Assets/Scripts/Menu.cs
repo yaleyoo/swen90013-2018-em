@@ -12,6 +12,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 public class Menu : MonoBehaviour {
 
@@ -26,9 +27,6 @@ public class Menu : MonoBehaviour {
     // The input field to set the ratio
     private InputField inputRatio;
 
-    // The string to save the type and ratio
-    private string tempText;
-
     // Button to confirm the type and ratio
     private Button confirmButton;
 
@@ -37,9 +35,6 @@ public class Menu : MonoBehaviour {
 
     // Dictionary of leaf shapes and their ratio (used by LeafGenerator class)
     public static Dictionary<LeafShape, int> leavesAndRatios;
-
-    // Text to show the selected type and ratio
-    private Text showText;
 
     // Button to reset the leaves and ratio
     private Button resetButton;
@@ -51,12 +46,11 @@ public class Menu : MonoBehaviour {
 
     private Button unlimitedButton;
 
-    // The total number of selected leaves must be smaller than leafNum
+    // The total number of selected leaves must be 100%
     public static int total_ratio;
 
     // The flag whether the user click the un limited button
     private bool flag_unlimited;
-
 
     // Component for message box
     // String to save the warning message
@@ -65,6 +59,12 @@ public class Menu : MonoBehaviour {
     private Button okButton;
     private Text boxConent;
     //private bool flag_box;    // whether the message box is shown
+
+    // Component for ListView
+    public GameObject leafButton;
+    public Transform listContent;
+    
+
 
     // Invoke when Start button clicked
     public void ClickStart()
@@ -168,9 +168,6 @@ public class Menu : MonoBehaviour {
         // Get the component - ConfirmButton
         confirmButton = GameObject.Find("ConfirmButton").GetComponent<Button>();
 
-        // Get the component - DisplayText
-        showText = GameObject.Find("DisplayText").GetComponent<Text>();
-
         // Get the component - ResetButton
         resetButton = GameObject.Find("ResetButton").GetComponent<Button>();
 
@@ -256,15 +253,29 @@ public class Menu : MonoBehaviour {
 
                 typeWithRatio.Add(typeString, ratioInt);
 
-                tempText = "";
+                // Add a leafButton
+                GameObject newButton = Instantiate(leafButton) as GameObject;
+                LeafButton button = newButton.GetComponent<LeafButton>();
+                button.leafName.text = typeString;
+                button.leafRatio.text = ratioInt.ToString() + "%";
+                newButton.transform.SetParent(listContent);
+                // Listen to the leaf button
+                button.onClick.AddListener(
+                        delegate ()
+                        {
+                            LeafButtonClick(newButton, typeString, ratioInt);
+                        }
+
+                    );
+
+
                 total_ratio = 0;
                 foreach (KeyValuePair<string, int> pair in typeWithRatio)
                 {
-                    tempText = tempText + pair.Key + ", " + pair.Value.ToString() + "%\n";
-                    total_ratio += pair.Value;
+                     total_ratio += pair.Value;
                 }
 
-                showText.text = "The Type of Leaves, Ratio\n" + tempText;
+
             }
            
         }
@@ -277,18 +288,33 @@ public class Menu : MonoBehaviour {
         
     }
 
+    private void LeafButtonClick(GameObject button, String typeString, int ratioInt)
+    {
+        Destroy(button);
+        typeWithRatio.Remove(typeString);
+        total_ratio = total_ratio - ratioInt;
+    }
+
     /*
      * The response of clicking reset button.
      * Reset all setting
      * Clear the dictionary typeWithRatio and the display text
      */
-     private void ResetButtonClick()
+    private void ResetButtonClick()
     {
         typeWithRatio.Clear();
-        showText.text = "The Type of Leaves, Ratio\n";
         inputRatio.text = "";
         leafNumField.text = "";
         flag_unlimited = false;
+        GameObject[] leafButtons= GameObject.FindGameObjectsWithTag("LeafButton");
+        if (leafButtons.Length > 0)
+        {
+            foreach (GameObject o in leafButtons)
+            {
+                Destroy(o);
+            }
+        }        
+        total_ratio = 0;
         //leafNum = 0;
     }
 

@@ -23,7 +23,7 @@ public abstract class Leaf : MonoBehaviour {
             float angularVelocity = this.GetComponent<Rigidbody>().angularVelocity.sqrMagnitude;
 
             // If the leaf is not moving disable physics movement
-            if (!isMoving(speed, angularVelocity)) {
+            if (!IsMoving(speed, angularVelocity)) {
                 this.GetComponent<Rigidbody>().isKinematic = true;
             }
             tick = 0;
@@ -34,7 +34,7 @@ public abstract class Leaf : MonoBehaviour {
 
         // If the leaf has fallen below the ground delete itself
         if (this.GetPosition().y < 0) {
-            Destroy(this);
+            Destroy(this.gameObject);
         }
     }
 
@@ -45,7 +45,7 @@ public abstract class Leaf : MonoBehaviour {
     /// <param name="speed">The speed of the object</param>
     /// <param name="angularVelocity">The anglar velocity of the object</param>
     /// <returns>Is object moving</returns>
-    public bool isMoving(float speed, float angularVelocity) {
+    public bool IsMoving(float speed, float angularVelocity) {
 
         if (speed < MOVEMENT_MINIMUM && angularVelocity < MOVEMENT_MINIMUM) {
             return false;

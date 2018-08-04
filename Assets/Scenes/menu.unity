@@ -125,7 +125,7 @@ GameObject:
   - component: {fileID: 4800752}
   - component: {fileID: 4800751}
   m_Layer: 0
-  m_Name: Unlimited
+  m_Name: UnlimitedButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -190,7 +190,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1966181418}
-        m_MethodName: UnlimitedButtonClick
+        m_MethodName: UnlimitedOnClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1187,7 +1187,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1966181418}
-        m_MethodName: ClickQuit
+        m_MethodName: QuitOnClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1727,7 +1727,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1966181418}
-        m_MethodName: ConfirmButtonClick
+        m_MethodName: ConfirmOnClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1783,7 +1783,7 @@ GameObject:
   - component: {fileID: 706854724}
   - component: {fileID: 706854723}
   m_Layer: 0
-  m_Name: Text
+  m_Name: Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2362,7 +2362,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1966181418}
-        m_MethodName: ResetButtonClick
+        m_MethodName: ResetOnClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2848,7 +2848,7 @@ GameObject:
   - component: {fileID: 1148679504}
   - component: {fileID: 1148679503}
   m_Layer: 0
-  m_Name: TypeDropdown
+  m_Name: LeafDropdown
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3410,7 +3410,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1966181418}
-        m_MethodName: OKButtonClick
+        m_MethodName: OkOnClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3540,7 +3540,7 @@ GameObject:
   - component: {fileID: 1476930828}
   - component: {fileID: 1476930827}
   m_Layer: 0
-  m_Name: Text (1)
+  m_Name: Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3980,7 +3980,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1966181418}
-        m_MethodName: ClickStart
+        m_MethodName: StartOnClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4130,7 +4130,7 @@ GameObject:
   - component: {fileID: 1846619140}
   - component: {fileID: 1846619139}
   m_Layer: 0
-  m_Name: Panel
+  m_Name: SelectedLeavesInfo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4328,8 +4328,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   visualizeToggle: {fileID: 129391949}
+  leafDropdown: {fileID: 1148679503}
   inputRatio: {fileID: 473987216}
-  showText: {fileID: 1806871869}
+  selectedTypesAndRatios: {fileID: 1806871869}
   leafNumField: {fileID: 467062092}
   messageBox: {fileID: 1230414029}
   messageBoxConent: {fileID: 1298445753}

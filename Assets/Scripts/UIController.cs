@@ -18,10 +18,10 @@ public class UIController : MonoBehaviour {
     public Toggle visualizeToggle;
 
     // Dropdown menu to select types of leaves
-    private Dropdown selectedType;
+    public Dropdown leafDropdown;
 
     // The list to save the selected name
-    private List<string> type;
+    private List<string> type = new List<string>();
 
     // The input field to set the ratio
     public InputField inputRatio;
@@ -36,7 +36,7 @@ public class UIController : MonoBehaviour {
     public static Dictionary<LeafShape, int> leavesAndRatios;
 
     // Text to show the selected type and ratio
-    public Text showText;
+    public Text selectedTypesAndRatios;
 
     // InputField on the canvas
     public InputField leafNumField;
@@ -45,10 +45,10 @@ public class UIController : MonoBehaviour {
     private int leafNum;
 
     // The total number of selected leaves must be smaller than leafNum
-    public static int total_ratio;
+    public static int totalRatio;
 
     // The flag whether the user click the un limited button
-    private bool flag_unlimited;
+    private bool isUnlimited;
 
 
     // Component for message box
@@ -58,7 +58,7 @@ public class UIController : MonoBehaviour {
     public Text messageBoxConent;
 
     // Invoke when Start button clicked
-    public void ClickStart()
+    public void StartOnClick()
     {
         // To pass the dictionary leavesAndRatios to the LeafGenerator
         // Get the LeafShap based on the leaf name
@@ -70,41 +70,41 @@ public class UIController : MonoBehaviour {
         if (System.Int32.TryParse(leafNumField.text, out leafNum))
         {
             // Check if inputed leaf number is greater than 0
-            if (leafNum >= 0 && total_ratio == 100)
+            if (leafNum >= 0 && totalRatio == 100)
             {
                 Debug.Log("You selected " + leafNum + " leafs.");
                 SimSettings.SetLeafLimit(leafNum);
 
                 ChangeScene();
             }
-            else if(leafNum >= 0 && total_ratio != 100)
+            else if(leafNum >= 0 && totalRatio != 100)
             {
                 Debug.Log("Wrong input, please click the REST button and input agian.\n" +
                     "The sume of ratios must be 100.\n");
                 
                 message = "Wrong input, please click the REST button and input agian.\n" +
                     "The sume of ratios must be 100.\n";
-                MessageBox(message);
+                DisplayMessage(message);
             }
             else 
             {
                 Debug.Log("Invalid number.");
 
                 message = "Invalid number. Please check the leaf quantity.";
-                MessageBox(message);
+                DisplayMessage(message);
             }
         }
         // Click the unlimited button, nothing in input field
-        else if(flag_unlimited == true)
+        else if(isUnlimited == true)
         {
-            if (total_ratio != 100)
+            if (totalRatio != 100)
             {
                 Debug.Log("Wrong input, please click the REST button and input agian.\n" +
                    "The sume of ratios must be 100.\n");
 
                 message = "Wrong input, please click the REST button and input agian.\n" +
                    "The sume of ratios must be 100.\n";
-                MessageBox(message);
+                DisplayMessage(message);
             }
             else
             {
@@ -117,7 +117,7 @@ public class UIController : MonoBehaviour {
                 + "Please check the leaf quantity. ");
 
             message = "Invalid number. Please check the leaf quantity.";
-            MessageBox(message);
+            DisplayMessage(message);
         }
     }
 
@@ -140,44 +140,34 @@ public class UIController : MonoBehaviour {
     }
 
     // Invoke when Quit button clicked
-    public void ClickQuit()
+    public void QuitOnClick()
     {
         Debug.Log("quit");
         Application.Quit();
     }
 
-    // Initialization
-    private void Awake()
+    private void Start()
     {
-        // Dropdown menu for selecting the leaf type
-        // Just one dropdown UI, so use FindObjectOfType to get the UI
-        selectedType = Dropdown.FindObjectOfType<Dropdown>();
-        type = new List<string>();
-
         typeWithRatio = new Dictionary<string, int>();
 
-        total_ratio = 0;
+        totalRatio = 0;
 
-        flag_unlimited = false;
+        isUnlimited = false;
 
         messageBox.gameObject.SetActive(false);
 
         message = "";
-    }
 
-    private void Start()
-    {
         // Add the type to the dropdown menu
-        AddType();
-        UpdateDropdownView(type);
+        InitializeLeafDropdown();
     }
  
     /* 
      * The response of clicking add button.
-     * Deisplay the selected type with ratio 
+     * Display the selected type with ratio 
      *      and add to the dictionary which just save the name and ratio.
      */
-    public void ConfirmButtonClick()
+    public void ConfirmOnClick()
     {
         // The int number to save the ratio of each type
         int ratioInt = 0;
@@ -188,23 +178,23 @@ public class UIController : MonoBehaviour {
             {
                 Debug.Log("The ratio cannot be larger than 100.");
                 message = "The ratio cannot be larger than 100.";
-                MessageBox(message);
+                DisplayMessage(message);
             }
             else
             {
-                string typeString = selectedType.captionText.text;
+                string typeString = leafDropdown.captionText.text;
 
                 typeWithRatio.Add(typeString, ratioInt);
 
                 tempText = "";
-                total_ratio = 0;
+                totalRatio = 0;
                 foreach (KeyValuePair<string, int> pair in typeWithRatio)
                 {
                     tempText = tempText + pair.Key + ", " + pair.Value.ToString() + "%\n";
-                    total_ratio += pair.Value;
+                    totalRatio += pair.Value;
                 }
 
-                showText.text = "The Type of Leaves, Ratio\n" + tempText;
+                selectedTypesAndRatios.text = "The Type of Leaves, Ratio\n" + tempText;
             }
            
         }
@@ -212,7 +202,7 @@ public class UIController : MonoBehaviour {
         {
             Debug.Log("Please check the ratio.");
             message = "Please check the ratio.";
-            MessageBox(message);
+            DisplayMessage(message);
         }
         
     }
@@ -222,27 +212,27 @@ public class UIController : MonoBehaviour {
      * Reset all setting
      * Clear the dictionary typeWithRatio and the display text
      */
-     public void ResetButtonClick()
+     public void ResetOnClick()
     {
         typeWithRatio.Clear();
-        showText.text = "The Type of Leaves, Ratio\n";
+        selectedTypesAndRatios.text = "The Type of Leaves, Ratio\n";
         inputRatio.text = "";
         leafNumField.text = "";
-        flag_unlimited = false;
+        isUnlimited = false;
         //leafNum = 0;
     }
 
     // Actions when click unlimited button
-    public void UnlimitedButtonClick()
+    public void UnlimitedOnClick()
     {
-        flag_unlimited = true;
+        isUnlimited = true;
         SimSettings.RemoveLeafLimit();
         Debug.Log("Leaf limit set to unlimited.");
         leafNumField.text = "Set as Unlimited";
     }
 
     // Read leaf name from csv and add them to the dropdown menu
-    private void AddType()
+    private void InitializeLeafDropdown()
     {
         // Read leaf trait csv
         CsvImporter.ReadCsv();
@@ -251,31 +241,26 @@ public class UIController : MonoBehaviour {
         {
             type.Add(l.Name);
         }
+
+        leafDropdown.options.Clear();
+        Dropdown.OptionData tempData;
+        for (int i = 0; i < type.Count; i++)
+        {
+            tempData = new Dropdown.OptionData();
+            tempData.text = type[i];
+            leafDropdown.options.Add(tempData);
+        }
+        // Update the name show on the label of dropdown
+        leafDropdown.captionText.text = type[0];
     }
 
-    public void OKButtonClick()
+    public void OkOnClick()
     {
         messageBox.gameObject.SetActive(false);
         Debug.Log("Click OK button");
     }
 
-    // Display the name on the dropdown menu
-    private void UpdateDropdownView(List<string> showType)
-    {
-        selectedType.options.Clear();
-        Dropdown.OptionData tempData;
-        for (int i = 0; i < showType.Count; i++)
-        {
-            tempData = new Dropdown.OptionData();
-            tempData.text = showType[i];
-            selectedType.options.Add(tempData);
-        }
-        // Update the name show on the label of dropdown
-        selectedType.captionText.text = showType[0];
-    }
-
-    // Get the the selected LeafShape according to the name
-    // and saved as an dictionary
+    // Get the the selected LeafShape according to the name and saved as an dictionary
     private void GetLeafShape(Dictionary<string, int> nameDictionary)
     {
         leavesAndRatios = new Dictionary<LeafShape, int>();
@@ -290,7 +275,7 @@ public class UIController : MonoBehaviour {
     }
 
     // The method to disaplay the message box
-    private void MessageBox(string str)
+    private void DisplayMessage(string str)
     {
         messageBox.gameObject.SetActive(true);
         // Bring the components to front

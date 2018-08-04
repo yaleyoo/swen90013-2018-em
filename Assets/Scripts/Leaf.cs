@@ -1,14 +1,12 @@
-﻿/** Created by Chao Li 
- * Script for leaf object
-﻿/** Created by Chao Li 
+﻿﻿/** Created by Chao Li 
  * Script for leaf object
 **/
 
 using UnityEngine;
 
-public class Leaf : MonoBehaviour {
+public abstract class Leaf : MonoBehaviour {
     // default gravity for leaf mass calculation
-    private const float GRAVITY = 9.8f;
+    protected const float GRAVITY = 9.8f;
     // height to start detection of leaf's velocity
     private const float HEIGHT_TO_START_DETECTION = 50f;
     // Minimum movement to be considered to be moving
@@ -21,14 +19,6 @@ public class Leaf : MonoBehaviour {
 
     private int tick = 0;
 
-    // height of the top leaf
-    private static float height = 0;
-
-    // Use this for initialization
-    void Start() {
-
-    }
-
     // Update is called once per frame
     void Update() {
         // Every MOVEMENT_CHECK_INTERVAL updates check if the leaf is moving
@@ -37,12 +27,8 @@ public class Leaf : MonoBehaviour {
             float angularVelocity = this.GetComponent<Rigidbody>().angularVelocity.sqrMagnitude;
 
             // If the leaf is not moving disable physics movement
-            if (!CheckIfMoving(speed, angularVelocity)) {
+            if (!isMoving(speed, angularVelocity)) {
                 this.GetComponent<Rigidbody>().isKinematic = true;
-                // If this object is highest, log the y value when turn on the Kinematic
-                if (transform.position.y > Leaf.height) {
-                    Leaf.height = transform.position.y;
-                }
             }
             tick = 0;
         }
@@ -50,6 +36,10 @@ public class Leaf : MonoBehaviour {
             tick++;
         }
 
+        // If the leaf has fallen below the ground delete itself
+        if (this.GetPosition().y < 0) {
+            Destroy(this);
+        }
     }
 
     /// <summary>
@@ -59,7 +49,7 @@ public class Leaf : MonoBehaviour {
     /// <param name="speed">The speed of the object</param>
     /// <param name="angularVelocity">The anglar velocity of the object</param>
     /// <returns>Is object moving</returns>
-    public bool CheckIfMoving(float speed, float angularVelocity) {
+    public bool isMoving(float speed, float angularVelocity) {
 
         if (speed < MOVEMENT_MINIMUM && angularVelocity < MOVEMENT_MINIMUM) {
             return false;
@@ -75,20 +65,7 @@ public class Leaf : MonoBehaviour {
     }
 
     // Set the thichness, width and lenth of a leaf, set the mass based on size
-    public void SetSize(float thickness, float width, float length) {
-        this.transform.localScale = new Vector3(width, thickness, length);
-
-        // Calculate the mass of the leaf
-        // assume density is 1 for all leaves
-
-        // The leaf has a cylinder shape
-        if (this.GetComponent<CapsuleCollider>()) {
-            this.GetComponent<Rigidbody>().mass = Mathf.PI * width * thickness * length * 1000 / GRAVITY;
-        }
-        else {
-            this.GetComponent<Rigidbody>().mass = width * thickness * length * 1000 / GRAVITY;
-        }        
-    }
+    public abstract void SetSize(float thickness, float width, float length);
 
     // Set the rotation of a leaf
     public void SetRotation(float x, float y, float z) {
@@ -105,14 +82,11 @@ public class Leaf : MonoBehaviour {
         return this.transform.localScale;
     }
 
+    // Get the volume of this leaf
+    public abstract float GetVolume();
+
     // Get the current position of this leaf
     public Vector3 GetPosition() {
         return this.transform.position;
-    }
-
-    // Get the height of the top leaf
-    public float GetHeight()
-    {
-        return Leaf.height;
     }
 }

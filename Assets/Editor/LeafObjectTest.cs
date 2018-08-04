@@ -36,7 +36,7 @@ public class LeafObjectTest {
 
         float speed = 0.5f;
         float angularVelocity = 0.5f;
-        bool result = leaf.CheckIfMoving(speed, angularVelocity);
+        bool result = leaf.isMoving(speed, angularVelocity);
 
         Assert.IsTrue(result);
 
@@ -49,7 +49,7 @@ public class LeafObjectTest {
 
         float speed = 0.4f;
         float angularVelocity = 0.4f;
-        bool result = leaf.CheckIfMoving(speed, angularVelocity);
+        bool result = leaf.isMoving(speed, angularVelocity);
 
         Assert.IsFalse(result);
 

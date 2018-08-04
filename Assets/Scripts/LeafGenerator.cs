@@ -73,12 +73,19 @@ public class LeafGenerator : MonoBehaviour {
     // Generate a new leaf, and drop it in the simulation
     private void DropLeaf()
     {
-        // Make a new leaf object
-        GameObject leaf = Resources.Load("Leaf") as GameObject;
+        GameObject leaf;
 
         // Get the next leaf type to drop based on their ratios, and then get the size of a single such leaf
         LeafShape nextLeafShape = getLeafSize();
         Vector3 leafSize = getConcreteLeafSize(nextLeafShape);
+
+        // Make a new leaf object of correct type
+        if (nextLeafShape.LeafForm.ToLower() == "round") {
+            leaf = Resources.Load("RoundLeaf") as GameObject;
+        }
+        else {
+            leaf = Resources.Load("FlatLeaf") as GameObject;
+        }
 
         // Set the leaf object to have the calculated leaf size
         leaf.GetComponent<Leaf>().SetSize(leafSize.x, leafSize.y, leafSize.z);

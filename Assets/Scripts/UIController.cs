@@ -13,7 +13,7 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
-public class Menu : MonoBehaviour {
+public class UIController : MonoBehaviour {
 
     public Toggle toggle;
 
@@ -81,7 +81,7 @@ public class Menu : MonoBehaviour {
             if (leafNum >= 0 && total_ratio == 100)
             {
                 Debug.Log("You selected " + leafNum + " leafs.");
-                LeafLimit.SetLeafNumberLimit(leafNum);
+                SimSettings.SetLeafLimit(leafNum);
 
                 ChangeScene();
             }
@@ -135,13 +135,13 @@ public class Menu : MonoBehaviour {
         // If visualization toggle is choosen
         if (toggle.isOn)
         {
-            MenuSettings.SetIsVisualize(true);
+            SimSettings.SetVisualize(true);
             SceneManager.LoadScene("Main");
         }
         // If visualization toggle is not choosen
         else
         {
-            MenuSettings.SetIsVisualize(false);
+            SimSettings.SetVisualize(false);
             SceneManager.LoadScene("Main");
 
         }
@@ -296,7 +296,7 @@ public class Menu : MonoBehaviour {
     private void UnlimitedButtonClick()
     {
         flag_unlimited = true;
-        LeafLimit.RemoveLeafNumberLimit();
+        SimSettings.RemoveLeafLimit();
         Debug.Log("Leaf limit set to unlimited.");
         leafNumField.text = "Set as Unlimited";
     }

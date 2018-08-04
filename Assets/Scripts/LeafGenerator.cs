@@ -11,60 +11,24 @@ using UnityEngine.SceneManagement;
 public class LeafGenerator : MonoBehaviour {
 
     // Area to generate leaves in
-    private float height;
-    private float dropAreaX;
-    private float dropAreaY;
-
-    // Whether or not to stop generating leaves at some maximum number
-    private bool stopAtLeafLimit;
-    private int leafNumberLimit;
+    //private float height;
+    //private float dropAreaX;
+    //private float dropAreaY;
 
     // List of all the leaves that have been generated
     private List<GameObject> listOfLeaves;
 
     // Dictionary of leaf shapes, and their ratio in the current leaves to be dropped
-    private Dictionary<LeafShape, int> sizesAndRatios;
+    //private Dictionary<LeafShape, int> sizesAndRatios;
     private int totalRatioWeights;
 
     // Is visualization?
-    private bool isVisualize;
+    //private bool isVisualize;
     
     // Use this for initialization
     void Start () {
-        // Initial values for simulation
-        this.height = 100;
-        this.dropAreaX = 100;
-        this.dropAreaY = 100;
-        this.stopAtLeafLimit = true;
-        this.leafNumberLimit = 1000;
+        // Initialize the list of leaves in the simulation
         this.listOfLeaves = new List<GameObject>();
-        this.isVisualize = MenuSettings.GetIsVisualize(); // Set visualization for simulation
-
-        // TEMP Default leaves defined here - remove when simulation is not started automatically
-        LeafShape AcaciaMelanoxylon = new LeafShape(
-            "Acacia Melanoxylon", 
-            "flat",
-            0.021f,
-            0.01f,
-            1.8f,
-            1.2f,
-            10f,
-            4f);
-
-        LeafShape BurchardiaUmbellata = new LeafShape(
-            "Burchardia Umbellata", 
-            "flat",
-            0.02f,
-            0.008f,
-            0.9f,
-            0.3f,
-            20f,
-            10f);
-
-        // TEMP Add the default leaves and set their ratios (irrelevant in the case on one leaf)
-        this.sizesAndRatios = new Dictionary<LeafShape, int>();
-        this.sizesAndRatios.Add(AcaciaMelanoxylon, 1);
-        this.sizesAndRatios.Add(BurchardiaUmbellata, 1);
 
         // TEMP Update the ratio weights sum, used for selecting the next leaf with right probability
         calcTotalRatioWeight();
@@ -127,13 +91,13 @@ public class LeafGenerator : MonoBehaviour {
 
         // Place the leaf object randomly within a circle defined by the dropping area
         Vector2 random2DPoint = Random.insideUnitCircle;
-        GameObject leafCopy = Instantiate(leaf, new Vector3(random2DPoint.x * (this.dropAreaX/2), this.height, random2DPoint.y * (this.dropAreaY/2)), Quaternion.identity);
+        GameObject leafCopy = Instantiate(leaf, new Vector3(random2DPoint.x * (SimSettings.dropAreaX/2), SimSettings.height, random2DPoint.y * (SimSettings.dropAreaY/2)), Quaternion.identity);
 
         // Rotate the leaf object randomly after it's spawn
         leafCopy.GetComponent<Leaf>().SetRotation(Random.Range(0f, 360f), Random.Range(0f, 360f), Random.Range(0f, 360f));
 
         // In case of no visualization, turn off the renderer for leaves
-        if (!this.isVisualize)
+        if (!SimSettings.GetVisualize())
         {
             leafCopy.GetComponent<Renderer>().enabled = false;
         }
@@ -142,7 +106,7 @@ public class LeafGenerator : MonoBehaviour {
         this.listOfLeaves.Add(leafCopy);
         
         // If terminating at leaf limit, and limit is reached, end the simulation
-        if (this.stopAtLeafLimit && this.listOfLeaves.Count >= this.leafNumberLimit){
+        if (SimSettings.GetUseLeafLimit() && this.listOfLeaves.Count >= SimSettings.GetLeafLimit()){
             EndSim();
         }
     }
@@ -184,7 +148,6 @@ public class LeafGenerator : MonoBehaviour {
         return new Vector3(thickness, width, length);
     }
 
-
     // Calculates the sum of all leaf ratios, to use when choosing which next leaf to drop. Only needs to be run when sizesAndRatios dict is updated
     private void calcTotalRatioWeight()
     {
@@ -196,7 +159,6 @@ public class LeafGenerator : MonoBehaviour {
         this.totalRatioWeights = sum;
     }
 
-
     // Set new set of leaf sizes and leaf ratios
     public void SetRatiosAndSizes(Dictionary<LeafShape, int> sizesAndRatios)
     {
@@ -204,28 +166,11 @@ public class LeafGenerator : MonoBehaviour {
         calcTotalRatioWeight();
     }
 
-
-    // Set the number of maximum leaves for the simulation to stop at
-    public void SetLeafNumberLimit(int leafNumberLimit)
-    {
-        this.leafNumberLimit = leafNumberLimit;
-        this.stopAtLeafLimit = true;
-    }
-
-
-    // Remove the maximum number of leaves limit, and let the simulation run until call to stop method
-    public void RemoveLeafNumberLimit()
-    {
-        this.stopAtLeafLimit = false;
-    }
-
-
     // Set a new drop height for the lewaves to be dropped from
     public void SetDropHeight(float height)
     {
         this.height = height;
     }
-
 
     // Set a new size of area that the leaves are dropped from
     public void SetDropArea(float x, float y)
@@ -246,16 +191,16 @@ public class LeafGenerator : MonoBehaviour {
 		return this.height;
 	}
 
-	// Return the number of all leaves
+	// Return the number of all leaves generated
 	public int getNumberOfLeaf()
 	{
-		return this.leafNumberLimit;
-	}
+		return this.listOfLeaves.Count;
+    }
 
     // Click the button and load the menu scene
     public void ChangeLeafSettings() 
     {
-        SceneManager.LoadScene("menu");
+        SceneManager.LoadScene("Menu");
     }
 
 }

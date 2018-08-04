@@ -16,7 +16,7 @@ public class CsvImporter {
     private static string CSV_NAME = "LeafTraits";
 
     // Scaling factor of leaf sizes to our simulation units
-    private static float SCALE = 0.1;
+    private static float SCALE = 0.1f;
 
     // Where to store csv data
     public static List<LeafShape> Leaves { get; set; }

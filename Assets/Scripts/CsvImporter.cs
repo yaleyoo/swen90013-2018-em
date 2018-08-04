@@ -15,6 +15,9 @@ public class CsvImporter {
     // Name of the csv file; must be located in the Resources folder
     private static string CSV_NAME = "LeafTraits";
 
+    // Scaling factor of leaf sizes to our simulation units
+    private static float SCALE = 0.1f;
+
     // Where to store csv data
     public static List<LeafShape> Leaves { get; set; }
 
@@ -40,17 +43,17 @@ public class CsvImporter {
                                         // Leaf form (lower case for consistency)
                                         parts[1].Trim().ToLower(),
                                         // Thickness mean
-                                        float.Parse(parts[2].Trim(), CultureInfo.InvariantCulture.NumberFormat),
+                                        float.Parse(parts[2].Trim(), CultureInfo.InvariantCulture.NumberFormat) * SCALE,
                                         // Thickness range
-                                        float.Parse(parts[3].Trim(), CultureInfo.InvariantCulture.NumberFormat),
+                                        float.Parse(parts[3].Trim(), CultureInfo.InvariantCulture.NumberFormat) * SCALE,
                                         // Width mean
-                                        float.Parse(parts[4].Trim(), CultureInfo.InvariantCulture.NumberFormat),
+                                        float.Parse(parts[4].Trim(), CultureInfo.InvariantCulture.NumberFormat) * SCALE,
                                         // Width range
-                                        float.Parse(parts[5].Trim(), CultureInfo.InvariantCulture.NumberFormat),
+                                        float.Parse(parts[5].Trim(), CultureInfo.InvariantCulture.NumberFormat) * SCALE,
                                         // Length mean
-                                        float.Parse(parts[6].Trim(), CultureInfo.InvariantCulture.NumberFormat),
+                                        float.Parse(parts[6].Trim(), CultureInfo.InvariantCulture.NumberFormat) * SCALE,
                                         // Length range
-                                        float.Parse(parts[7].Trim(), CultureInfo.InvariantCulture.NumberFormat))
+                                        float.Parse(parts[7].Trim(), CultureInfo.InvariantCulture.NumberFormat) * SCALE)
                             );
         }
 

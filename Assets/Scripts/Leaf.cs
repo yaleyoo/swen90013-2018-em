@@ -5,10 +5,6 @@
 using UnityEngine;
 
 public abstract class Leaf : MonoBehaviour {
-    // default gravity for leaf mass calculation
-    protected const float GRAVITY = 9.8f;
-    // height to start detection of leaf's velocity
-    private const float HEIGHT_TO_START_DETECTION = 50f;
     // Minimum movement to be considered to be moving
     private const float MOVEMENT_MINIMUM = 0.5f;
     // Number of updates to wait before checking movement

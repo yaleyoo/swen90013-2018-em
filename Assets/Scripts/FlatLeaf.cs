@@ -14,6 +14,6 @@ public class FlatLeaf : Leaf
     {
         this.transform.localScale = new Vector3(width, thickness, length);
 
-        this.GetComponent<Rigidbody>().mass = width * thickness * length * 1000 / GRAVITY;
+        this.GetComponent<Rigidbody>().mass = width * thickness * length * 1000;
     }
 }

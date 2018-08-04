@@ -152,12 +152,4 @@ public class LeafGenerator : MonoBehaviour {
         }
         this.totalRatioWeights = sum;
     }
-
-    // Click the button and load the menu scene
-    public void ChangeLeafSettings() 
-    {
-        EndSim();
-        SceneManager.LoadScene("Menu");
-    }
-
 }

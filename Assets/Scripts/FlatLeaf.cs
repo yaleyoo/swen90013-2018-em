@@ -1,4 +1,9 @@
-﻿using System.Collections;
+﻿/*
+ * Created by Michael Lumley
+ * Subclass for a flat leaf
+ */
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 

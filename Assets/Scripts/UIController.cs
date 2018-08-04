@@ -15,7 +15,7 @@ using System.Collections.Generic;
 
 public class UIController : MonoBehaviour {
 
-    public Toggle toggle;
+    public Toggle visualizeToggle;
 
     // Dropdown menu to select types of leaves
     private Dropdown selectedType;
@@ -24,13 +24,10 @@ public class UIController : MonoBehaviour {
     private List<string> type;
 
     // The input field to set the ratio
-    private InputField inputRatio;
+    public InputField inputRatio;
 
     // The string to save the type and ratio
     private string tempText;
-
-    // Button to confirm the type and ratio
-    private Button confirmButton;
 
     // Dictionary to save the type-ratio value pair
     private Dictionary<string, int> typeWithRatio;
@@ -39,17 +36,13 @@ public class UIController : MonoBehaviour {
     public static Dictionary<LeafShape, int> leavesAndRatios;
 
     // Text to show the selected type and ratio
-    private Text showText;
-
-    // Button to reset the leaves and ratio
-    private Button resetButton;
+    public Text showText;
 
     // InputField on the canvas
     public InputField leafNumField;
+
     // Limit of leaf to be set
     private int leafNum;
-
-    private Button unlimitedButton;
 
     // The total number of selected leaves must be smaller than leafNum
     public static int total_ratio;
@@ -61,10 +54,8 @@ public class UIController : MonoBehaviour {
     // Component for message box
     // String to save the warning message
     private string message;
-    private Image box;
-    private Button okButton;
-    private Text boxConent;
-    //private bool flag_box;    // whether the message box is shown
+    public Image messageBox;
+    public Text messageBoxConent;
 
     // Invoke when Start button clicked
     public void ClickStart()
@@ -134,7 +125,7 @@ public class UIController : MonoBehaviour {
     private void ChangeScene()
     {
         // If visualization toggle is choosen
-        if (toggle.isOn)
+        if (visualizeToggle.isOn)
         {
             SimSettings.SetVisualize(true);
             SceneManager.LoadScene("Simulation");
@@ -163,71 +154,19 @@ public class UIController : MonoBehaviour {
         selectedType = Dropdown.FindObjectOfType<Dropdown>();
         type = new List<string>();
 
-        // Get the input field to input the ratio
-        inputRatio = GameObject.Find("RatioInput").GetComponent<InputField>();
-
-        // Get the component - ConfirmButton
-        confirmButton = GameObject.Find("ConfirmButton").GetComponent<Button>();
-
-        // Get the component - DisplayText
-        showText = GameObject.Find("DisplayText").GetComponent<Text>();
-
-        // Get the component - ResetButton
-        resetButton = GameObject.Find("ResetButton").GetComponent<Button>();
-
         typeWithRatio = new Dictionary<string, int>();
-
-        leafNumField = GameObject.Find("QuantityInput").GetComponent<InputField>();
-
-        unlimitedButton = GameObject.Find("Unlimited").GetComponent<Button>();
 
         total_ratio = 0;
 
         flag_unlimited = false;
 
-        box = GameObject.Find("MessageBox").GetComponent<Image>();
-        okButton = GameObject.Find("OKButton").GetComponent<Button>();
-        boxConent = GameObject.Find("content_box").GetComponent<Text>();
-        box.gameObject.SetActive(false);
-        //flag_box = false;
+        messageBox.gameObject.SetActive(false);
+
         message = "";
     }
 
     private void Start()
     {
-        // Listen to the add Button
-        confirmButton.onClick.AddListener(
-            delegate ()
-            {
-                ConfirmButtonClick();
-            }    
-        );
-
-        // Listen to the reset Button
-        resetButton.onClick.AddListener(
-            delegate ()
-            {
-                ResetButtonClick();
-            }
-        );
-
-        // Listen to the unlimited button
-        unlimitedButton.onClick.AddListener(
-            delegate ()
-            {
-                UnlimitedButtonClick();
-            }    
-        );
-
-        // There is a message box, listen to the ok button
-        okButton.onClick.AddListener(
-                delegate ()
-                {
-                    OKButtonClick();
-                }
-
-            );
-
         // Add the type to the dropdown menu
         AddType();
         UpdateDropdownView(type);
@@ -238,7 +177,7 @@ public class UIController : MonoBehaviour {
      * Deisplay the selected type with ratio 
      *      and add to the dictionary which just save the name and ratio.
      */
-    private void ConfirmButtonClick()
+    public void ConfirmButtonClick()
     {
         // The int number to save the ratio of each type
         int ratioInt = 0;
@@ -283,7 +222,7 @@ public class UIController : MonoBehaviour {
      * Reset all setting
      * Clear the dictionary typeWithRatio and the display text
      */
-     private void ResetButtonClick()
+     public void ResetButtonClick()
     {
         typeWithRatio.Clear();
         showText.text = "The Type of Leaves, Ratio\n";
@@ -294,7 +233,7 @@ public class UIController : MonoBehaviour {
     }
 
     // Actions when click unlimited button
-    private void UnlimitedButtonClick()
+    public void UnlimitedButtonClick()
     {
         flag_unlimited = true;
         SimSettings.RemoveLeafLimit();
@@ -314,9 +253,9 @@ public class UIController : MonoBehaviour {
         }
     }
 
-    private void OKButtonClick()
+    public void OKButtonClick()
     {
-        box.gameObject.SetActive(false);
+        messageBox.gameObject.SetActive(false);
         Debug.Log("Click OK button");
     }
 
@@ -353,9 +292,9 @@ public class UIController : MonoBehaviour {
     // The method to disaplay the message box
     private void MessageBox(string str)
     {
-        box.gameObject.SetActive(true);
+        messageBox.gameObject.SetActive(true);
         // Bring the components to front
-        box.gameObject.transform.SetAsLastSibling();
-        boxConent.text = str;
+        messageBox.gameObject.transform.SetAsLastSibling();
+        messageBoxConent.text = str;
     }
 }

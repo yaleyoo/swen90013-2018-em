@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657826, g: 0.49641263, b: 0.57481676, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657844, g: 0.49641222, b: 0.57481694, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -189,8 +189,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_MethodName: 
+      - m_Target: {fileID: 1966181418}
+        m_MethodName: UnlimitedButtonClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -626,7 +626,7 @@ GameObject:
   - component: {fileID: 129391948}
   - component: {fileID: 129391949}
   m_Layer: 5
-  m_Name: Toggle
+  m_Name: VisualizeToggle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1186,7 +1186,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1966181418}
         m_MethodName: ClickQuit
         m_Mode: 1
         m_Arguments:
@@ -1725,7 +1725,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 648908702}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1966181418}
+        m_MethodName: ConfirmButtonClick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &648908702
@@ -2349,7 +2360,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 916852740}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1966181418}
+        m_MethodName: ResetButtonClick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &916852740
@@ -2958,7 +2980,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1230414028
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3183,7 +3205,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0.2922361}
   m_AnchorMax: {x: 1, y: 0.7385355}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: -353, y: -42.018925}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1298445752
 MonoBehaviour:
@@ -3386,7 +3408,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1399176810}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1966181418}
+        m_MethodName: OKButtonClick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &1399176810
@@ -3946,7 +3979,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1966181418}
         m_MethodName: ClickStart
         m_Mode: 1
         m_Arguments:
@@ -4294,8 +4327,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32338c108363f5447b9b69d1a7bb8cbf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  toggle: {fileID: 129391949}
-  leafNumField: {fileID: 0}
+  visualizeToggle: {fileID: 129391949}
+  inputRatio: {fileID: 473987216}
+  showText: {fileID: 1806871869}
+  leafNumField: {fileID: 467062092}
+  messageBox: {fileID: 1230414029}
+  messageBoxConent: {fileID: 1298445753}
 --- !u!4 &1966181419
 Transform:
   m_ObjectHideFlags: 0

@@ -1,6 +1,4 @@
-﻿/** Created by Chao Li 
- * Script for leaf object
-﻿/** Created by Chao Li 
+﻿﻿/** Created by Chao Li 
  * Script for leaf object
 **/
 

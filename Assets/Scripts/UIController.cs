@@ -72,6 +72,7 @@ public class UIController : MonoBehaviour {
         // To pass the dictionary leavesAndRatios to the LeafGenerator
         // Get the LeafShap based on the leaf name
         GetLeafShape(typeWithRatio);
+        SimSettings.SetLeafSizesAndRatios(leavesAndRatios);
 
         // Actions to submit the number of leaves
         // Check if input leaf limit is valid
@@ -129,20 +130,20 @@ public class UIController : MonoBehaviour {
         }
     }
 
-    // Load Main scene
+    // Load the simulation
     private void ChangeScene()
     {
         // If visualization toggle is choosen
         if (toggle.isOn)
         {
             SimSettings.SetVisualize(true);
-            SceneManager.LoadScene("Main");
+            SceneManager.LoadScene("Simulation");
         }
         // If visualization toggle is not choosen
         else
         {
             SimSettings.SetVisualize(false);
-            SceneManager.LoadScene("Main");
+            SceneManager.LoadScene("Simulation");
 
         }
     }

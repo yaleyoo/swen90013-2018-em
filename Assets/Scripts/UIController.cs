@@ -13,7 +13,7 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
-public class Menu : MonoBehaviour {
+public class UIController : MonoBehaviour {
 
     public Toggle toggle;
 
@@ -72,6 +72,7 @@ public class Menu : MonoBehaviour {
         // To pass the dictionary leavesAndRatios to the LeafGenerator
         // Get the LeafShap based on the leaf name
         GetLeafShape(typeWithRatio);
+        SimSettings.SetLeafSizesAndRatios(leavesAndRatios);
 
         // Actions to submit the number of leaves
         // Check if input leaf limit is valid
@@ -81,7 +82,7 @@ public class Menu : MonoBehaviour {
             if (leafNum >= 0 && total_ratio == 100)
             {
                 Debug.Log("You selected " + leafNum + " leafs.");
-                LeafLimit.SetLeafNumberLimit(leafNum);
+                SimSettings.SetLeafLimit(leafNum);
 
                 ChangeScene();
             }
@@ -129,20 +130,20 @@ public class Menu : MonoBehaviour {
         }
     }
 
-    // Load Main scene
+    // Load the simulation
     private void ChangeScene()
     {
         // If visualization toggle is choosen
         if (toggle.isOn)
         {
-            MenuSettings.SetIsVisualize(true);
-            SceneManager.LoadScene("Main");
+            SimSettings.SetVisualize(true);
+            SceneManager.LoadScene("Simulation");
         }
         // If visualization toggle is not choosen
         else
         {
-            MenuSettings.SetIsVisualize(false);
-            SceneManager.LoadScene("Main");
+            SimSettings.SetVisualize(false);
+            SceneManager.LoadScene("Simulation");
 
         }
     }
@@ -296,7 +297,7 @@ public class Menu : MonoBehaviour {
     private void UnlimitedButtonClick()
     {
         flag_unlimited = true;
-        LeafLimit.RemoveLeafNumberLimit();
+        SimSettings.RemoveLeafLimit();
         Debug.Log("Leaf limit set to unlimited.");
         leafNumField.text = "Set as Unlimited";
     }

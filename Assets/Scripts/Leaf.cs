@@ -33,7 +33,7 @@ public abstract class Leaf : MonoBehaviour {
         }
 
         // If the leaf has fallen below the ground delete itself
-        if (this.GetPosition().y < 0) {
+        if (this.GetPosition().y < -10) {
             Destroy(this.gameObject);
         }
     }

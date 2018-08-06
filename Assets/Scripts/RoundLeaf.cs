@@ -12,7 +12,7 @@ public class RoundLeaf : Leaf {
     public override float GetVolume()
     {
         Vector3 scale = this.transform.localScale;
-        return Mathf.PI * (scale.x / 2f) * (scale.y / 2f) * scale.z;
+        return Mathf.PI * (scale.x / 2f) * (scale.z / 2f) * scale.y;
     }
 
     public override void SetSize(float thickness, float width, float length)

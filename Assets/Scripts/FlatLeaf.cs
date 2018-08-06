@@ -7,8 +7,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FlatLeaf : Leaf
-{
+public class FlatLeaf : Leaf {
+	
     public override float GetVolume()
     {
         Vector3 scale = this.transform.localScale;

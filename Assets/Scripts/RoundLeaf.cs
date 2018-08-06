@@ -19,6 +19,6 @@ public class RoundLeaf : Leaf {
     {
         this.transform.localScale = new Vector3(width, thickness, length);
 
-        this.GetComponent<Rigidbody>().mass = Mathf.PI * width * thickness * length * 1000;
+        this.GetComponent<Rigidbody>().mass = Mathf.PI * (width / 2f) * (thickness / 2f) * length * 1000;
     }
 }

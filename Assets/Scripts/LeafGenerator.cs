@@ -16,6 +16,12 @@ public class LeafGenerator : MonoBehaviour {
     // Sum of leaf ratios use when generating leaves
     private int totalRatioWeights;
     
+	// Preset of Colors for differentiating leaves in various types
+	List<Color> preColors = new List<Color>{Color.green, Color.red, Color.cyan, Color.yellow, 
+		Color.magenta, Color.blue,Color.gray, Color.white, Color.black };
+
+	// Dictionary of all kinds of leaf names and their corresponding colors
+	private Dictionary<string, Color> nameAndColors = new Dictionary<string, Color>();
     
     // Use this for initialization
     void Start () {
@@ -87,12 +93,15 @@ public class LeafGenerator : MonoBehaviour {
             leaf = Resources.Load("FlatLeaf") as GameObject;
         }
 
-        // Set the leaf object to have the calculated leaf size
-        leaf.GetComponent<Leaf>().SetSize(leafSize.x, leafSize.y, leafSize.z);
+		// Set the leaf object to have the calculated leaf size
+		leaf.GetComponent<Leaf>().SetSize(leafSize.x, leafSize.y, leafSize.z);
 
         // Place the leaf object randomly within a circle defined by the dropping area
         Vector2 random2DPoint = Random.insideUnitCircle;
         GameObject leafCopy = Instantiate(leaf, new Vector3(random2DPoint.x * (SimSettings.GetDropAreaX()/2), SimSettings.GetDropHeight(), random2DPoint.y * (SimSettings.GetDropAreaY()/2)), Quaternion.identity);
+
+		// Set colors for different types of leaves
+		setColor (nextLeafShape, leafCopy);
 
         // Rotate the leaf object randomly after it's spawn
         leafCopy.GetComponent<Leaf>().SetRotation(Random.Range(0f, 360f), Random.Range(0f, 360f), Random.Range(0f, 360f));
@@ -159,4 +168,52 @@ public class LeafGenerator : MonoBehaviour {
         }
         this.totalRatioWeights = sum;
     }
+
+	// Set colors according to types of leaves
+	private void setColor(LeafShape shape, GameObject leaf){
+		
+		string nameOfLeaf = shape.Name;
+
+		// If the leaf is already be paired with a color, then use its paired color
+		if (!nameAndColors.ContainsKey (nameOfLeaf)) {
+
+			// If preset colors are not exhausted
+			if (preColors.Count != 0) {
+				
+				// Pair the leaf name and a new preset color into dictionary
+				nameAndColors.Add (nameOfLeaf, preColors [0]);
+
+				// Change the color of this leaf
+				leaf.GetComponent<MeshRenderer> ().material.color = preColors [0];
+
+				// Remove the used color from the preset colors array
+				preColors.Remove (preColors [0]);
+			} 
+			else {
+				while (true) {
+					
+					// Random a new color 
+					float r = Random.Range (0f, 1f);
+					float g = Random.Range (0f, 1f);
+					float b = Random.Range (0f, 1f);
+					Color randomColor = new Color(r, g, b);
+
+					// If the random color is not used, change the color then break the loop
+					if (!nameAndColors.ContainsValue (randomColor)) {
+						
+						// Pair the leaf name and the new random color
+						nameAndColors.Add (nameOfLeaf, randomColor);
+
+						// Change the color of this leaf
+						leaf.GetComponent<MeshRenderer> ().material.color = randomColor;
+						break;
+					}
+				}
+			}
+		}
+		else
+			// colorate the leaf by its corresponding color in dictionary
+			leaf.GetComponent<MeshRenderer> ().material.color = nameAndColors [nameOfLeaf];
+
+	}
 }

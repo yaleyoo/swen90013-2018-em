@@ -93,15 +93,15 @@ public class LeafGenerator : MonoBehaviour {
             leaf = Resources.Load("FlatLeaf") as GameObject;
         }
 
+		// Set the leaf object to have the calculated leaf size
+		leaf.GetComponent<Leaf>().SetSize(leafSize.x, leafSize.y, leafSize.z);
+
         // Place the leaf object randomly within a circle defined by the dropping area
         Vector2 random2DPoint = Random.insideUnitCircle;
         GameObject leafCopy = Instantiate(leaf, new Vector3(random2DPoint.x * (SimSettings.GetDropAreaX()/2), SimSettings.GetDropHeight(), random2DPoint.y * (SimSettings.GetDropAreaY()/2)), Quaternion.identity);
 
 		// Set colors for different types of leaves
 		setColor (nextLeafShape, leafCopy);
-
-		// Set the leaf object to have the calculated leaf size
-		leaf.GetComponent<Leaf>().SetSize(leafSize.x, leafSize.y, leafSize.z);
 
         // Rotate the leaf object randomly after it's spawn
         leafCopy.GetComponent<Leaf>().SetRotation(Random.Range(0f, 360f), Random.Range(0f, 360f), Random.Range(0f, 360f));
@@ -186,6 +186,7 @@ public class LeafGenerator : MonoBehaviour {
 				// Change the color of this leaf
 				leaf.GetComponent<MeshRenderer> ().material.color = preColors [0];
 
+				// Remove the used color from the preset colors array
 				preColors.Remove (preColors [0]);
 			} 
 			else {
@@ -202,6 +203,8 @@ public class LeafGenerator : MonoBehaviour {
 						
 						// Pair the leaf name and the new random color
 						nameAndColors.Add (nameOfLeaf, randomColor);
+
+						// Change the color of this leaf
 						leaf.GetComponent<MeshRenderer> ().material.color = randomColor;
 						break;
 					}

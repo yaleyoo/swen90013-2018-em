@@ -239,10 +239,23 @@ public class LeafGenerator : MonoBehaviour {
     {
         return this.listOfLeaves;
     }
+		
+	// Return the height of leaves will fall
+	public float getHeight()
+	{
+		return this.height;
+	}
+
+	// Return the number of all leaves
+	public int getNumberOfLeaf()
+	{
+		return this.leafNumberLimit;
+	}
 
     // Click the button and load the menu scene
     public void ChangeLeafSettings() 
     {
         SceneManager.LoadScene("menu");
     }
+
 }

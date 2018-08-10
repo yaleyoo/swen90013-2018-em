@@ -186,6 +186,14 @@ public class UIController : MonoBehaviour {
             {
                 string typeString = leafDropdown.captionText.text;
 
+                if (typeWithRatio.ContainsKey(typeString))
+                {
+                    message = "The leaf has already been added.";
+                    Debug.Log(message);                    
+                    DisplayMessage(message);
+                    return;
+                }
+
                 typeWithRatio.Add(typeString, ratioInt);
 
 				// Add a leafButton

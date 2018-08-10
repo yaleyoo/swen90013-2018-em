@@ -56,7 +56,11 @@ public class UIController : MonoBehaviour {
     // Component for ListView
     public GameObject leafButton;
     public Transform listContent;
-    
+    private LeafButton leafButtonClicked;
+   
+
+    public Text OkButtonText;
+    public Button DeleteButton;
 
 
     // Invoke when Start button clicked
@@ -206,7 +210,8 @@ public class UIController : MonoBehaviour {
                 button.onClick.AddListener(
                         delegate ()
                         {
-                            LeafButtonClick(newButton, typeString, ratioInt);
+                            leafButtonClicked = button;
+                            LeafButtonClick();
                         }
 
                     );
@@ -228,14 +233,12 @@ public class UIController : MonoBehaviour {
         
     }
 
-    private void LeafButtonClick(GameObject button, String typeString, int ratioInt)
+    private void LeafButtonClick()
     {
-        if(EditorUtility.DisplayDialog("Delete warning", "Are you sure to delete?", "Yes", "No"))
-        {
-            Destroy(button);
-            typeWithRatio.Remove(typeString);
-            totalRatio = totalRatio - ratioInt;
-        }               
+        message = "Are you sure to delete?";
+        OkButtonText.text = "Cancel";
+        DeleteButton.gameObject.SetActive(true);
+        DisplayMessage(message);
     }
 
     /*
@@ -297,6 +300,17 @@ public class UIController : MonoBehaviour {
     {
         messageBox.gameObject.SetActive(false);
         Debug.Log("Click OK button");
+    }
+
+    public void DeleteOnClick()
+    {        
+        OkButtonText.text = "OK";
+        DeleteButton.gameObject.SetActive(false);
+        messageBox.gameObject.SetActive(false);
+        Destroy(leafButtonClicked.gameObject);
+        typeWithRatio.Remove(leafButtonClicked.leafName.text);
+        totalRatio = totalRatio - Int32.Parse(leafButtonClicked.leafRatio.text.Remove(leafButtonClicked.leafRatio.text.Length - 1, 1));
+        Debug.Log("Delete Cancel button");
     }
 
     // Get the the selected LeafShape according to the name and saved as an dictionary

@@ -9,25 +9,23 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class VolRatioCalculator : MonoBehaviour {
+public class DensityCalculator : MonoBehaviour {
 
 	// The result that we need
 	public static float volumeRatio;
 
-	// Number of generated leaf, the default value is 1000
-	public int numOfLeaf = 1000;
-
 	// List of leaf objects 
-	protected List<GameObject> listOfLeaves;
+	protected GameObject[] listOfLeaves;
 
-	// Used for delay update() 
-	private int tick = 0;
+	// Number of all leaves
+	private int numOfLeaf;
 
-	// Sum of all ticks
-	private int countTick = 0;
+	// Falling height
+	private float fallHeight;
 
-	// Tick interval for checking whether all leaves are stopped  
-	private int checkInterval = 50;
+	// The time that calculation should wait for,
+	// it based on falling height and number of leaves
+	private float waitTime;
 
 	// Label for showing whether volume ratio has been calculated
 	private bool isCalculated = false;
@@ -41,69 +39,55 @@ public class VolRatioCalculator : MonoBehaviour {
 	void Update () {
 
 		// Check if volume ratio has been calculated
+		// the density will only be calculated once
 		if (isCalculated == false) {
-			
-			// Initialise the value of leaf list
-			this.listOfLeaves = GameObject.Find ("Ground").
-				GetComponent<LeafGenerator> ().GetListOfLeaves ();
 
-			// Check whether all leaves are stopped every checkInterval
-			if (tick == checkInterval) {
+			this.isCalculated = true;
 
-				// Check if all leaves have been stopped, if they are,
-				// calculate the volume ratio; if they are not, keep updating
-				// unless it ticks more than 1500 times
-				if (CheckIfStopped (listOfLeaves) || countTick >= 1500) {
+			// Get the falling height and the number of all leaves
+			this.fallHeight = SimSettings.GetDropHeight();
+            this.numOfLeaf = GameObject.FindGameObjectsWithTag("Leaf").Length;
 
-					// Calculate the volume ratio now
-					volumeRatio = 
-						this.CalcVolRatio (CalcSumOfLeafVolume (listOfLeaves),
-						CalcBulkVolume (listOfLeaves));
+			// Calculate the wait time
+			this.waitTime = CalcWaitTime (fallHeight, numOfLeaf);
 
-					// Set the isCalculated label as true
-					isCalculated = true;
-
-					// Log volume ratio as static value
-					MenuSettings.SetVolumeRatio(volumeRatio);
-				}
-				tick = 0;
-				countTick++;
-
-				// Test output
-				Debug.Log (volumeRatio);
-			} else {
-				tick++;	
-				countTick++;
-			}
-		} 
-		else {
-			// Show the result
-			SceneManager.LoadScene("Result");
+			// Delay the calculation
+			StartCoroutine (ExecCalcAfterSometime (waitTime));
 		}
 	}
 		
 	/// <summary>
-	/// Checks if all leaves have been stopped
+	/// Calculates the wait time.
 	/// </summary>
-	/// <param name="listOfLeaves"> GameObject type list of all leaves </param>
-	/// <returns> are all leaves stopped </returns>
-	public bool CheckIfStopped(List<GameObject> listOfLeaves){
+	/// <returns>The wait time.</returns>
+	/// <param name="height">Falling Height.</param>
+	/// <param name="numOfLeaf">Number of all leaves.</param>
+	public float CalcWaitTime(float height, int numOfLeaf){
 
-		foreach (var leaf in listOfLeaves) {
-			
-			// To avoid leaf being destroyed
-			if (leaf) {
-				// If there is a leaf which is still moving, return false
-				if (leaf.GetComponent<Rigidbody> ().isKinematic == false)
-					return false;
+		// Time of all leaves are generated = (number of leaves) * 0.01
+		// Time of leaves falling down = sqrt(1/2 * height * g)
+		// Give extra 5s to ensure that almost all leaves stop moving
+		return (Mathf.Sqrt (height / 4.9f) + numOfLeaf * 0.01f) + 5f;
+	}
 
-				// If the last leaf is stopped, return true
-				else if (listOfLeaves.IndexOf (leaf) + 1 == listOfLeaves.Count)
-					return true;
-			}
-		}
-		// Default return true if there is destroyed leaf at last
-		return true;
+	/// <summary>
+	/// Execute the calculation after the wait time.
+	/// </summary>
+	/// <param name="waitTime">Wait time.</param>
+	public IEnumerator ExecCalcAfterSometime(float waitTime){
+
+		yield return new WaitForSeconds (waitTime);
+
+		// Get the list of leaves from leaf generator script
+		this.listOfLeaves = GameObject.FindGameObjectsWithTag("Leaf");
+
+		// Calculate the volume ratio
+		volumeRatio = 
+			this.CalcVolRatio (CalcSumOfLeafVolume (listOfLeaves),
+				CalcBulkVolume (listOfLeaves));
+
+		// Only for test output
+		Debug.Log (volumeRatio);
 	}
 
 	/// <summary>
@@ -111,7 +95,7 @@ public class VolRatioCalculator : MonoBehaviour {
 	/// </summary>
 	/// <param name="listOfLeaves"> GameObject type list of all leaves </param>
 	/// <returns> sum of all leaves volume </returns>
-	public float CalcSumOfLeafVolume(List<GameObject> listOfLeaves){
+	public float CalcSumOfLeafVolume(GameObject[] listOfLeaves){
 
 		// Initialise the sum of leaf volume
 		float sumOfVolume = 0f;
@@ -136,7 +120,7 @@ public class VolRatioCalculator : MonoBehaviour {
 	/// </summary>
 	/// <param name="listOfLeaves"> GameObject type list of all leaves </param>
 	/// <returns> bulk volume </returns>
-	public float CalcBulkVolume(List<GameObject> listOfLeaves){
+	public float CalcBulkVolume(GameObject[] listOfLeaves){
 
 		// Initialise the sum of leaf height
 		float sumOfHeight = 0f;
@@ -155,10 +139,10 @@ public class VolRatioCalculator : MonoBehaviour {
 				sumOfHeight = sumOfHeight + positionOfLeaf.y;
 			}
 		}
-		if (listOfLeaves.Count == 0)
+		if (listOfLeaves.Length == 0)
 			return 0;
 		// Calculate the average height of all leaves
-		float averHeight = sumOfHeight / listOfLeaves.Count;
+		float averHeight = sumOfHeight / listOfLeaves.Length;
 
 		// Calculate the surface area of ground
 		Vector3 scaleOfGround = GameObject.Find("Ground").transform.localScale;

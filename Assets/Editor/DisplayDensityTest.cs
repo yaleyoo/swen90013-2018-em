@@ -8,8 +8,8 @@ public class DisplayDensityTest {
 
 	[Test]
 	public void DisplayDensityTestSimplePasses() {
-        float resultCalculated = VolRatioCalculator.GetVolumeRatio();
-        float resultDisplayed = MenuSettings.GetVolumeRatio();
+        float resultCalculated = DensityCalculator.GetVolumeRatio();
+        float resultDisplayed = Results.GetDensity();
         Assert.AreEqual(resultCalculated, resultDisplayed);
     }
 

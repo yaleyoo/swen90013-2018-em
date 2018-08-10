@@ -9,13 +9,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class VolRatioCalculator : MonoBehaviour {
+public class DensityCalculator : MonoBehaviour {
 
 	// The result that we need
 	public static float volumeRatio;
 
 	// List of leaf objects 
-	protected List<GameObject> listOfLeaves;
+	protected GameObject[] listOfLeaves;
 
 	// Number of all leaves
 	private int numOfLeaf;
@@ -45,10 +45,8 @@ public class VolRatioCalculator : MonoBehaviour {
 			this.isCalculated = true;
 
 			// Get the falling height and the number of all leaves
-			this.fallHeight = GameObject.Find ("Ground").
-				GetComponent<LeafGenerator> ().getHeight();
-			this.numOfLeaf = GameObject.Find ("Ground").
-				GetComponent<LeafGenerator> ().getNumberOfLeaf();
+			this.fallHeight = SimSettings.GetDropHeight();
+            this.numOfLeaf = GameObject.FindGameObjectsWithTag("Leaf").Length;
 
 			// Calculate the wait time
 			this.waitTime = CalcWaitTime (fallHeight, numOfLeaf);
@@ -81,8 +79,7 @@ public class VolRatioCalculator : MonoBehaviour {
 		yield return new WaitForSeconds (waitTime);
 
 		// Get the list of leaves from leaf generator script
-		this.listOfLeaves = GameObject.Find ("Ground").
-			GetComponent<LeafGenerator> ().GetListOfLeaves();
+		this.listOfLeaves = GameObject.FindGameObjectsWithTag("Leaf");
 
 		// Calculate the volume ratio
 		volumeRatio = 
@@ -98,7 +95,7 @@ public class VolRatioCalculator : MonoBehaviour {
 	/// </summary>
 	/// <param name="listOfLeaves"> GameObject type list of all leaves </param>
 	/// <returns> sum of all leaves volume </returns>
-	public float CalcSumOfLeafVolume(List<GameObject> listOfLeaves){
+	public float CalcSumOfLeafVolume(GameObject[] listOfLeaves){
 
 		// Initialise the sum of leaf volume
 		float sumOfVolume = 0f;
@@ -123,7 +120,7 @@ public class VolRatioCalculator : MonoBehaviour {
 	/// </summary>
 	/// <param name="listOfLeaves"> GameObject type list of all leaves </param>
 	/// <returns> bulk volume </returns>
-	public float CalcBulkVolume(List<GameObject> listOfLeaves){
+	public float CalcBulkVolume(GameObject[] listOfLeaves){
 
 		// Initialise the sum of leaf height
 		float sumOfHeight = 0f;
@@ -142,10 +139,10 @@ public class VolRatioCalculator : MonoBehaviour {
 				sumOfHeight = sumOfHeight + positionOfLeaf.y;
 			}
 		}
-		if (listOfLeaves.Count == 0)
+		if (listOfLeaves.Length == 0)
 			return 0;
 		// Calculate the average height of all leaves
-		float averHeight = sumOfHeight / listOfLeaves.Count;
+		float averHeight = sumOfHeight / listOfLeaves.Length;
 
 		// Calculate the surface area of ground
 		Vector3 scaleOfGround = GameObject.Find("Ground").transform.localScale;

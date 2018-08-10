@@ -13,7 +13,6 @@ public class LeafDestroyTest {
 
     [UnityTest]
     public IEnumerator LeafDestroy() {
-        var plane = GameObject.Instantiate(Resources.Load("Plane"), new Vector3(0, -6, 0), new Quaternion());
         var leaf = GameObject.Instantiate(Resources.Load("Leaf"), new Vector3(30, 30, 120), new Quaternion());
 
         yield return new WaitForSecondsRealtime(5);

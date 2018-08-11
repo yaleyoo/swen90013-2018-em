@@ -59,8 +59,8 @@ public class UIController : MonoBehaviour {
     private LeafButton leafButtonClicked;
    
 
-    public Text OkButtonText;
-    public Button DeleteButton;
+    public Text okButtonText;
+    public Button deleteButton;
 
 
     // Invoke when Start button clicked
@@ -236,8 +236,8 @@ public class UIController : MonoBehaviour {
     private void LeafButtonClick()
     {
         message = "Are you sure to delete?";
-        OkButtonText.text = "Cancel";
-        DeleteButton.gameObject.SetActive(true);
+        okButtonText.text = "Cancel";
+        deleteButton.gameObject.SetActive(true);
         DisplayMessage(message);
     }
 
@@ -304,8 +304,8 @@ public class UIController : MonoBehaviour {
 
     public void DeleteOnClick()
     {        
-        OkButtonText.text = "OK";
-        DeleteButton.gameObject.SetActive(false);
+        okButtonText.text = "OK";
+        deleteButton.gameObject.SetActive(false);
         messageBox.gameObject.SetActive(false);
         Destroy(leafButtonClicked.gameObject);
         typeWithRatio.Remove(leafButtonClicked.leafName.text);

@@ -1,7 +1,8 @@
 ﻿/* 
  * Created by Jing Bi
- * Script of calculating the volume ratio of 
- * sum of leaf volume to ground volume
+ * Modified by Marko Ristic
+ * Script of calculating the density of leaf litter
+ * as the volume ratio of leaves to air
  */
 
 using System.Collections;
@@ -10,167 +11,179 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class DensityCalculator : MonoBehaviour {
+    // Variables for periodic end checking. Saves computational time by not checking continuously. All values are in seconds.
+    private bool isWaiting = false;
+    private float timeWaited = 0;
+    private float timeBetweenChecks = 3;
 
-	// The result that we need
-	public static float volumeRatio;
+    // Variables for waiting the time it takes for a leaf to drop, after having deduced that the simulation has ended
+    private bool readyToCalculateDensity = false;
+    //TODO make gravity be adjusted for the units of height, as this may not be in meters
+    private float timeToFall = (float) System.Math.Sqrt(SimSettings.GetDropHeight() / Physics.gravity.magnitude);
 
-	// List of leaf objects 
-	protected GameObject[] listOfLeaves;
+    // Run once at start of scene
+    void Start()
+    {
 
-	// Number of all leaves
-	private int numOfLeaf;
+    }
 
-	// Falling height
-	private float fallHeight;
+    // Run once per frame
+    void Update()
+    {
+        //========================// Waiting //========================//
 
-	// The time that calculation should wait for,
-	// it based on falling height and number of leaves
-	private float waitTime;
+        // Wait either between checks to see if simulation ended, or after ending wait the time it takes for a leaf to fall from the drop height
+        if (isWaiting)
+        {
+            timeWaited += Time.deltaTime;
+            // If waited long enough, stop waiting, and perform the check on next Update call
+            if (!readyToCalculateDensity && timeWaited >= timeBetweenChecks)
+            {
+                isWaiting = false;
+                timeWaited = 0;
+            }
+            // If ready to calculate, wait the time it takes for a leaf to drop before doing so
+            else if (readyToCalculateDensity && timeWaited >= timeToFall)
+            {
+                // When waited long enough, calculate the density and change scene to the Output scene
+                CalculateDensity();
+                ChangeToOutputScene();
+            }
+        }
 
-	// Label for showing whether volume ratio has been calculated
-	private bool isCalculated = false;
+        //========================// Checking if simulation is done //========================//
+        else
+        {
+            // Simulation ends depending on whether or not there is a leaf limit set
+            if (SimSettings.GetUseLeafLimit())
+            {
+                // If there is a leaf limit, generation will have stopped automatically
+                if (SimSettings.GetNumLeavesDropped() >= SimSettings.GetLeafLimit())
+                {
+                    // Ready to compute density flag, marks that density will be computed after the time it takes for a leaf to fall from it's dropped height
+                    readyToCalculateDensity = true;
+                }
+            }
+            else
+            {
+                // If no limit set, end the simulation manually when the leaves dropped exceed a volume threshold
+                float leafVolumeSum = 0;
+                foreach (GameObject leaf in GameObject.FindGameObjectsWithTag("Leaf"))
+                {
+                    leafVolumeSum += leaf.GetComponent<Leaf>().GetVolume();
+                }
+                // If computed volume sum exceeds the threshold, then ready to computed density
+                if (leafVolumeSum >= SimSettings.GetLeafVolumeLimit())
+                {
+                    GetComponent<LeafGenerator>().EndSim();
+                    // Ready to compute density flag, marks that density will be computed after the time it takes for a leaf to fall from it's dropped height
+                    readyToCalculateDensity = true;
+                }
+            }
 
-	// Start this script
-	void Start () {
-		
-	}
+            // After checking if simulation complete, wait the set timeout before checking again
+            isWaiting = true;
+        }
+    }
 
-	// Update once per frame
-	void Update () {
+    // Calculates the density of leaf litter as a volume ratio
+    private void CalculateDensity()
+    {
+        // To get the cylinder in which to calculate the volume ratio, use the lowest point of the highest leaf as the height of the cylinder
+        GameObject[] leaves = GameObject.FindGameObjectsWithTag("Leaf");
+        GameObject highestLeaf = GetHighestObject(leaves);
+        float cylinderHeight = GetHeightOfLowestPointOfObject(highestLeaf);
 
-		// Check if volume ratio has been calculated
-		// the density will only be calculated once
-		if (isCalculated == false) {
+        //========================// Calculating density //========================//
 
-			this.isCalculated = true;
+        // To calculate the volume ratio, the intersection of the cylinder and all dropped leaves is calculated
+        // Use the Monte Carlo method for computing the 3D integration problem of object intersection
+        int numPointsInAir = 0;
+        int numPointsInLeaves = 0;
 
-			// Get the falling height and the number of all leaves
-			this.fallHeight = SimSettings.GetDropHeight();
-            this.numOfLeaf = GameObject.FindGameObjectsWithTag("Leaf").Length;
+        // The number of iterations is a trade off between accuracy and time taken to compute, the constant is set in the simulation settings
+        for (int i=0; i<SimSettings.GetMonteCarloNumIterations(); i++)
+        {
+            // Each random point inside the cylinder is either also inside some leaf, or not
+            Vector3 pointInCylinder = RandomPointInCylinder(cylinderHeight);
 
-			// Calculate the wait time
-			this.waitTime = CalcWaitTime (fallHeight, numOfLeaf);
+            // Update the counters appropriately
+            if (IsPointInObjects(pointInCylinder, leaves))
+            {
+                numPointsInLeaves++;
+            }
+            else
+            {
+                numPointsInAir++;
+            }
+        }
 
-			// Delay the calculation
-			StartCoroutine (ExecCalcAfterSometime (waitTime));
-		}
-	}
-		
-	/// <summary>
-	/// Calculates the wait time.
-	/// </summary>
-	/// <returns>The wait time.</returns>
-	/// <param name="height">Falling Height.</param>
-	/// <param name="numOfLeaf">Number of all leaves.</param>
-	public float CalcWaitTime(float height, int numOfLeaf){
+        // The density is the ratio between the two counters, this is saved to the results static class for displaying and saving in the output scene
+        Results.SetDensity(numPointsInLeaves / numPointsInAir);
+    }
 
-		// Time of all leaves are generated = (number of leaves) * 0.01
-		// Time of leaves falling down = sqrt(1/2 * height * g)
-		// Give extra 5s to ensure that almost all leaves stop moving
-		return (Mathf.Sqrt (height / 4.9f) + numOfLeaf * 0.01f) + 5f;
-	}
+    // Finds the highest object from a list
+    private GameObject GetHighestObject(GameObject[] objs)
+    {
+        GameObject highestObj = null;
+        // Check every object against saved, and replace it if new object is higher than it
+        foreach(GameObject obj in objs)
+        {
+            // On first object, choose it as the saved on regardless
+            if (highestObj == null)
+            {
+                highestObj = obj;
+            }
+            else if (obj.GetComponent<Leaf>().GetPosition().y >= highestObj.GetComponent<Leaf>().GetPosition().y)
+            {
+                highestObj = obj;
+            }
+        }
+        // Return the object that was the highest
+        return highestObj;
+    }
 
-	/// <summary>
-	/// Execute the calculation after the wait time.
-	/// </summary>
-	/// <param name="waitTime">Wait time.</param>
-	public IEnumerator ExecCalcAfterSometime(float waitTime){
+    // Finds the y-value of the lowest point in an object
+    private float GetHeightOfLowestPointOfObject(GameObject obj)
+    {
+        // All object points are found using the Mesh component
+        float lowestPoint = SimSettings.GetDropHeight();
+        Vector3[] pointsInObj = obj.GetComponent<Mesh>().vertices;
 
-		yield return new WaitForSeconds (waitTime);
+        // Check every point's y value against saved y value and replace it if new one's is lower
+        foreach (Vector3 point in pointsInObj)
+        {
+            if (point.y < lowestPoint)
+            {
+                lowestPoint = point.y;
+            }
+        }
 
-		// Get the list of leaves from leaf generator script
-		this.listOfLeaves = GameObject.FindGameObjectsWithTag("Leaf");
+        // Return the lowest y value that was found
+        return lowestPoint;
+    }
 
-		// Calculate the volume ratio
-		volumeRatio = 
-			this.CalcVolRatio (CalcSumOfLeafVolume (listOfLeaves),
-				CalcBulkVolume (listOfLeaves));
+    // Generates a random point inside an eliptic cylinder of passed height, and
+    private Vector3 RandomPointInCylinder(float cylinderHeight)
+    {
+        Vector2 UnitCirclePoint = Random.insideUnitCircle;
+        float height = Random.Range(0, cylinderHeight);
 
-		// Only for test output
-		Debug.Log (volumeRatio);
-	}
+        // unit circle point values are multiplied by the area dimensions that are where the density is calculated
+        return new Vector3(UnitCirclePoint.x * ((SimSettings.GetDropAreaX()/2) - SimSettings.GetDensityIgnoreBorder()), 
+                            UnitCirclePoint.y * ((SimSettings.GetDropAreaY()/2) - SimSettings.GetDensityIgnoreBorder()), 
+                            height);
+    }
 
-	/// <summary>
-	/// Calculate the sum of leaf volume 
-	/// </summary>
-	/// <param name="listOfLeaves"> GameObject type list of all leaves </param>
-	/// <returns> sum of all leaves volume </returns>
-	public float CalcSumOfLeafVolume(GameObject[] listOfLeaves){
+    // Checks whether or not a given point is inside any object in the given object array
+    private bool IsPointInObjects(Vector3 point, GameObject[] objects)
+    {
+        return false;
+    }
 
-		// Initialise the sum of leaf volume
-		float sumOfVolume = 0f;
-
-		// sizeOfLeaf is a temporary variable to store current leaf size
-		Vector3 sizeOfLeaf = new Vector3();
-		foreach (var leaf in this.listOfLeaves) {
-			
-			// To avoid leaf being destroyed
-			if (leaf) {
-				// For each leaf, get its length, width and thickness 
-				sizeOfLeaf = leaf.GetComponent<Leaf> ().GetSize ();
-				sumOfVolume += sizeOfLeaf.x * sizeOfLeaf.y * sizeOfLeaf.z;
-			} 
-		}
-		return sumOfVolume;
-	}
-
-	/// <summary> Considering the area as a cylinder, approximately calculate 
-	/// the volume by Volume = h(average height of Leaves) * 
-	/// S (surface area of ground), S(for square) = length * width 
-	/// </summary>
-	/// <param name="listOfLeaves"> GameObject type list of all leaves </param>
-	/// <returns> bulk volume </returns>
-	public float CalcBulkVolume(GameObject[] listOfLeaves){
-
-		// Initialise the sum of leaf height
-		float sumOfHeight = 0f;
-
-		// Set a temporary variable to store current leaf position
-		Vector3 positionOfLeaf = new Vector3 ();
-		foreach (var leaf in this.listOfLeaves){
-			
-			// To avoid leaf being destroyed
-			if (leaf) {
-				positionOfLeaf = 
-					leaf.GetComponent<Leaf> ().transform.position;
-
-				// Height of leaf can be calculated as
-				// height of leaf - height of ground(=0)
-				sumOfHeight = sumOfHeight + positionOfLeaf.y;
-			}
-		}
-		if (listOfLeaves.Length == 0)
-			return 0;
-		// Calculate the average height of all leaves
-		float averHeight = sumOfHeight / listOfLeaves.Length;
-
-		// Calculate the surface area of ground
-		Vector3 scaleOfGround = GameObject.Find("Ground").transform.localScale;
-		float surArea = scaleOfGround.x * scaleOfGround.z;
-
-		// Return the surface area of ground
-		return averHeight * surArea;
-	}
-
-	/// <summary> Calculate the volume ratio by 
-	/// (sum of leaf volume) / (bulk volume) 
-	/// </summary>
-	/// <param name="sumOfLeafVolume"> sum of all leaves volume </param>
-	/// <param name="bulkVolume"> bulk volume </param>
-	/// <returns> leaf volume ratio </returns>
-	public float CalcVolRatio(float sumOfLeafVolume, float bulkVolume){
-
-		if (bulkVolume == 0)
-			return 0;
-		float volumeRatio = sumOfLeafVolume/bulkVolume;
-		return volumeRatio;
-	}
-
-	/// <summary>
-	/// Get the current value of volume ratio
-	/// </summary>
-	public static float GetVolumeRatio(){
-		
-		return volumeRatio;
-	}
+    // Changes the Unity scene to the output scene, where results calculated here are displayed and saved
+    private void ChangeToOutputScene()
+    {
+        SceneManager.LoadScene("Output");
+    }
 }

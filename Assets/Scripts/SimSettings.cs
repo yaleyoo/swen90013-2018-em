@@ -16,10 +16,18 @@ public class SimSettings {
     private static float dropAreaX = 100;
     private static float dropAreaY = 100;
 
-    // Leaf Simulation settings
+    // Leaf simulation settings
     private static Dictionary<LeafShape, int> leafSizesAndRatios;
     private static bool useLeafLimit = true;
     private static int leafLimit = 1000;
+    private static float leafVolumeLimit = 1000;
+
+    // Dynamic simulation information
+    private static int numLeavesDropped = 0;
+
+    // Density calculation settings
+    private static float densityIgnoreBorder = 10;
+    private static int monteCarloNumIterations = 10000;
 
     // Get visualization flag
     public static bool GetVisualize()
@@ -56,6 +64,12 @@ public class SimSettings {
     public static void RemoveLeafLimit()
     {
         useLeafLimit = false;
+    }
+
+    // Get leaf volume limit
+    public static float GetLeafVolumeLimit()
+    {
+        return leafVolumeLimit;
     }
 
     // Get the drop height of the simulation
@@ -100,4 +114,30 @@ public class SimSettings {
     {
         SimSettings.leafSizesAndRatios = leafSizesAndRatios;
     }
+
+    // Get the number of leaves that have been dropped in the sumulation so far
+    public static int GetNumLeavesDropped()
+    {
+        return numLeavesDropped;
+    }
+
+    // Set the number of leaves dropped in the simulation so far
+    public static void SetNumLeavesDropped(int numLeavesDropped)
+    {
+        SimSettings.numLeavesDropped = numLeavesDropped;
+    }
+
+    // Get the distance from the edge of the dropping area to ignore when calculating density
+    // This avoid edge effects where the density may be different when leaves slope to the ground
+    public static float GetDensityIgnoreBorder()
+    {
+        return densityIgnoreBorder;
+    }
+
+    // Get the number of iterations to run the monte carlo method when calculating the leaf litter density (uses volume intersaction)
+    public static int GetMonteCarloNumIterations()
+    {
+        return monteCarloNumIterations;
+    }
+
 }

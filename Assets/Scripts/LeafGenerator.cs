@@ -10,9 +10,6 @@ using UnityEngine.SceneManagement;
 
 public class LeafGenerator : MonoBehaviour {
 
-    // List of all the leaves that have been generated
-    private List<GameObject> listOfLeaves;
-
     // Sum of leaf ratios use when generating leaves
     private int totalRatioWeights;
     
@@ -25,11 +22,6 @@ public class LeafGenerator : MonoBehaviour {
     
     // Use this for initialization
     void Start () {
-        // Initialize the list of leaves in the simulation
-        //TODO remove this and associated methods, should use the fact leaves are tagged 
-        //(since leaves with -y value will be destroyed corrupting this list)
-        this.listOfLeaves = new List<GameObject>();
-
         // Update the ratio weights sum, used for selecting the next leaf with right probability
         calcTotalRatioWeight();
 
@@ -42,13 +34,15 @@ public class LeafGenerator : MonoBehaviour {
 		
 	}
 
-
     // Begin the simulation, generating a new leaf every timeBetweenDrops seconds
     public void BeginSim(float timeBetweenDrops)
     {
-        // End an ongoing simulation if there is one, erase all leaves in scene
+        // End an ongoing simulation if there is one, and erase all leaves in scene
         EndSim();
-        RemoveAllLeaves();
+        foreach (GameObject leaf in GameObject.FindGameObjectsWithTag("Leaf"))
+        {
+            Destroy(leaf);
+        }
 
         // Start the generation of leaves
         InvokeRepeating("DropLeaf", 0f, timeBetweenDrops);
@@ -59,20 +53,6 @@ public class LeafGenerator : MonoBehaviour {
     public void EndSim()
     {
         CancelInvoke("DropLeaf");
-    }
-
-
-    // Remove all the currently added leaves in the simulation
-    public void RemoveAllLeaves()
-    {
-        // Destroys the game objects
-        foreach (var leaf in this.listOfLeaves)
-        {
-            Destroy(leaf);
-        }
-
-        // Empties the list of leaves
-        this.listOfLeaves.Clear();
     }
 
 
@@ -112,11 +92,11 @@ public class LeafGenerator : MonoBehaviour {
             leafCopy.GetComponent<Renderer>().enabled = false;
         }
 
-        // Add the new leaf to the list of existing leaves
-        this.listOfLeaves.Add(leafCopy);
+        // Increase the counter of leaves that have been created
+        SimSettings.SetNumLeavesDropped(SimSettings.GetNumLeavesDropped() + 1);
         
         // If terminating at leaf limit, and limit is reached, end the simulation
-        if (SimSettings.GetUseLeafLimit() && this.listOfLeaves.Count >= SimSettings.GetLeafLimit()){
+        if (SimSettings.GetUseLeafLimit() && SimSettings.GetNumLeavesDropped() >= SimSettings.GetLeafLimit()){
             EndSim();
         }
     }

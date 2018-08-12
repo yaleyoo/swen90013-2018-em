@@ -7,8 +7,7 @@ public class OutputController : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		// Restrict the precision of the result to 6 bits. To make sure it would not be too long for screen.
-		string result = "The density is: " + "UNKNOWN";
+		string result = "Volume density of leaf litter:\n" + System.Math.Round(Results.GetDensity()).ToString();
 		GetComponent<Text> ().text = result;
 	}
 

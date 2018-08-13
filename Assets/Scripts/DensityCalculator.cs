@@ -18,7 +18,7 @@ public class DensityCalculator : MonoBehaviour {
 
     // Variables for waiting the time it takes for a leaf to drop, after having deduced that the simulation has ended
     private bool readyToCalculateDensity = false;
-    //TODO make gravity be adjusted for the units of height, as this may not be in meters
+    // height is in meters and works as expected with the gravity constant
     private float timeToFall = (float) System.Math.Sqrt(SimSettings.GetDropHeight() / Physics.gravity.magnitude);
 
     // Run once at start of scene
@@ -46,6 +46,7 @@ public class DensityCalculator : MonoBehaviour {
             else if (readyToCalculateDensity && timeWaited >= timeToFall)
             {
                 // When waited long enough, calculate the density and change scene to the Output scene
+                Debug.Log("Finished waiting for last leaves. Beginning density calculation.");
                 CalculateDensity();
                 ChangeToOutputScene();
             }
@@ -55,12 +56,14 @@ public class DensityCalculator : MonoBehaviour {
         else
         {
             // Simulation ends depending on whether or not there is a leaf limit set
+            Debug.Log("Checking if simulation is complete ...");
             if (SimSettings.GetUseLeafLimit())
             {
                 // If there is a leaf limit, generation will have stopped automatically
                 if (SimSettings.GetNumLeavesDropped() >= SimSettings.GetLeafLimit())
                 {
                     // Ready to compute density flag, marks that density will be computed after the time it takes for a leaf to fall from it's dropped height
+                    Debug.Log("Simulation complete, leaf limit has been reached. Waiting to let potential remaining leaves drop.");
                     readyToCalculateDensity = true;
                 }
             }
@@ -77,6 +80,7 @@ public class DensityCalculator : MonoBehaviour {
                 {
                     GetComponent<LeafGenerator>().EndSim();
                     // Ready to compute density flag, marks that density will be computed after the time it takes for a leaf to fall from it's dropped height
+                    Debug.Log("Simulation complete, all current leaves add up to the volume limit (" + SimSettings.GetNumLeavesDropped() + " leaves dropped). Waiting to let potential remaining leaves drop.");
                     readyToCalculateDensity = true;
                 }
             }
@@ -92,7 +96,9 @@ public class DensityCalculator : MonoBehaviour {
         // To get the cylinder in which to calculate the volume ratio, use the lowest point of the highest leaf as the height of the cylinder
         GameObject[] leaves = GameObject.FindGameObjectsWithTag("Leaf");
         GameObject highestLeaf = GetHighestObject(leaves);
-        float cylinderHeight = GetHeightOfLowestPointOfObject(highestLeaf);
+        Debug.Log("Highest leaf position: " + highestLeaf.GetComponent<Leaf>().GetPosition());
+        float cylinderHeight = highestLeaf.GetComponent<Collider>().bounds.min.y;
+        Debug.Log("Top of cylinder is at height: " + cylinderHeight);
 
         //========================// Calculating density //========================//
 
@@ -119,7 +125,9 @@ public class DensityCalculator : MonoBehaviour {
         }
 
         // The density is the ratio between the two counters, this is saved to the results static class for displaying and saving in the output scene
-        Results.SetDensity(numPointsInLeaves / numPointsInAir);
+        float volumeDensity = (float)numPointsInLeaves / (float)numPointsInAir;
+        Results.SetDensity(volumeDensity);
+        Debug.Log("Density calculated as: " + volumeDensity);
     }
 
     // Finds the highest object from a list
@@ -143,26 +151,6 @@ public class DensityCalculator : MonoBehaviour {
         return highestObj;
     }
 
-    // Finds the y-value of the lowest point in an object
-    private float GetHeightOfLowestPointOfObject(GameObject obj)
-    {
-        // All object points are found using the Mesh component
-        float lowestPoint = SimSettings.GetDropHeight();
-        Vector3[] pointsInObj = obj.GetComponent<Mesh>().vertices;
-
-        // Check every point's y value against saved y value and replace it if new one's is lower
-        foreach (Vector3 point in pointsInObj)
-        {
-            if (point.y < lowestPoint)
-            {
-                lowestPoint = point.y;
-            }
-        }
-
-        // Return the lowest y value that was found
-        return lowestPoint;
-    }
-
     // Generates a random point inside an eliptic cylinder of passed height, and
     private Vector3 RandomPointInCylinder(float cylinderHeight)
     {
@@ -178,6 +166,17 @@ public class DensityCalculator : MonoBehaviour {
     // Checks whether or not a given point is inside any object in the given object array
     private bool IsPointInObjects(Vector3 point, GameObject[] objects)
     {
+        // For every object, check if the point is contained within it (using the collider bounds class)
+        foreach (GameObject obj in objects)
+        {
+            // If point in any object, finish and return true
+            if (obj.GetComponent<Collider>().bounds.Contains(point))
+            {
+                return true;
+            }
+        }
+
+        // Point must not have been in any of the objects in the array, return false
         return false;
     }
 

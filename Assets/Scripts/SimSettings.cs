@@ -20,7 +20,7 @@ public class SimSettings {
     private static Dictionary<LeafShape, int> leafSizesAndRatios;
     private static bool useLeafLimit = true;
     private static int leafLimit = 1000;
-    private static float leafVolumeLimit = 1000;
+    private static float leafVolumeLimit = 30;
 
     // Dynamic simulation information
     private static int numLeavesDropped = 0;

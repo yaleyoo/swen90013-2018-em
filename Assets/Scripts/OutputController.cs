@@ -7,8 +7,8 @@ public class OutputController : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		string result = "Volume density of leaf litter:\n" + System.Math.Round(Results.GetDensity()).ToString();
-		GetComponent<Text> ().text = result;
+		string result = "Volume density of leaf litter (as ratio):\n" + System.Math.Round(Results.GetDensity(), 6).ToString();
+        GameObject.FindGameObjectWithTag("OutputText").GetComponent<Text>().text = result;
 	}
 
 }

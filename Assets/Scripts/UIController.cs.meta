@@ -5,7 +5,16 @@ licenseType: Free
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - visualizeToggle: {instanceID: 0}
+  - leafDropdown: {instanceID: 0}
+  - inputRatio: {instanceID: 0}
+  - selectedTypesAndRatios: {instanceID: 0}
+  - leafNumField: {instanceID: 0}
+  - messageBox: {instanceID: 0}
+  - messageBoxConent: {instanceID: 0}
+  - leafButton: {instanceID: 0}
+  - listContent: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

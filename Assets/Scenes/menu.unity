@@ -4117,8 +4117,8 @@ MonoBehaviour:
   messageBoxConent: {fileID: 1298445753}
   leafButton: {fileID: 1791777198202678, guid: 5853cabacad19ca4db4d6b79685ebf5c, type: 2}
   listContent: {fileID: 1592860118}
-  OkButtonText: {fileID: 1388411022}
-  DeleteButton: {fileID: 1653230259}
+  okButtonText: {fileID: 1388411022}
+  deleteButton: {fileID: 1653230259}
 --- !u!4 &1966181419
 Transform:
   m_ObjectHideFlags: 0

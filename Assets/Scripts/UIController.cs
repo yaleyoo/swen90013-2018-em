@@ -5,7 +5,7 @@
  * User interface to select the type of leaf
  *      and set the ratio of leaves
  *      
- *  User interface to select number of leaves to drop
+ * User interface to select number of leaves to drop
  */
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -44,7 +44,7 @@ public class UIController : MonoBehaviour {
     // Limit of leaf to be set
     private int leafNum;
 
-    // The total number of selected leaves must be smaller than leafNum
+    // The total ratio of selected leaves must be equal to 100
     public static int totalRatio;
 
     // The flag whether the user click the un limited button
@@ -80,10 +80,10 @@ public class UIController : MonoBehaviour {
             else if(leafNum >= 0 && totalRatio != 100)
             {
                 Debug.Log("Wrong input, please click the REST button and input agian.\n" +
-                    "The sume of ratios must be 100.\n");
+                    "The sum of ratios must be 100.\n");
                 
                 message = "Wrong input, please click the REST button and input agian.\n" +
-                    "The sume of ratios must be 100.\n";
+                    "The sum of ratios must be 100.\n";
                 DisplayMessage(message);
             }
             else 
@@ -100,10 +100,10 @@ public class UIController : MonoBehaviour {
             if (totalRatio != 100)
             {
                 Debug.Log("Wrong input, please click the REST button and input agian.\n" +
-                   "The sume of ratios must be 100.\n");
+                   "The sum of ratios must be 100.\n");
 
                 message = "Wrong input, please click the REST button and input agian.\n" +
-                   "The sume of ratios must be 100.\n";
+                   "The sum of ratios must be 100.\n";
                 DisplayMessage(message);
             }
             else
@@ -184,7 +184,17 @@ public class UIController : MonoBehaviour {
             {
                 string typeString = leafDropdown.captionText.text;
 
-                typeWithRatio.Add(typeString, ratioInt);
+                // Check if the same leaf type is selected
+                if (typeWithRatio.ContainsKey(typeString))
+                {
+                    message = "You have already chosen this type of leaf.\n" +
+                        "Please check your selection.";
+                    DisplayMessage(message);
+                }
+                else
+                {
+                    typeWithRatio.Add(typeString, ratioInt);
+                }
 
                 tempText = "";
                 totalRatio = 0;

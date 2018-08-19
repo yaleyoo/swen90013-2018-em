@@ -5,13 +5,15 @@
  * User interface to select the type of leaf
  *      and set the ratio of leaves
  *      
- *  User interface to select number of leaves to drop
+ * User interface to select number of leaves to drop
  */
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
+using System;
+using UnityEditor;
 
 public class UIController : MonoBehaviour {
 
@@ -26,17 +28,11 @@ public class UIController : MonoBehaviour {
     // The input field to set the ratio
     public InputField inputRatio;
 
-    // The string to save the type and ratio
-    private string tempText;
-
     // Dictionary to save the type-ratio value pair
     private Dictionary<string, int> typeWithRatio;
 
     // Dictionary of leaf shapes and their ratio (used by LeafGenerator class)
     public static Dictionary<LeafShape, int> leavesAndRatios;
-
-    // Text to show the selected type and ratio
-    public Text selectedTypesAndRatios;
 
     // InputField on the canvas
     public InputField leafNumField;
@@ -44,7 +40,7 @@ public class UIController : MonoBehaviour {
     // Limit of leaf to be set
     private int leafNum;
 
-    // The total number of selected leaves must be smaller than leafNum
+    // The total ratio of selected leaves must be equal to 100
     public static int totalRatio;
 
     // The flag whether the user click the un limited button
@@ -56,6 +52,16 @@ public class UIController : MonoBehaviour {
     private string message;
     public Image messageBox;
     public Text messageBoxConent;
+
+    // Component for ListView
+    public GameObject leafButton;
+    public Transform listContent;
+    private LeafButton leafButtonClicked;
+   
+
+    public Text okButtonText;
+    public Button deleteButton;
+
 
     // Invoke when Start button clicked
     public void StartOnClick()
@@ -80,10 +86,10 @@ public class UIController : MonoBehaviour {
             else if(leafNum >= 0 && totalRatio != 100)
             {
                 Debug.Log("Wrong input, please click the REST button and input agian.\n" +
-                    "The sume of ratios must be 100.\n");
+                    "The sum of ratios must be 100.\n");
                 
                 message = "Wrong input, please click the REST button and input agian.\n" +
-                    "The sume of ratios must be 100.\n";
+                    "The sum of ratios must be 100.\n";
                 DisplayMessage(message);
             }
             else 
@@ -100,10 +106,10 @@ public class UIController : MonoBehaviour {
             if (totalRatio != 100)
             {
                 Debug.Log("Wrong input, please click the REST button and input agian.\n" +
-                   "The sume of ratios must be 100.\n");
+                   "The sum of ratios must be 100.\n");
 
                 message = "Wrong input, please click the REST button and input agian.\n" +
-                   "The sume of ratios must be 100.\n";
+                   "The sum of ratios must be 100.\n";
                 DisplayMessage(message);
             }
             else
@@ -184,17 +190,38 @@ public class UIController : MonoBehaviour {
             {
                 string typeString = leafDropdown.captionText.text;
 
+                // Check if the same leaf type is selected
+                if (typeWithRatio.ContainsKey(typeString))
+                {
+                    message = "You have already chosen this type of leaf.\n" +
+                        "Please check your selection.";
+                    DisplayMessage(message);
+                    return;
+                }
+
                 typeWithRatio.Add(typeString, ratioInt);
 
-                tempText = "";
+				// Add a leafButton
+                GameObject newButton = Instantiate(leafButton) as GameObject;
+                LeafButton button = newButton.GetComponent<LeafButton>();
+                button.leafName.text = typeString;
+                button.leafRatio.text = ratioInt.ToString() + "%";
+                newButton.transform.SetParent(listContent);
+                // Listen to the leaf button
+                button.onClick.AddListener(
+                        delegate ()
+                        {
+                            leafButtonClicked = button;
+                            LeafButtonClick();
+                        }
+
+                    );
+					
                 totalRatio = 0;
                 foreach (KeyValuePair<string, int> pair in typeWithRatio)
                 {
-                    tempText = tempText + pair.Key + ", " + pair.Value.ToString() + "%\n";
                     totalRatio += pair.Value;
                 }
-
-                selectedTypesAndRatios.text = "The Type of Leaves, Ratio\n" + tempText;
             }
            
         }
@@ -207,6 +234,14 @@ public class UIController : MonoBehaviour {
         
     }
 
+    private void LeafButtonClick()
+    {
+        message = "Are you sure to delete?";
+        okButtonText.text = "Cancel";
+        deleteButton.gameObject.SetActive(true);
+        DisplayMessage(message);
+    }
+
     /*
      * The response of clicking reset button.
      * Reset all setting
@@ -215,10 +250,18 @@ public class UIController : MonoBehaviour {
      public void ResetOnClick()
     {
         typeWithRatio.Clear();
-        selectedTypesAndRatios.text = "The Type of Leaves, Ratio\n";
         inputRatio.text = "";
         leafNumField.text = "";
         isUnlimited = false;
+		GameObject[] leafButtons= GameObject.FindGameObjectsWithTag("LeafButton");
+        if (leafButtons.Length > 0)
+        {
+            foreach (GameObject o in leafButtons)
+            {
+                Destroy(o);
+            }
+        }        
+        totalRatio = 0;
         //leafNum = 0;
     }
 
@@ -258,6 +301,17 @@ public class UIController : MonoBehaviour {
     {
         messageBox.gameObject.SetActive(false);
         Debug.Log("Click OK button");
+    }
+
+    public void DeleteOnClick()
+    {        
+        okButtonText.text = "OK";
+        deleteButton.gameObject.SetActive(false);
+        messageBox.gameObject.SetActive(false);
+        Destroy(leafButtonClicked.gameObject);
+        typeWithRatio.Remove(leafButtonClicked.leafName.text);
+        totalRatio = totalRatio - Int32.Parse(leafButtonClicked.leafRatio.text.Remove(leafButtonClicked.leafRatio.text.Length - 1, 1));
+        Debug.Log("Delete Cancel button");
     }
 
     // Get the the selected LeafShape according to the name and saved as an dictionary

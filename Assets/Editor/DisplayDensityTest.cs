@@ -6,13 +6,6 @@ using System.Collections;
 
 public class DisplayDensityTest {
 
-	[Test]
-	public void DisplayDensityTestSimplePasses() {
-        float resultCalculated = DensityCalculator.GetVolumeRatio();
-        float resultDisplayed = Results.GetDensity();
-        Assert.AreEqual(resultCalculated, resultDisplayed);
-    }
-
 	// A UnityTest behaves like a coroutine in PlayMode
 	// and allows you to yield null to skip a frame in EditMode
 	[UnityTest]

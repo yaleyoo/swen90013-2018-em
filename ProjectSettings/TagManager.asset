@@ -6,7 +6,7 @@ TagManager:
   tags:
   - Leaf
   - Ground
-  - LeafButton
+  - OutputText
   layers:
   - Default
   - TransparentFX

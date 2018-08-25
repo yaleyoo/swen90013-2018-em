@@ -21,12 +21,6 @@ public class DensityCalculator : MonoBehaviour {
     // height is in meters and works as expected with the gravity constant
     private float timeToFall = (float) System.Math.Sqrt(SimSettings.GetDropHeight() / Physics.gravity.magnitude);
 
-    // Run once at start of scene
-    void Start()
-    {
-
-    }
-
     // Run once per frame
     void Update()
     {
@@ -78,7 +72,7 @@ public class DensityCalculator : MonoBehaviour {
                 // If computed volume sum exceeds the threshold, then ready to computed density
                 if (leafVolumeSum >= SimSettings.GetLeafVolumeLimit())
                 {
-                    GetComponent<LeafGenerator>().EndSim();
+                    //GetComponent<LeafGenerator>().EndSim();
                     // Ready to compute density flag, marks that density will be computed after the time it takes for a leaf to fall from it's dropped height
                     Debug.Log("Simulation complete, all current leaves add up to the volume limit (" + SimSettings.GetNumLeavesDropped() + " leaves dropped). Waiting to let potential remaining leaves drop.");
                     readyToCalculateDensity = true;

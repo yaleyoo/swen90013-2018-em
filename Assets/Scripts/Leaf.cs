@@ -70,7 +70,7 @@ public abstract class Leaf : MonoBehaviour {
 
     // Get the name of this leaf
     public string GetName() {
-        return leafName;
+        return this.leafName;
     }
 
     // Get the size of this leaf

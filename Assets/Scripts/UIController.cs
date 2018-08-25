@@ -32,7 +32,7 @@ public class UIController : MonoBehaviour {
     private Dictionary<string, int> typeWithRatio;
 
     // Dictionary of leaf shapes and their ratio (used by LeafGenerator class)
-    public static Dictionary<LeafShape, int> leavesAndRatios;
+    public static Dictionary<LeafData, int> leavesAndRatios;
 
     // InputField on the canvas
     public InputField leafNumField;
@@ -280,7 +280,7 @@ public class UIController : MonoBehaviour {
         // Read leaf trait csv
         CsvImporter.ReadCsv();
 
-        foreach (LeafShape l in CsvImporter.Leaves)
+        foreach (LeafData l in CsvImporter.Leaves)
         {
             type.Add(l.Name);
         }
@@ -314,15 +314,15 @@ public class UIController : MonoBehaviour {
         Debug.Log("Delete Cancel button");
     }
 
-    // Get the the selected LeafShape according to the name and saved as an dictionary
+    // Get the the selected LeafData according to the name and saved as an dictionary
     private void GetLeafShape(Dictionary<string, int> nameDictionary)
     {
-        leavesAndRatios = new Dictionary<LeafShape, int>();
-        LeafShape temp;
+        leavesAndRatios = new Dictionary<LeafData, int>();
+        LeafData temp;
 
         foreach (KeyValuePair<string, int> pair in typeWithRatio)
         {
-            temp = CsvImporter.Leaves.Find((LeafShape l) => l.Name == pair.Key);
+            temp = CsvImporter.Leaves.Find((LeafData l) => l.Name == pair.Key);
             leavesAndRatios.Add(temp, pair.Value);
             Debug.Log(temp.Name + ":" + pair.Value);
         }

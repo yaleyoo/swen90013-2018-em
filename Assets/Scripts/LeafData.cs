@@ -4,11 +4,7 @@
  * used when directing simulation which leaves and ratios to use
  */
 
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class LeafShape {
+public class LeafData {
 
     // Can get all instance variables
     public string Name { get; set; }
@@ -21,7 +17,7 @@ public class LeafShape {
     public float LengthRange { get; set; }
 
     // Constructor just takes all variables
-    public LeafShape(string name,
+    public LeafData(string name,
                     string leafForm,
                     float thicknessMean, 
                     float thicknessRange, 
@@ -40,7 +36,7 @@ public class LeafShape {
     }
 
     // Empty contructor that creates default leaf
-    public LeafShape() {
+    public LeafData() {
         this.Name = "";
         this.LeafForm = "";
         this.ThicknessMean = 1;

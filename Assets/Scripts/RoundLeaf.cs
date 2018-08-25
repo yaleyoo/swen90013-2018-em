@@ -23,6 +23,6 @@ public class RoundLeaf : Leaf {
 		// third is z, corresponding to minor axis
 		this.transform.localScale = new Vector3(longAxis, height, minorAxis);
 
-		this.GetComponent<Rigidbody>().mass = Mathf.PI * (longAxis / 2f) * (minorAxis / 2f) * height * 1000;
+		this.GetComponent<Rigidbody>().mass = Mathf.PI * (longAxis / 2f) * (minorAxis / 2f) * height;
     }
 }

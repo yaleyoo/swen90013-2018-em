@@ -33,7 +33,7 @@ public abstract class Leaf : MonoBehaviour {
         }
 
         // If the leaf has fallen below the ground delete itself
-        if (this.GetPosition().y < -10) {
+        if (this.transform.position.y < -10) {
             Destroy(this.gameObject);
         }
     }
@@ -63,11 +63,6 @@ public abstract class Leaf : MonoBehaviour {
     // Set the thichness, width and lenth of a leaf, set the mass based on size
     public abstract void SetSize(float thickness, float width, float length);
 
-    // Set the rotation of a leaf
-    public void SetRotation(float x, float y, float z) {
-        this.transform.rotation = Quaternion.Euler(x, y, z);
-    }
-
     // Get the name of this leaf
     public string GetName() {
         return this.leafName;
@@ -80,9 +75,4 @@ public abstract class Leaf : MonoBehaviour {
 
     // Get the volume of this leaf
     public abstract float GetVolume();
-
-    // Get the current position of this leaf
-    public Vector3 GetPosition() {
-        return this.transform.position;
-    }
 }

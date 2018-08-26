@@ -3,7 +3,7 @@
  * Reprsents the volume that the density calculator compares with the 
  * volume of leaves.
  */
- 
+
 using UnityEngine;
 
 public class DensityCalculationCylinder {
@@ -25,7 +25,6 @@ public class DensityCalculationCylinder {
         Debug.Log("Top of cylinder is at height: " + height);
     }
 
-    // Finds the highest object from a list
     public GameObject GetHighestObject() {
         GameObject highestObj = null;
         // Check every object against saved, and replace it if new object is higher than it
@@ -42,6 +41,12 @@ public class DensityCalculationCylinder {
         return highestObj;
     }
 
+    /// <summary>
+    /// Returns the y value of lowest point of the object.
+    /// Returns 0 is the lowest point is negative.
+    /// </summary>
+    /// <param name="obj">The object</param>
+    /// <returns>The y value of the lowest point</returns>
     private float CalcHeight(GameObject obj) {
         float height = highestLeaf.GetComponent<Collider>().bounds.min.y;
 
@@ -52,18 +57,16 @@ public class DensityCalculationCylinder {
         return 0f;
     }
 
-    // Generates a random point inside an eliptic cylinder of passed height, and
     public Vector3 RandomPointInCylinder() {
         Vector2 UnitCirclePoint = Random.insideUnitCircle;
-        float height = Random.Range(0, this.height);
+        float x = UnitCirclePoint.x * this.dropAreaX;
+        float y = Random.Range(0, this.height);
+        float z = UnitCirclePoint.y * dropAreaY;
 
         // unit circle point values are multiplied by the area dimensions that are where the density is calculated
-        return new Vector3(UnitCirclePoint.x * dropAreaX,
-                            UnitCirclePoint.y * dropAreaY,
-                            height);
+        return new Vector3(x, y, z);
     }
 
-    // Checks whether or not a given point is inside any object in the given object array
     public bool IsPointInObjects(Vector3 point) {
         // For every object, check if the point is contained within it (using the collider bounds class)
         foreach (GameObject objs in this.objects) {

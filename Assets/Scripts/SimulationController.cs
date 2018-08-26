@@ -15,7 +15,7 @@ public class SimulationController : MonoBehaviour {
 
     // Use this for initialization
     void Start() {
-        leafGen = new LeafGenerator(SimSettings.GetLeafSizesAndRatios());
+        leafGen = new LeafGenerator(SimSettings.GetLeafSizesAndRatios(), (SimSettings.GetDropAreaX() / 2), (SimSettings.GetDropAreaY() / 2));
         denCalc = new DensityCalculator();
     }
 
@@ -31,11 +31,21 @@ public class SimulationController : MonoBehaviour {
         }
     }
 
-    private void CreateLeaf() {
-        leafGen.GetNextLeaf();
+    /// <summary>
+    /// Creates a leaf gameobject
+    /// </summary>
+    /// <returns>A leaf</returns>
+    private GameObject CreateLeaf() {
+        GameObject leaf = leafGen.GetNextLeaf();
         this.numLeavesCreated++;
+        return leaf;
     }
 
+    /// <summary>
+    /// Check whether to create a leaf or not based on the
+    /// number of leaves created or on the total leaf volume
+    /// </summary>
+    /// <returns>Can create a leaf</returns>
     public bool CanCreateLeaf() {
         // Limited
         if (SimSettings.GetUseLeafLimit() && this.numLeavesCreated < SimSettings.GetLeafLimit()) {
@@ -51,6 +61,12 @@ public class SimulationController : MonoBehaviour {
         return false;
     }
 
+    /// <summary>
+    /// Calculates the total cumulative volume of all leaves
+    /// in an array of leaves
+    /// </summary>
+    /// <param name="leaves">An array of leaf gameobjects</param>
+    /// <returns>Total volume</returns>
     public float totalLeavesVolume(GameObject[] leaves) {
         float sum = 0f;
 

@@ -1,8 +1,11 @@
 ﻿/*
  * Create by Marko Ristic
+ * Modified by Michael Lumley
  * Container class for a leaf shape, used to store leaves from leaf trait csv, and
  * used when directing simulation which leaves and ratios to use
  */
+
+using UnityEngine;
 
 public class LeafData {
 
@@ -45,5 +48,19 @@ public class LeafData {
         this.WidthRange = 0.5f;
         this.LengthMean = 1;
         this.LengthRange = 0.5f;
+    }
+
+    // Given a leaf shape, returns a size of that leaf, taking the dimensions and their ranges into account
+    public Vector3 GetConcreteLeafSize() {
+        // Three dimensions of the leaf
+        float thickness = Random.Range(this.ThicknessMean - this.ThicknessRange / 2,
+                                        this.ThicknessMean + this.ThicknessRange / 2);
+        float width = Random.Range(this.WidthMean - this.WidthRange / 2,
+                                        this.WidthMean + this.WidthRange / 2);
+        float length = Random.Range(this.LengthMean - this.LengthRange / 2,
+                                        this.LengthMean + this.LengthRange / 2);
+
+        // Return as a vector for simplicity
+        return new Vector3(thickness, width, length);
     }
 }

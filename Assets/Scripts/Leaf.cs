@@ -1,6 +1,7 @@
-﻿﻿/** Created by Chao Li 
+﻿/* Created by Chao Li
+ * Modified by Michael Lumley
  * Script for leaf object
-**/
+ */
 
 using UnityEngine;
 
@@ -60,13 +61,13 @@ public abstract class Leaf : MonoBehaviour {
         this.leafName = leafName;
     }
 
-    // Set the thichness, width and lenth of a leaf, set the mass based on size
-    public abstract void SetSize(float thickness, float width, float length);
-
     // Get the name of this leaf
     public string GetName() {
         return this.leafName;
     }
+
+    // Set the thichness, width and lenth of a leaf, set the mass based on size
+    public abstract void SetSize(float thickness, float width, float length);
 
     // Get the size of this leaf
     public Vector3 GetSize() {

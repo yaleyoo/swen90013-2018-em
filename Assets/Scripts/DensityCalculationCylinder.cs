@@ -6,7 +6,7 @@
 /// </summary>
 public class DensityCalculationCylinder {
 
-    private GameObject[] objects;
+    private GameObject[] objectsInWorld;
     private float cylinderAreaX;
     private float cylinderAreaY;
 
@@ -17,7 +17,7 @@ public class DensityCalculationCylinder {
     /// <param name="cylinderAreaX">The X size of the cylinder</param>
     /// <param name="cylinderAreaY">The Y size of the cylinder</param>
     public DensityCalculationCylinder(GameObject[] objects, float cylinderAreaX, float cylinderAreaY) {
-        this.objects = objects;
+        this.objectsInWorld = objects;
         this.cylinderAreaX = cylinderAreaX;
         this.cylinderAreaY = cylinderAreaY;
     }
@@ -29,7 +29,7 @@ public class DensityCalculationCylinder {
     public GameObject GetHighestObject() {
         GameObject highestObj = null;
 
-        foreach (GameObject leaf in this.objects) {
+        foreach (GameObject leaf in this.objectsInWorld) {
             if (highestObj == null) {
                 highestObj = leaf;
             }
@@ -79,7 +79,7 @@ public class DensityCalculationCylinder {
     /// <param name="point">The point</param>
     /// <returns>Whether the point is in an object</returns>
     public bool IsPointInObjects(Vector3 point) {
-        foreach (GameObject obj in this.objects) {
+        foreach (GameObject obj in this.objectsInWorld) {
             if (obj.GetComponent<Collider>().bounds.Contains(point)) {
                 return true;
             }

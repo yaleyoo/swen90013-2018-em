@@ -1,59 +1,70 @@
-﻿/*
- * Created by Michael Lumley.
- * Get or assigns a color to a leaf
- */
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Get a colour for a given leaf type
+/// </summary>
 public class LeafColorer {
 
     private List<Color> presetColors = new List<Color>{Color.green, Color.red, Color.cyan, Color.yellow,
         Color.magenta, Color.blue,Color.gray, Color.white, Color.black };
 
-    private Dictionary<string, Color> nameAndColors = new Dictionary<string, Color>();
+    private Dictionary<LeafData, Color> leafColours = new Dictionary<LeafData, Color>();
 
- 
-    public Color GetColor(LeafData shape) {
-
-        string leafName = shape.Name;
-        bool colourAlreadyAssigned = nameAndColors.ContainsKey(leafName);
+    /// <summary>
+    /// Return the colour assigned to a leaf type or
+    /// assign a colour to a leaf type if one doesn't exist
+    /// </summary>
+    /// <param name="leafData">The leafData</param>
+    /// <returns>The colour</returns>
+    public Color GetColor(LeafData leafData) {
+        bool colourAlreadyAssigned = leafColours.ContainsKey(leafData);
 
         // If colour not assigned and presets available
         if (!colourAlreadyAssigned && presetColors.Count > 0) {
-            return this.SelectPresetColor(leafName);
+            return this.SelectPresetColor(leafData);
         }
         // If colour not assigned and presets not available
         else if (!colourAlreadyAssigned && presetColors.Count == 0) {
-            return this.GetRandomColor(leafName);
+            return this.GetRandomColor(leafData);
         }
         // Colour already assigned
         else {
-            return nameAndColors[leafName];
+            return leafColours[leafData];
         }
     }
 
-    private Color SelectPresetColor(string leafName) {
+    /// <summary>
+    /// Return the first color in the list of preset colours
+    /// and then remove it from the list so it is not selected
+    /// again
+    /// </summary>
+    /// <param name="leafData">The leafData</param>
+    /// <returns>The colour selected</returns>
+    private Color SelectPresetColor(LeafData leafData) {
         Color selectedColor = presetColors[0];
 
-        nameAndColors.Add(leafName, selectedColor);
+        leafColours.Add(leafData, selectedColor);
         presetColors.Remove(selectedColor);
 
         return selectedColor;
     }
 
-    private Color GetRandomColor(string leafName) {
-        while(true) {
-            // Random a new color 
+    /// <summary>
+    /// Return a random colour that doesn't exist in
+    /// leafColours
+    /// </summary>
+    /// <param name="leafData">The leafData</param>
+    /// <returns>The colour</returns>
+    private Color GetRandomColor(LeafData leafData) {
+        while (true) {
             float r = Random.Range(0f, 1f);
             float g = Random.Range(0f, 1f);
             float b = Random.Range(0f, 1f);
             Color randomColor = new Color(r, g, b);
 
-            // If the random color is not used, change the color then break the loop
-            if (!nameAndColors.ContainsValue(randomColor)) {
-                // Pair the leaf name and the new random color
-                nameAndColors.Add(leafName, randomColor);
+            if (!leafColours.ContainsValue(randomColor)) {
+                leafColours.Add(leafData, randomColor);
                 return randomColor;
             }
         }

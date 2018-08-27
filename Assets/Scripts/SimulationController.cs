@@ -1,22 +1,27 @@
-﻿/*
- * Created by Michael Lumley.
- * Controls the running of the simulation
- */
-
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 
+/// <summary>
+/// Controls the running of the simulation
+/// </summary>
 public class SimulationController : MonoBehaviour {
+
+    private const string OUTPUT_SCENE = "Output";
 
     private LeafGenerator leafGen;
     private DensityCalculator denCalc;
     private int numLeavesCreated = 0;
     private GameObject[] leaves;
 
+    private float dropAreaX = SimSettings.GetDropAreaX() / 2;
+    private float dropAreaY = SimSettings.GetDropAreaY() / 2;
+    private float height = SimSettings.GetDropHeight();
+    private float densityIgnoreBorder = SimSettings.GetDensityIgnoreBorder();
+
     // Use this for initialization
     void Start() {
-        leafGen = new LeafGenerator(SimSettings.GetLeafSizesAndRatios(), (SimSettings.GetDropAreaX() / 2), (SimSettings.GetDropAreaY() / 2), SimSettings.GetDropHeight());
-        denCalc = new DensityCalculator();
+        this.leafGen = new LeafGenerator(SimSettings.GetLeafSizesAndRatios(), this.dropAreaX, this.dropAreaY, this.height);
+        this.denCalc = new DensityCalculator();
     }
 
     // Update is called once per frame
@@ -26,7 +31,7 @@ public class SimulationController : MonoBehaviour {
             this.CreateLeaf();
         }
 
-        if (this.hasEnded()) {
+        if (this.hasEnded(this.leaves)) {
             this.CalculateDensity(this.leaves);
         }
     }
@@ -36,7 +41,7 @@ public class SimulationController : MonoBehaviour {
     /// </summary>
     /// <returns>A leaf</returns>
     private GameObject CreateLeaf() {
-        GameObject leaf = leafGen.GetNextLeaf(SimSettings.GetVisualize());
+        GameObject leaf = this.leafGen.GetNextLeaf(SimSettings.GetVisualize());
         this.numLeavesCreated++;
         return leaf;
     }
@@ -54,7 +59,6 @@ public class SimulationController : MonoBehaviour {
 
         // Unlimited
         if (!SimSettings.GetUseLeafLimit() && this.totalLeavesVolume(this.leaves) < SimSettings.GetLeafVolumeLimit()) {
-            
             return true;
         }
 
@@ -82,9 +86,10 @@ public class SimulationController : MonoBehaviour {
     /// to display the results
     /// </summary>
     private void CalculateDensity(GameObject[] leaves) {
-        DensityCalculationCylinder calcArea = new DensityCalculationCylinder(leaves,
-                                    ((SimSettings.GetDropAreaX() / 2) - SimSettings.GetDensityIgnoreBorder()),
-                                    ((SimSettings.GetDropAreaY() / 2) - SimSettings.GetDensityIgnoreBorder())
+        DensityCalculationCylinder calcArea = new DensityCalculationCylinder(
+                                    leaves,
+                                    (this.dropAreaX - this.densityIgnoreBorder),
+                                    (this.dropAreaY - this.densityIgnoreBorder)
                                   );
         float density = denCalc.CalculateDensity(calcArea, SimSettings.GetMonteCarloNumIterations());
         Debug.Log("Density calculated as: " + density);
@@ -95,9 +100,9 @@ public class SimulationController : MonoBehaviour {
     /// <summary>
     /// Returns true when all leaf objects are kinematic (frozen)
     /// </summary>
-    public bool hasEnded() {
-        GameObject[] leaves = GameObject.FindGameObjectsWithTag("Leaf");
-
+    /// <param name="leaves">List of all leaves in the world</param>
+    /// <returns>Whether all leaves have been frozen</returns>
+    public bool hasEnded(GameObject[] leaves) {
         foreach (GameObject leaf in leaves) {
             if (!leaf.GetComponent<Rigidbody>().isKinematic) {
                 return false;
@@ -106,9 +111,10 @@ public class SimulationController : MonoBehaviour {
         return true;
     }
 
-    // Changes the Unity scene to the output scene, where results calculated here are displayed and saved
+    /// <summary>
+    /// Change to the output scene
+    /// </summary>
     public void ChangeToOutputScene() {
-        SceneManager.LoadScene("Output");
+        SceneManager.LoadScene(OUTPUT_SCENE);
     }
-
 }

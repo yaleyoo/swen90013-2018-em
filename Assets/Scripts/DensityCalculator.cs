@@ -1,46 +1,38 @@
-﻿/* 
- * Created by Jing Bi
- * Modified by Marko Ristic, Michael Lumley
- * Script of calculating the density of leaf litter
- * as the volume ratio of leaves to air
- */
+﻿using UnityEngine;
 
-using UnityEngine;
-
+/// <summary>
+/// Script of calculating the density of leaf litter
+/// as the volume ratio of leaves to air.
+/// </summary>
 public class DensityCalculator {
 
-    // Calculates the density of leaf litter as a volume ratio
-    public float CalculateDensity(DensityCalculationCylinder calcArea, int numIterations)
-    {
-        // To calculate the volume ratio, the intersection of the cylinder and all dropped leaves is calculated
-        // Use the Monte Carlo method for computing the 3D integration problem of object intersection
-        int numPointsInAir = 0;
-        int numPointsInLeaves = 0;
+    /// <summary>
+    /// Calculates the density of leaf litter as a volume ratio by randomly sampling
+    /// the area to check if a point exists in a leaf or not
+    /// </summary>
+    /// <param name="calcArea">The area to calculate the density for</param>
+    /// <param name="sampleSize">The number of points to sample</param>
+    /// <returns></returns>
+    public float CalculateDensity(DensityCalculationCylinder calcArea, int sampleSize) {
+        float numPointsInAir = 0;
+        float numPointsInLeaves = 0;
 
-        // The number of iterations is a trade off between accuracy and time taken to compute, the constant is set in the simulation settings
-        for (int i = 0; i < numIterations; i++)
-        {
-            // Each random point inside the cylinder is either also inside some leaf, or not
+        for (int i = 0; i < sampleSize; i++) {
             Vector3 pointInCylinder = calcArea.RandomPointInCylinder();
 
-            // Update the counters appropriately
-            if (calcArea.IsPointInObjects(pointInCylinder))
-            {
+            if (calcArea.IsPointInObjects(pointInCylinder)) {
                 numPointsInLeaves++;
             }
-            else
-            {
+            else {
                 numPointsInAir++;
             }
         }
 
-        // The density is the ratio between the two counters, this is saved to the results static class for displaying and saving in the output scene
-        return (float)numPointsInLeaves / (float)numPointsInAir;
+        if (numPointsInAir > 0) {
+            return numPointsInLeaves / numPointsInAir;
+        }
+        else {
+            return 0;
+        }
     }
-
-
-
-
-
-
 }

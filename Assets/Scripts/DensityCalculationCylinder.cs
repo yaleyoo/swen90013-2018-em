@@ -1,35 +1,35 @@
-﻿/*
- * Created by Michael Lumley.
- * Reprsents the volume that the density calculator compares with the 
- * volume of leaves.
- */
+﻿using UnityEngine;
 
-using UnityEngine;
-
+/// <summary>
+/// Reprsents the volume that the density calculator compares with the 
+/// volume of leaves.
+/// </summary>
 public class DensityCalculationCylinder {
 
-    GameObject[] objects;
-    GameObject highestLeaf;
-    float height;
+    private GameObject[] objects;
+    private float cylinderAreaX;
+    private float cylinderAreaY;
 
-    float dropAreaX;
-    float dropAreaY;
-
-    public DensityCalculationCylinder(GameObject[] objects, float dropAreaX, float dropAreaY) {
+    /// <summary>
+    /// Creates a DensityCalculationCylinder
+    /// </summary>
+    /// <param name="objects">Objects in the world</param>
+    /// <param name="cylinderAreaX">The X size of the cylinder</param>
+    /// <param name="cylinderAreaY">The Y size of the cylinder</param>
+    public DensityCalculationCylinder(GameObject[] objects, float cylinderAreaX, float cylinderAreaY) {
         this.objects = objects;
-        this.highestLeaf = GetHighestObject();
-        this.height = CalcHeight(highestLeaf);
-        this.dropAreaX = dropAreaX;
-        this.dropAreaY = dropAreaY;
-        Debug.Log("Highest leaf position: " + highestLeaf.transform.position);
-        Debug.Log("Top of cylinder is at height: " + height);
+        this.cylinderAreaX = cylinderAreaX;
+        this.cylinderAreaY = cylinderAreaY;
     }
 
+    /// <summary>
+    /// Returns the object with the largest y value
+    /// </summary>
+    /// <returns>The object</returns>
     public GameObject GetHighestObject() {
         GameObject highestObj = null;
-        // Check every object against saved, and replace it if new object is higher than it
+
         foreach (GameObject leaf in this.objects) {
-            // On first object, choose it as the saved on regardless
             if (highestObj == null) {
                 highestObj = leaf;
             }
@@ -37,7 +37,7 @@ public class DensityCalculationCylinder {
                 highestObj = leaf;
             }
         }
-        // Return the object that was the highest
+
         return highestObj;
     }
 
@@ -48,7 +48,7 @@ public class DensityCalculationCylinder {
     /// <param name="obj">The object</param>
     /// <returns>The y value of the lowest point</returns>
     private float CalcHeight(GameObject obj) {
-        float height = highestLeaf.GetComponent<Collider>().bounds.min.y;
+        float height = obj.GetComponent<Collider>().bounds.min.y;
 
         if (height > 0) {
             return height;
@@ -57,26 +57,34 @@ public class DensityCalculationCylinder {
         return 0f;
     }
 
+    /// <summary>
+    /// Returns a random point within the cylinder
+    /// </summary>
+    /// <returns>The point</returns>
     public Vector3 RandomPointInCylinder() {
+        float height = this.CalcHeight(this.GetHighestObject());
         Vector2 UnitCirclePoint = Random.insideUnitCircle;
-        float x = UnitCirclePoint.x * this.dropAreaX;
-        float y = Random.Range(0, this.height);
-        float z = UnitCirclePoint.y * dropAreaY;
+
+        float x = UnitCirclePoint.x * this.cylinderAreaX;
+        float y = Random.Range(0, height);
+        float z = UnitCirclePoint.y * cylinderAreaY;
 
         // unit circle point values are multiplied by the area dimensions that are where the density is calculated
         return new Vector3(x, y, z);
     }
 
+    /// <summary>
+    /// Checks if the point is in any of the objects
+    /// </summary>
+    /// <param name="point">The point</param>
+    /// <returns>Whether the point is in an object</returns>
     public bool IsPointInObjects(Vector3 point) {
-        // For every object, check if the point is contained within it (using the collider bounds class)
-        foreach (GameObject objs in this.objects) {
-            // If point in any object, finish and return true
-            if (objs.GetComponent<Collider>().bounds.Contains(point)) {
+        foreach (GameObject obj in this.objects) {
+            if (obj.GetComponent<Collider>().bounds.Contains(point)) {
                 return true;
             }
         }
 
-        // Point must not have been in any of the objects in the array, return false
         return false;
     }
 

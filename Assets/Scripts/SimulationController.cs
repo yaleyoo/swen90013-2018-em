@@ -15,7 +15,7 @@ public class SimulationController : MonoBehaviour {
 
     // Use this for initialization
     void Start() {
-        leafGen = new LeafGenerator(SimSettings.GetLeafSizesAndRatios(), (SimSettings.GetDropAreaX() / 2), (SimSettings.GetDropAreaY() / 2));
+        leafGen = new LeafGenerator(SimSettings.GetLeafSizesAndRatios(), (SimSettings.GetDropAreaX() / 2), (SimSettings.GetDropAreaY() / 2), SimSettings.GetDropHeight());
         denCalc = new DensityCalculator();
     }
 
@@ -36,7 +36,7 @@ public class SimulationController : MonoBehaviour {
     /// </summary>
     /// <returns>A leaf</returns>
     private GameObject CreateLeaf() {
-        GameObject leaf = leafGen.GetNextLeaf();
+        GameObject leaf = leafGen.GetNextLeaf(SimSettings.GetVisualize());
         this.numLeavesCreated++;
         return leaf;
     }

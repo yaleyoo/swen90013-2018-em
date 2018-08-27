@@ -1,72 +1,84 @@
-﻿/*
- * Created by Marko Ristic.
- * Modified by Michael Lumley
- * Generation and simulation of leaves dropping
- */
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Generates leaves is the drop area at the set height
+/// </summary>
 public class LeafGenerator {
+
+    private const string ROUND_LEAF = "round";
 
     private int totalRatioWeights;
     private float dropAreaX;
     private float dropAreaY;
+    private float height;
     private LeafColorer leafColorer;
     private Dictionary<LeafData, int> leafShapes;
 
-    public LeafGenerator(Dictionary<LeafData, int> leafShapes, float dropAreaX, float dropAreaY) {
+    /// <summary>
+    /// Creates a LeafGenerator
+    /// </summary>
+    /// <param name="leafRatios">
+    ///     A dictionary of leafData to be used and
+    ///     the percentage of that type of leaf to create
+    /// </param>
+    /// <param name="dropAreaX">The X size of the drop area</param>
+    /// <param name="dropAreaY">The Y size of the drop area</param>
+    /// <param name="height">The height of the drop area</param>
+    public LeafGenerator(Dictionary<LeafData, int> leafRatios, float dropAreaX, float dropAreaY, float height) {
         int sum = 0;
 
-        foreach (LeafData ls in leafShapes.Keys) {
-            sum += leafShapes[ls];
+        foreach (LeafData ls in leafRatios.Keys) {
+            sum += leafRatios[ls];
         }
 
         this.totalRatioWeights = sum;
         this.dropAreaX = dropAreaX;
         this.dropAreaY = dropAreaY;
+        this.height = height;
         this.leafColorer = new LeafColorer();
-        this.leafShapes = leafShapes;
+        this.leafShapes = leafRatios;
     }
 
-    public GameObject GetNextLeaf() {
+    /// <summary>
+    /// Instantiates a leaf in the world
+    /// </summary>
+    /// <param name="visualize">Should the leaf be visable</param>
+    /// <returns>The leaf instantiated</returns>
+    public GameObject GetNextLeaf(bool visualize) {
         GameObject leaf = null;
 
-        // Get the next leaf type to drop based on their ratios, and then get the size of a single such leaf
         LeafData nextLeafShape = this.GetLeafData(this.leafShapes);
         Vector3 leafData = nextLeafShape.GetConcreteLeafSize();
 
-        // Make a new leaf object of correct type
-        if (nextLeafShape.LeafForm.ToLower() == "round") {
-            leaf = Resources.Load("RoundLeaf") as GameObject;
-        }
-        else {
-            leaf = Resources.Load("FlatLeaf") as GameObject;
+        switch (nextLeafShape.LeafForm.ToLower()) {
+            case ROUND_LEAF:
+                leaf = Resources.Load("RoundLeaf") as GameObject;
+                break;
+            default:
+                leaf = Resources.Load("FlatLeaf") as GameObject;
+                break;
         }
 
-        // Place the leaf object randomly within a circle defined by the dropping area
-        Vector3 randomPoint = this.GetRandomPointInDropArea();
+        Vector3 randomPoint = this.GetRandomPointInDropArea(this.dropAreaX, this.dropAreaY, this.height);
         leaf = GameObject.Instantiate(leaf, randomPoint, Quaternion.identity);
 
         leaf.GetComponent<Leaf>().SetName(nextLeafShape.Name);
-
-        // Set the leaf object to have the calculated leaf size
         leaf.GetComponent<Leaf>().SetSize(leafData.x, leafData.y, leafData.z);
-
-        // Set colors for different types of leaves
         leaf.GetComponent<MeshRenderer>().material.color = this.leafColorer.GetColor(nextLeafShape);
-
-        // Rotate the leaf object randomly after it's spawn
         leaf.transform.eulerAngles = this.GetRandomAngle();
 
-        // In case of no visualization, turn off the renderer for leaves
-        if (!SimSettings.GetVisualize()) {
+        if (!visualize) {
             leaf.GetComponent<Renderer>().enabled = false;
         }
 
         return leaf;
     }
 
+    /// <summary>
+    /// Returns a random euler angle
+    /// </summary>
+    /// <returns>The angle</returns>
     private Vector3 GetRandomAngle() {
         float x = Random.Range(0f, 360f);
         float y = Random.Range(0f, 360f);
@@ -75,27 +87,34 @@ public class LeafGenerator {
         return new Vector3(x, y, z);
     }
 
-    public Vector3 GetRandomPointInDropArea() {
+    /// <summary>
+    /// Return a random point in the drop area
+    /// </summary>
+    /// <param name="dropAreaX">The X size of the drop area</param>
+    /// <param name="dropAreaY">THe Y size of the drop area</param>
+    /// <param name="height">The height of the drop area</param>
+    /// <returns>The point</returns>
+    public Vector3 GetRandomPointInDropArea(float dropAreaX, float dropAreaY, float height) {
         Vector2 random2DPoint = Random.insideUnitCircle;
-        return new Vector3(random2DPoint.x * dropAreaX, SimSettings.GetDropHeight(), random2DPoint.y * dropAreaY);
+        return new Vector3(random2DPoint.x * dropAreaX, height, random2DPoint.y * dropAreaY);
     }
 
-    // Using the ratio of leaf to drop choose at random, in the right proportions, the next leaf to drop
-    private LeafData GetLeafData(Dictionary<LeafData, int> leafShapes) {
-        // use the cumulative sum of the ratios, and a random number between 0 and the total ratio sum to choose the next leaf
+    /// <summary>
+    /// Return the LeafData of a leaf using the ratio of leaves to drop
+    /// </summary>
+    /// <param name="leafData">The dictionary of LeafData for the simulation</param>
+    /// <returns>The selected LeafData</returns>
+    private LeafData GetLeafData(Dictionary<LeafData, int> leafData) {
         int cumulativeSum = 0;
         float randomNumber = Random.Range(0, this.totalRatioWeights);
-        foreach (LeafData leafShape in leafShapes.Keys) {
-            cumulativeSum += leafShapes[leafShape];
+
+        foreach (LeafData leafShape in leafData.Keys) {
+            cumulativeSum += leafData[leafShape];
             if (randomNumber < cumulativeSum) {
-                // Return the chosen next leaf
                 return leafShape;
             }
         }
 
-        // Return the default next leaf
         return new LeafData();
     }
-
-
 }

@@ -1,19 +1,14 @@
-﻿/* Created by Chao Li
- * Modified by Michael Lumley
- * Script for leaf object
- */
+﻿using UnityEngine;
 
-using UnityEngine;
-
+/// <summary>
+/// Represents a leaf object
+/// </summary>
 public abstract class Leaf : MonoBehaviour {
+
     // Minimum movement to be considered to be moving
     private const float MOVEMENT_MINIMUM = 0.5f;
-    // Number of updates to wait before checking movement
     private const int MOVEMENT_CHECK_INTERVAL = 50;
-
-    // name of leaf
     private string leafName;
-
     private int tick = 0;
 
     // Update is called once per frame
@@ -56,24 +51,41 @@ public abstract class Leaf : MonoBehaviour {
         }
     }
 
-    // Set the name of a leaf
+    /// <summary>
+    /// Set the name of a leaf
+    /// </summary>
+    /// <param name="leafName">The name</param>
     public void SetName(string leafName) {
         this.leafName = leafName;
     }
 
-    // Get the name of this leaf
+    /// <summary>
+    /// Get the name of this leaf
+    /// </summary>
+    /// <returns>The name</returns>
     public string GetName() {
         return this.leafName;
     }
 
-    // Set the thichness, width and lenth of a leaf, set the mass based on size
+    /// <summary>
+    /// Set the thichness, width and length of the leaf also set the mass based on size
+    /// </summary>
+    /// <param name="thickness">The thickness</param>
+    /// <param name="width">The width</param>
+    /// <param name="length">The length</param>
     public abstract void SetSize(float thickness, float width, float length);
 
-    // Get the size of this leaf
+    /// <summary>
+    /// Get the size of this leaf
+    /// </summary>
+    /// <returns>The size</returns>
     public Vector3 GetSize() {
         return this.transform.localScale;
     }
 
-    // Get the volume of this leaf
+    /// <summary>
+    /// Get the volume of this leaf
+    /// </summary>
+    /// <returns>The volume</returns>
     public abstract float GetVolume();
 }

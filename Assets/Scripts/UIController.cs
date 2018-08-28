@@ -27,6 +27,9 @@ public class UIController : MonoBehaviour {
     // The input field to set the ratio
     public InputField inputRatio;
 
+    public Slider inputRatioV2;
+    public Text inputRatioText;
+
     // Dictionary to save the type-ratio value pair
     private Dictionary<string, int> typeWithRatio;
 
@@ -166,7 +169,13 @@ public class UIController : MonoBehaviour {
         // Add the type to the dropdown menu
         InitializeLeafDropdown();
     }
- 
+
+    public void UpdateRatioValue()
+    {
+        //inputRatioText = GetComponent<Text>();
+        inputRatioText.text = Mathf.Round(inputRatioV2.value).ToString()+"%";
+
+    }
     /* 
      * The response of clicking add button.
      * Display the selected type with ratio 
@@ -174,63 +183,79 @@ public class UIController : MonoBehaviour {
      */
     public void ConfirmOnClick()
     {
+        if (totalRatio + Mathf.Round(inputRatioV2.value) > 100)
+        {
+           
+        }
+
         // The int number to save the ratio of each type
         int ratioInt = 0;
         // Type conversion, string to int
-        if (System.Int32.TryParse(inputRatio.text, out ratioInt))
+        if (totalRatio + Mathf.Round(inputRatioV2.value) > 100)
         {
-            if (ratioInt > 100)
-            {
-                Debug.Log("The ratio cannot be larger than 100.");
-                message = "The ratio cannot be larger than 100.";
-                DisplayMessage(message);
-            }
-            else
-            {
-                string typeString = leafDropdown.captionText.text;
-
-                // Check if the same leaf type is selected
-                if (typeWithRatio.ContainsKey(typeString))
-                {
-                    message = "You have already chosen this type of leaf.\n" +
-                        "Please check your selection.";
-                    DisplayMessage(message);
-                    return;
-                }
-
-                typeWithRatio.Add(typeString, ratioInt);
-
-				// Add a leafButton
-                GameObject newButton = Instantiate(leafButton) as GameObject;
-                LeafButton button = newButton.GetComponent<LeafButton>();
-                button.leafName.text = typeString;
-                button.leafRatio.text = ratioInt.ToString() + "%";
-                newButton.transform.SetParent(listContent);
-                // Listen to the leaf button
-                button.onClick.AddListener(
-                        delegate ()
-                        {
-                            leafButtonClicked = button;
-                            LeafButtonClick();
-                        }
-
-                    );
-					
-                totalRatio = 0;
-                foreach (KeyValuePair<string, int> pair in typeWithRatio)
-                {
-                    totalRatio += pair.Value;
-                }
-            }
-           
+            Debug.Log("The sum of ratios must be no more than 100.\n You can only add " + (100-totalRatio) + " more percentage");
+            message = "The sum of ratios must be no more than 100.\n You can only add " + (100-totalRatio) + " more percentage";
+            DisplayMessage(message);
         }
         else
         {
-            Debug.Log("Please check the ratio.");
-            message = "Please check the ratio.";
-            DisplayMessage(message);
+
+            if (System.Int32.TryParse(Mathf.Round(inputRatioV2.value).ToString(), out ratioInt))
+            {
+                if (ratioInt > 100)
+                {
+                    Debug.Log("The ratio cannot be larger than 100.");
+                    message = "The ratio cannot be larger than 100.";
+                    DisplayMessage(message);
+                }
+                else
+                {
+                    string typeString = leafDropdown.captionText.text;
+
+                    // Check if the same leaf type is selected
+                    if (typeWithRatio.ContainsKey(typeString))
+                    {
+                        message = "You have already chosen this type of leaf.\n" +
+                            "Please check your selection.";
+                        DisplayMessage(message);
+                        return;
+                    }
+
+                    typeWithRatio.Add(typeString, ratioInt);
+
+                    // Add a leafButton
+                    GameObject newButton = Instantiate(leafButton) as GameObject;
+                    LeafButton button = newButton.GetComponent<LeafButton>();
+                    button.leafName.text = typeString + "      " + ratioInt.ToString() + "%";
+                    button.leafRatio.text = "";
+                    newButton.transform.SetParent(listContent);
+
+
+                    // Listen to the leaf button
+                    button.onClick.AddListener(
+                            delegate ()
+                            {
+                                leafButtonClicked = button;
+                                LeafButtonClick();
+                            }
+
+                        );
+
+                    totalRatio = 0;
+                    foreach (KeyValuePair<string, int> pair in typeWithRatio)
+                    {
+                        totalRatio += pair.Value;
+                    }
+                }
+
+            }
+            else
+            {
+                Debug.Log("Please check the ratio.");
+                message = "Please check the ratio.";
+                DisplayMessage(message);
+            }
         }
-        
     }
 
     private void LeafButtonClick()

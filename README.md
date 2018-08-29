@@ -37,7 +37,6 @@ To run the project, press the play button at the top centre of the screen. This 
 ``` 
 Assoc. Prof. **Trent Penman :**  E-mail: trent.penman@unimelb.edu.au
 Lead Developer for archived project  **Dan Ababei:**  E-mail: dan.ababei@unimelb.edu.au
-Assoc. Prof.**Steven Mascaro :**  E-mail: steven.mascaro@bayesian-intelligence.com
 ``` 
 
 Bushfre Prediction simulator is a project from the university. It's about simulation of falling leaves in forest to predict and calculate the spread of a bushfire

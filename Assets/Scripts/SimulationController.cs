@@ -30,8 +30,7 @@ public class SimulationController : MonoBehaviour {
         if (this.CanCreateLeaf()) {
             this.CreateLeaf();
         }
-
-        if (this.hasEnded(this.leaves)) {
+        else if (this.hasEnded(this.leaves)) {
             this.CalculateDensity(this.leaves);
         }
     }

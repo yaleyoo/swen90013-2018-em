@@ -1,14 +1,13 @@
 ﻿/*
  * Create by Marko Ristic
+ * Modified by Michael Lumley
  * Container class for a leaf shape, used to store leaves from leaf trait csv, and
  * used when directing simulation which leaves and ratios to use
  */
 
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class LeafShape {
+public class LeafData {
 
     // Can get all instance variables
     public string Name { get; set; }
@@ -21,7 +20,7 @@ public class LeafShape {
     public float LengthRange { get; set; }
 
     // Constructor just takes all variables
-    public LeafShape(string name,
+    public LeafData(string name,
                     string leafForm,
                     float thicknessMean, 
                     float thicknessRange, 
@@ -40,7 +39,7 @@ public class LeafShape {
     }
 
     // Empty contructor that creates default leaf
-    public LeafShape() {
+    public LeafData() {
         this.Name = "";
         this.LeafForm = "";
         this.ThicknessMean = 1;
@@ -49,5 +48,19 @@ public class LeafShape {
         this.WidthRange = 0.5f;
         this.LengthMean = 1;
         this.LengthRange = 0.5f;
+    }
+
+    // Given a leaf shape, returns a size of that leaf, taking the dimensions and their ranges into account
+    public Vector3 GetConcreteLeafSize() {
+        // Three dimensions of the leaf
+        float thickness = Random.Range(this.ThicknessMean - this.ThicknessRange / 2,
+                                        this.ThicknessMean + this.ThicknessRange / 2);
+        float width = Random.Range(this.WidthMean - this.WidthRange / 2,
+                                        this.WidthMean + this.WidthRange / 2);
+        float length = Random.Range(this.LengthMean - this.LengthRange / 2,
+                                        this.LengthMean + this.LengthRange / 2);
+
+        // Return as a vector for simplicity
+        return new Vector3(thickness, width, length);
     }
 }

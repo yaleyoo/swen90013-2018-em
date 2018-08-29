@@ -17,13 +17,10 @@ public class SimSettings {
     private static float dropAreaY = 100;
 
     // Leaf simulation settings
-    private static Dictionary<LeafShape, int> leafSizesAndRatios;
+    private static Dictionary<LeafData, int> leafSizesAndRatios;
     private static bool useLeafLimit = true;
     private static int leafLimit = 1000;
     private static float leafVolumeLimit = 30;
-
-    // Dynamic simulation information
-    private static int numLeavesDropped = 0;
 
     // Density calculation settings
     private static float densityIgnoreBorder = 10;
@@ -104,27 +101,15 @@ public class SimSettings {
     }
 
     // Get the list of leaves and their relative ratios to use in the simulation
-    public static Dictionary<LeafShape, int> GetLeafSizesAndRatios()
+    public static Dictionary<LeafData, int> GetLeafSizesAndRatios()
     {
         return leafSizesAndRatios;
     }
 
     // Set the list of leaves and their relative ratios to use in the simulation
-    public static void SetLeafSizesAndRatios(Dictionary<LeafShape, int> leafSizesAndRatios)
+    public static void SetLeafSizesAndRatios(Dictionary<LeafData, int> leafSizesAndRatios)
     {
         SimSettings.leafSizesAndRatios = leafSizesAndRatios;
-    }
-
-    // Get the number of leaves that have been dropped in the sumulation so far
-    public static int GetNumLeavesDropped()
-    {
-        return numLeavesDropped;
-    }
-
-    // Set the number of leaves dropped in the simulation so far
-    public static void SetNumLeavesDropped(int numLeavesDropped)
-    {
-        SimSettings.numLeavesDropped = numLeavesDropped;
     }
 
     // Get the distance from the edge of the dropping area to ignore when calculating density

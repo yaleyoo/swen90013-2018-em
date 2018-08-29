@@ -1,6 +1,6 @@
 ﻿/*
  * Created by Marko Ristic
- * Imports the leaf trait CSV and converts the leaves into the LeafShape class for passing
+ * Imports the leaf trait CSV and converts the leaves into the LeafData class for passing
  * to the leaf generation script
  */
 
@@ -19,12 +19,12 @@ public class CsvImporter {
     private static float SCALE = 0.1f;
 
     // Where to store csv data
-    public static List<LeafShape> Leaves { get; set; }
+    public static List<LeafData> Leaves { get; set; }
 
-    // Method to read leaf trait csv into LeafShape array, and return it
-    public static List<LeafShape> ReadCsv() {
+    // Method to read leaf trait csv into LeafData array, and return it
+    public static List<LeafData> ReadCsv() {
         // Initialise leaf list, this will also reset the list if being called again to re-load from csv
-        CsvImporter.Leaves = new List<LeafShape>();
+        CsvImporter.Leaves = new List<LeafData>();
 
         // Read csv and split into lines
         TextAsset data = Resources.Load(CSV_NAME) as TextAsset;
@@ -37,7 +37,7 @@ public class CsvImporter {
             if (parts.Length != 8) {
                 continue;
             }
-            CsvImporter.Leaves.Add(new LeafShape(
+            CsvImporter.Leaves.Add(new LeafData(
                                         // Name
                                         parts[0].Trim(),
                                         // Leaf form (lower case for consistency)
@@ -63,7 +63,7 @@ public class CsvImporter {
 
     // Debugging method to print all leaves in list on seperate lines
     public static void PrintLeaves() {
-        foreach (LeafShape l in CsvImporter.Leaves) {
+        foreach (LeafData l in CsvImporter.Leaves) {
             Debug.Log(string.Format("{0} - {1} - {2} {3} {4} {5} {6} {7}", 
                                     l.Name, 
                                     l.LeafForm, 

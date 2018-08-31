@@ -12,7 +12,7 @@ public class CsvImporterTest {
 
     [Test]
     public void CsvImporterRead() {
-        CsvImporter.ReadCsv();
-        CsvImporter.PrintLeaves();
+        CSVImporter.ReadCsv();
+        CSVImporter.PrintLeaves();
     }
 }

@@ -10,10 +10,10 @@ using System.Globalization;
 using System.Linq;
 using UnityEngine;
 
-public class CsvImporter {
+public class CSVImporter {
 
     // Name of the csv file; must be located in the Resources folder
-    private static string CSV_NAME = "LeafTraits";
+    private static string CSV_PATH = "Data/LeafTraits";
 
     // Scaling factor of leaf sizes to our simulation units
     private static float SCALE = 0.1f;
@@ -24,10 +24,10 @@ public class CsvImporter {
     // Method to read leaf trait csv into LeafData array, and return it
     public static List<LeafData> ReadCsv() {
         // Initialise leaf list, this will also reset the list if being called again to re-load from csv
-        CsvImporter.Leaves = new List<LeafData>();
+        CSVImporter.Leaves = new List<LeafData>();
 
         // Read csv and split into lines
-        TextAsset data = Resources.Load(CSV_NAME) as TextAsset;
+        TextAsset data = Resources.Load(CSV_PATH) as TextAsset;
         string[] lines = data.text.Split('\n');
 
         // For each line except first (header) parse individual sections, and add a new leaf shape to the list
@@ -37,7 +37,8 @@ public class CsvImporter {
             if (parts.Length != 8) {
                 continue;
             }
-            CsvImporter.Leaves.Add(new LeafData(
+
+            CSVImporter.Leaves.Add(new LeafData(
                                         // Name
                                         parts[0].Trim(),
                                         // Leaf form (lower case for consistency)
@@ -58,12 +59,13 @@ public class CsvImporter {
         }
 
         // Return the list of leaves
-        return CsvImporter.Leaves;
+        return CSVImporter.Leaves;
     }
 
     // Debugging method to print all leaves in list on seperate lines
     public static void PrintLeaves() {
-        foreach (LeafData l in CsvImporter.Leaves) {
+
+        foreach (LeafData l in CSVImporter.Leaves) {
             Debug.Log(string.Format("{0} - {1} - {2} {3} {4} {5} {6} {7}", 
                                     l.Name, 
                                     l.LeafForm, 

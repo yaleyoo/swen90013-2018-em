@@ -14,7 +14,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
-public class UIController : MonoBehaviour {
+public class UIController : MonoBehaviour
+{
 
     public Toggle visualizeToggle;
 
@@ -24,8 +25,9 @@ public class UIController : MonoBehaviour {
     // The list to save the selected name
     private List<string> type = new List<string>();
 
-    // The input field to set the ratio
-    public InputField inputRatio;
+    // The input field and slider to set the ratio
+    public Slider inputRatioSlider;
+    public Text inputRatioText;
 
     // Dictionary to save the type-ratio value pair
     private Dictionary<string, int> typeWithRatio;
@@ -56,7 +58,7 @@ public class UIController : MonoBehaviour {
     public GameObject leafButton;
     public Transform listContent;
     private LeafButton leafButtonClicked;
-   
+
 
     public Text okButtonText;
     public Button deleteButton;
@@ -75,23 +77,14 @@ public class UIController : MonoBehaviour {
         if (System.Int32.TryParse(leafNumField.text, out leafNum))
         {
             // Check if inputed leaf number is greater than 0
-            if (leafNum >= 0 && totalRatio == 100)
+            if (leafNum >= 0)
             {
                 Debug.Log("You selected " + leafNum + " leafs.");
                 SimSettings.SetLeafLimit(leafNum);
 
                 ChangeScene();
             }
-            else if(leafNum >= 0 && totalRatio != 100)
-            {
-                Debug.Log("Wrong input, please click the REST button and input agian.\n" +
-                    "The sum of ratios must be 100.\n");
-                
-                message = "Wrong input, please click the REST button and input agian.\n" +
-                    "The sum of ratios must be 100.\n";
-                DisplayMessage(message);
-            }
-            else 
+            else
             {
                 Debug.Log("Invalid number.");
 
@@ -100,21 +93,11 @@ public class UIController : MonoBehaviour {
             }
         }
         // Click the unlimited button, nothing in input field
-        else if(isUnlimited == true)
+        else if (isUnlimited == true)
         {
-            if (totalRatio != 100)
-            {
-                Debug.Log("Wrong input, please click the REST button and input agian.\n" +
-                   "The sum of ratios must be 100.\n");
-
-                message = "Wrong input, please click the REST button and input agian.\n" +
-                   "The sum of ratios must be 100.\n";
-                DisplayMessage(message);
-            }
-            else
-            {
-                ChangeScene();
-            }
+           
+            ChangeScene();
+            
         }
         else
         {
@@ -166,7 +149,13 @@ public class UIController : MonoBehaviour {
         // Add the type to the dropdown menu
         InitializeLeafDropdown();
     }
- 
+
+    public void UpdateRatio()
+    {
+        //inputRatioText = GetComponent<Text>();
+        inputRatioText.text = Mathf.Round(inputRatioSlider.value).ToString() + "%";
+    }
+    
     /* 
      * The response of clicking add button.
      * Display the selected type with ratio 
@@ -177,7 +166,7 @@ public class UIController : MonoBehaviour {
         // The int number to save the ratio of each type
         int ratioInt = 0;
         // Type conversion, string to int
-        if (System.Int32.TryParse(inputRatio.text, out ratioInt))
+        if (System.Int32.TryParse(Mathf.Round(inputRatioSlider.value).ToString(), out ratioInt))
         {
             if (ratioInt > 100)
             {
@@ -200,12 +189,15 @@ public class UIController : MonoBehaviour {
 
                 typeWithRatio.Add(typeString, ratioInt);
 
-				// Add a leafButton
+                // Add a leafButton
                 GameObject newButton = Instantiate(leafButton) as GameObject;
                 LeafButton button = newButton.GetComponent<LeafButton>();
-                button.leafName.text = typeString;
+                button.leafName.text = typeString ;
                 button.leafRatio.text = ratioInt.ToString() + "%";
+                
                 newButton.transform.SetParent(listContent);
+
+
                 // Listen to the leaf button
                 button.onClick.AddListener(
                         delegate ()
@@ -215,14 +207,14 @@ public class UIController : MonoBehaviour {
                         }
 
                     );
-					
+
                 totalRatio = 0;
                 foreach (KeyValuePair<string, int> pair in typeWithRatio)
                 {
                     totalRatio += pair.Value;
                 }
             }
-           
+
         }
         else
         {
@@ -230,12 +222,12 @@ public class UIController : MonoBehaviour {
             message = "Please check the ratio.";
             DisplayMessage(message);
         }
-        
+
     }
 
     private void LeafButtonClick()
     {
-        message = "Are you sure to delete?";
+        message = "Are you sure you want to delete?";
         okButtonText.text = "Cancel";
         deleteButton.gameObject.SetActive(true);
         DisplayMessage(message);
@@ -246,20 +238,19 @@ public class UIController : MonoBehaviour {
      * Reset all setting
      * Clear the dictionary typeWithRatio and the display text
      */
-     public void ResetOnClick()
+    public void ResetOnClick()
     {
         typeWithRatio.Clear();
-        inputRatio.text = "";
         leafNumField.text = "";
         isUnlimited = false;
-		GameObject[] leafButtons= GameObject.FindGameObjectsWithTag("LeafButton");
+        GameObject[] leafButtons = GameObject.FindGameObjectsWithTag("LeafButton");
         if (leafButtons.Length > 0)
         {
             foreach (GameObject o in leafButtons)
             {
                 Destroy(o);
             }
-        }        
+        }
         totalRatio = 0;
         //leafNum = 0;
     }
@@ -277,9 +268,9 @@ public class UIController : MonoBehaviour {
     private void InitializeLeafDropdown()
     {
         // Read leaf trait csv
-        CsvImporter.ReadCsv();
+        CSVImporter.ReadCsv();
 
-        foreach (LeafData l in CsvImporter.Leaves)
+        foreach (LeafData l in CSVImporter.Leaves)
         {
             type.Add(l.Name);
         }
@@ -303,7 +294,7 @@ public class UIController : MonoBehaviour {
     }
 
     public void DeleteOnClick()
-    {        
+    {
         okButtonText.text = "OK";
         deleteButton.gameObject.SetActive(false);
         messageBox.gameObject.SetActive(false);
@@ -321,7 +312,7 @@ public class UIController : MonoBehaviour {
 
         foreach (KeyValuePair<string, int> pair in typeWithRatio)
         {
-            temp = CsvImporter.Leaves.Find((LeafData l) => l.Name == pair.Key);
+            temp = CSVImporter.Leaves.Find((LeafData l) => l.Name == pair.Key);
             leavesAndRatios.Add(temp, pair.Value);
             Debug.Log(temp.Name + ":" + pair.Value);
         }

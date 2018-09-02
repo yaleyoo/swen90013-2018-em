@@ -2,7 +2,7 @@
  * Created by Marko Ristic.
  * Modified by Yudong Gao.
  * Class to store static variables between simulation and output scenes.
- * also for other margin of errors calculation
+ * also for other error calculations
  * 
  */
 
@@ -18,15 +18,23 @@ public class Results {
 
 	private static float median;
 
-	// a resultset used to store all density results
+	/// <summary>
+	/// a resultset used to store all density results
+	/// </summary>
 	private static List<float> resultset = new List<float>();
 
-	// return the average value
+	/// <summary>
+	/// Gets the value of average density.
+	/// </summary>
+	/// <returns>The average density(float).</returns>
 	public static float GetAverage(){
 		return average;
 	}
 
-	// calculate and set the average
+	/// <summary>
+	/// Calculate the average density,
+	/// then set it to the static variable "average".
+	/// </summary>
 	public static void SetAverage(){
 		float sum = 0;
 
@@ -38,12 +46,18 @@ public class Results {
 		average = sum / resultset.Count;
 	}
 
-	// get the value of standard deviation
+	/// <summary>
+	/// Gets the Standard Deviation.
+	/// </summary>
+	/// <returns>The Standard Deviation(double).</returns>
 	public static double GetSD(){
 		return standard_deviation;
 	}
 
-	// set the value of standard deviation
+	/// <summary>
+	/// Calculate the Standard Deviation,
+	/// then set it to the static variable "standard_deviation".
+	/// </summary>
 	public static void SetSD(){
 		float sum = 0;
 
@@ -57,12 +71,17 @@ public class Results {
 
 	}
 
-	// get the median value
+	/// <summary>
+	/// Gets the median.
+	/// </summary>
+	/// <returns>The median(float).</returns>
 	public static float GetMedian(){
 		return median;
 	}
 
-	// set the median value
+	/// <summary>
+	/// Sets the median, then set it to the static variable "median".
+	/// </summary>
 	public static void SetMedian(){
 		// index for 
 		int index;
@@ -80,7 +99,10 @@ public class Results {
 		median = resultset[index];
 	}
 
-	// add one result to the result set
+	/// <summary>
+	/// Adds the result to the "resultset" list
+	/// </summary>
+	/// <param name="rs">one density result(float)</param>
 	public static void addResult(float rs){
 		resultset.Add (rs);
 	}

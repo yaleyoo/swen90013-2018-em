@@ -11,8 +11,13 @@ public class OutputController : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
+		// first calculate the results
+		// note: only average for single-run now
+		//       lack standard-deviation and median
+		Results.SetAverage ();
+
         // Print the results to the screen
-		string result = "Volume density of leaf litter (as ratio):\n" + System.Math.Round(Results.GetDensity(), 6).ToString();
+		string result = "Volume density of leaf litter (as ratio):\n" + System.Math.Round(Results.GetAverage(), 6).ToString();
         GameObject.FindGameObjectWithTag("OutputText").GetComponent<Text>().text = result;
 
         // Save the results to a file
@@ -26,7 +31,7 @@ public class OutputController : MonoBehaviour {
     {
         StreamWriter writer = new StreamWriter(pathToOutputFile, false);
         writer.WriteLine("Density");
-        writer.WriteLine(Results.GetDensity());
+		writer.WriteLine(Results.GetAverage());
         writer.Close();
     }
 

@@ -13,11 +13,17 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 using System;
+using Crosstales.FB;
 
 public class UIController : MonoBehaviour
 {
+    // one of these two toggles must be on but cannot be on at the same time    
+    public Toggle bunchrunToggle;
+    public Toggle singlerunToggle;
 
     public Toggle visualizeToggle;
+
+    public bool bunchrunFileLoadSuccess = false;
 
     // Dropdown menu to select types of leaves
     public Dropdown leafDropdown;
@@ -66,12 +72,7 @@ public class UIController : MonoBehaviour
 
     // Invoke when Start button clicked
     public void StartOnClick()
-    {
-        // To pass the dictionary leavesAndRatios to the LeafGenerator
-        // Get the LeafShap based on the leaf name
-        GetLeafShape(typeWithRatio);
-        SimSettings.SetLeafSizesAndRatios(leavesAndRatios);
-
+    {      
         // Actions to submit the number of leaves
         // Check if input leaf limit is valid
         if (System.Int32.TryParse(leafNumField.text, out leafNum))
@@ -109,21 +110,67 @@ public class UIController : MonoBehaviour
         }
     }
 
+    public void LoadBunchRunCsvClick()
+    {
+        string extensions = "csv";
+        string path = FileBrowser.OpenSingleFile("Open File", "", extensions);
+        Debug.Log("Selected file: " + path);
+        bunchrunToggle.isOn = true;
+        // click cancel or didn't choose file
+        if (path == "") {
+            bunchrunFileLoadSuccess = false;
+            return;
+        }
+        string errormsg = "";
+        if (BunchRunCsvLoader.LoadFile(path, out errormsg) != 0)
+        {
+            bunchrunFileLoadSuccess = false;
+            DisplayMessage(errormsg);
+        }
+        else
+        {
+            bunchrunFileLoadSuccess = true;
+        }                
+    }
+
     // Load the simulation
     private void ChangeScene()
     {
-        // If visualization toggle is choosen
-        if (visualizeToggle.isOn)
-        {
-            SimSettings.SetVisualize(true);
+        // If single run toggle is choosen
+        if (singlerunToggle.isOn)
+        {            
+            // To pass the dictionary leavesAndRatios to the LeafGenerator
+            // Get the LeafShap based on the leaf name
+            GetLeafShape(typeWithRatio);
+            if (leavesAndRatios.Count == 0)
+            {
+                message = "Please input leaves and rations.";
+                DisplayMessage(message);
+                return;
+            }
+            SimSettings.SetLeafSizesAndRatios(leavesAndRatios);
+            // set visualize flag according to visualizeToggle's status
+            SimSettings.SetVisualize(visualizeToggle.isOn);            
+            SimSettings.SetRunTimesLeft(1);
             SceneManager.LoadScene("Simulation");
         }
-        // If visualization toggle is not choosen
-        else
+        // If bunch run toggle is choosen
+        else if (bunchrunToggle.isOn)
         {
+            if (!bunchrunFileLoadSuccess)
+            {
+                message = "Load bunch run data error.";
+                DisplayMessage(message);
+                return;
+            }
             SimSettings.SetVisualize(false);
+            SimSettings.SetBunchrun(true);
+            int runRound = BunchRunCsvLoader.bunchrunLeafAndRatio.Keys.Count - SimSettings.GetRunTimeesLeft() + 1;
+            Debug.Log("current round = " + runRound);
+            Dictionary<LeafData, int> leafSizesAndRatios;
+            BunchRunCsvLoader.bunchrunLeafAndRatio.TryGetValue(runRound, out leafSizesAndRatios);
+            SimSettings.SetLeafSizesAndRatios(leafSizesAndRatios);
             SceneManager.LoadScene("Simulation");
-
         }
     }
 

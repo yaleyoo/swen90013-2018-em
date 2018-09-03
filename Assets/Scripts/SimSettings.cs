@@ -11,6 +11,11 @@ public class SimSettings {
     // Visual simulation settings
     private static bool visualize;
 
+    // Bunch run flag
+    private static bool bunchrun;
+    // Remaining run times
+    private static int runTimesLeft = 1;
+
     // Spacial simulation settings
     private static float dropHeight = 100;
     private static float dropAreaX = 100;
@@ -36,6 +41,30 @@ public class SimSettings {
     public static void SetVisualize(bool isVisualize)
     {
         SimSettings.visualize = isVisualize;
+    }
+
+    // Get bunchrun flag
+    public static bool GetBunchrun()
+    {
+        return bunchrun;
+    }
+
+    // Set bunchrun flag
+    public static void SetBunchrun(bool isBunchrun)
+    {
+        bunchrun = isBunchrun;
+    }
+
+    // Get bunchrun times
+    public static int GetRunTimeesLeft()
+    {
+        return runTimesLeft;
+    }
+
+    // Set bunchrun times
+    public static void SetRunTimesLeft(int runTimesLeft)
+    {
+        SimSettings.runTimesLeft = runTimesLeft;
     }
 
     // Check if a leaf limit exists

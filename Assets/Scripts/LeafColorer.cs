@@ -69,4 +69,9 @@ public class LeafColorer {
             }
         }
     }
+
+	public List<Color> getPresetColors(){
+		return this.presetColors;
+	}
+
 }

@@ -11,7 +11,7 @@ public class LeafObjectTest {
 	[Test]
 	public void LeafSetAndGetName() {
 		//Arrage
-		GameObject gm = GameObject.Instantiate((GameObject)Resources.Load("Leaf"), new Vector3(0,10,0), Quaternion.Euler(0,0,0));
+		GameObject gm = GameObject.Instantiate((GameObject)Resources.Load("FlatLeaf"), new Vector3(0,10,0), Quaternion.Euler(0,0,0));
 		string leafName="";
 		//Act
 		gm.GetComponent<Leaf>().SetName("LeafName");

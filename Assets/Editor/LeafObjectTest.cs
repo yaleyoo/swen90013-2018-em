@@ -22,7 +22,7 @@ public class LeafObjectTest {
 
 	[Test]
 	public void LeafSetAndGetSize() {
-		GameObject gm = GameObject.Instantiate((GameObject)Resources.Load("Leaf"), new Vector3(0,10,0), Quaternion.Euler(0,0,0));
+		GameObject gm = GameObject.Instantiate((GameObject)Resources.Load("FlatLeaf"), new Vector3(0,10,0), Quaternion.Euler(0,0,0));
 		gm.GetComponent<Leaf> ().SetSize (0, 10, 0);
 		Vector3 v = new Vector3 (10, 0, 0);
 		Assert.AreEqual (v, gm.GetComponent<Leaf> ().GetSize ());
@@ -31,7 +31,7 @@ public class LeafObjectTest {
 
     [Test]
     public void LeafCheckIfMoving() {
-        GameObject gm = GameObject.Instantiate((GameObject)Resources.Load("Leaf"), new Vector3(0, 10, 0), Quaternion.Euler(0, 0, 0));
+        GameObject gm = GameObject.Instantiate((GameObject)Resources.Load("FlatLeaf"), new Vector3(0, 10, 0), Quaternion.Euler(0, 0, 0));
         Leaf leaf = gm.GetComponent<Leaf>();
 
         float speed = 0.5f;
@@ -44,7 +44,7 @@ public class LeafObjectTest {
 
     [Test]
     public void LeafCheckIfNotMoving() {
-        GameObject gm = GameObject.Instantiate((GameObject)Resources.Load("Leaf"), new Vector3(0, 10, 0), Quaternion.Euler(0, 0, 0));
+        GameObject gm = GameObject.Instantiate((GameObject)Resources.Load("FlatLeaf"), new Vector3(0, 10, 0), Quaternion.Euler(0, 0, 0));
         Leaf leaf = gm.GetComponent<Leaf>();
 
         float speed = 0.4f;

@@ -20,16 +20,16 @@ public class LeafGeneratorTest {
 		leafShapes.Add(ld2, 100);
 		LeafGenerator leafGen = new LeafGenerator(leafShapes, 50, 50, 100);
 	}
-	[Test]
-	public void GetNextLeafTest() {
-		GameObject nextLeaf = null;
-		LeafData ld1 = new LeafData ();
-		Dictionary<LeafData, int> leafShapes = new Dictionary<LeafData, int>();
-		leafShapes.Add(ld1, 200);
-		LeafGenerator leafGen = new LeafGenerator(leafShapes, 50, 50, 100);
-		nextLeaf = leafGen.GetNextLeaf (false);
-
-	}
+//	[Test]
+//	public void GetNextLeafTest() {
+//		GameObject nextLeaf = null;
+//		LeafData ld1 = new LeafData ();
+//		Dictionary<LeafData, int> leafShapes = new Dictionary<LeafData, int>();
+//		leafShapes.Add(ld1, 200);
+//		LeafGenerator leafGen = new LeafGenerator(leafShapes, 50, 50, 100);
+//		nextLeaf = leafGen.GetNextLeaf (false);
+//
+//	}
 	[Test]
 	public void GetRandomPointInDropAreaTest() {
 		LeafData ld1 = new LeafData ();

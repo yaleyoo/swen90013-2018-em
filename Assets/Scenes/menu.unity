@@ -2141,7 +2141,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Load Bunch Run CSV File
+  m_Text: Load Batch Run CSV File
 --- !u!222 &552321635
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3520,7 +3520,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Bunch run
+  m_Text: Batch run
 --- !u!222 &1030500668
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -4834,7 +4834,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Bunch run
+  m_Text: Batch run
 --- !u!222 &1356749741
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -6259,7 +6259,7 @@ GameObject:
   - component: {fileID: 1617224694}
   - component: {fileID: 1617224693}
   m_Layer: 5
-  m_Name: BunchrunToggle
+  m_Name: BatchrunToggle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6900,7 +6900,7 @@ GameObject:
   - component: {fileID: 1740221521}
   - component: {fileID: 1740221520}
   m_Layer: 5
-  m_Name: LoadBunchRunCsvButton
+  m_Name: LoadBatchRunCsvButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6986,7 +6986,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1966181418}
-        m_MethodName: LoadBunchRunCsvClick
+        m_MethodName: LoadBatchRunCsvClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -7794,10 +7794,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32338c108363f5447b9b69d1a7bb8cbf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bunchrunToggle: {fileID: 1617224695}
+  batchrunToggle: {fileID: 1617224695}
   singlerunToggle: {fileID: 111885470}
   visualizeToggle: {fileID: 140933380}
-  bunchrunFileLoadSuccess: 0
+  batchrunFileLoadSuccess: 0
   leafDropdown: {fileID: 1148679503}
   inputRatioSlider: {fileID: 171979961}
   inputRatioText: {fileID: 199428958}

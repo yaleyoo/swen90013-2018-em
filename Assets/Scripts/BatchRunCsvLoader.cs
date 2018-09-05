@@ -3,18 +3,18 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-public class BunchRunCsvLoader
+public class BatchRunCsvLoader
 {
     // holds leaves and rations for each run. 
     // key: run round id, the first run round is 1. value: Dictionary of this run's leaves and rations
-    public static Dictionary<int, Dictionary<LeafData, int>> bunchrunLeafAndRatio = new Dictionary<int, Dictionary<LeafData, int>>();
+    public static Dictionary<int, Dictionary<LeafData, int>> batchrunLeafAndRatio = new Dictionary<int, Dictionary<LeafData, int>>();
 
     // load csv file. 
     // Path: file path.
     // string: error message. Null if no error.
     // return: 0 for normal. -1 for error.
     public static int LoadFile(string path, out string errorMsg)    {
-        bunchrunLeafAndRatio.Clear();
+        batchrunLeafAndRatio.Clear();
         SimSettings.SetRunTimesLeft(0);
         // holds leaf types (by loading the first row of csv)
         List<LeafData> leafType = new List<LeafData>();
@@ -45,7 +45,7 @@ public class BunchRunCsvLoader
                             if (shape == null || shape.Name == "")
                             {
                                 errorMsg = "Cannot find leaf with name " + columnData;
-                                bunchrunLeafAndRatio.Clear();
+                                batchrunLeafAndRatio.Clear();
                                 return -1;
                             }
                             else
@@ -61,7 +61,7 @@ public class BunchRunCsvLoader
                             if (!result)
                             {
                                 errorMsg = "Cannot cast ration " + columnData;
-                                bunchrunLeafAndRatio.Clear();
+                                batchrunLeafAndRatio.Clear();
                                 return -1;
                             }
                             else
@@ -77,13 +77,13 @@ public class BunchRunCsvLoader
                     if (columnNum != leafType.Count)
                     {
                         errorMsg = "Ration number can't match leaf type number.";
-                        bunchrunLeafAndRatio.Clear();
+                        batchrunLeafAndRatio.Clear();
                         return -1;
                     }
                     if (lineNum > 0)
                     {
-                        // add this row data to the whole bunch run collection
-                        bunchrunLeafAndRatio.Add(lineNum, leafAndRatio);
+                        // add this row data to the whole batch run collection
+                        batchrunLeafAndRatio.Add(lineNum, leafAndRatio);
                     }
                 }
                 lineNum++;
@@ -98,11 +98,11 @@ public class BunchRunCsvLoader
         if (lineNum < 1)
         {
             errorMsg = "No ration lines.";
-            bunchrunLeafAndRatio.Clear();
+            batchrunLeafAndRatio.Clear();
             return -1;
         }
         // set runtimes
-        SimSettings.SetRunTimesLeft(bunchrunLeafAndRatio.Count);
+        SimSettings.SetRunTimesLeft(batchrunLeafAndRatio.Count);
         Debug.Log("GetRunTimes = " + SimSettings.GetRunTimeesLeft());            
         errorMsg = "";
         return 0;

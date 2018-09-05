@@ -24,11 +24,11 @@ public class OutputController : MonoBehaviour {
             if (SimSettings.GetRunTimeesLeft() > 0)                
             {
                 // get next round number
-                int runRound = BunchRunCsvLoader.bunchrunLeafAndRatio.Keys.Count - SimSettings.GetRunTimeesLeft() + 1;
+                int runRound = BatchRunCsvLoader.batchrunLeafAndRatio.Keys.Count - SimSettings.GetRunTimeesLeft() + 1;
                 Debug.Log("current round = " + runRound);
                 Dictionary<LeafData, int> leafSizesAndRatios;
-                // get next round leaves and ratios from bunch run dictionary by run round number
-                BunchRunCsvLoader.bunchrunLeafAndRatio.TryGetValue(runRound, out leafSizesAndRatios);
+                // get next round leaves and ratios from batch run dictionary by run round number
+                BatchRunCsvLoader.batchrunLeafAndRatio.TryGetValue(runRound, out leafSizesAndRatios);
                 // set next round leaves and ratios to settings for loading by simulation 
                 SimSettings.SetLeafSizesAndRatios(leafSizesAndRatios);
                 // go to simulate next run

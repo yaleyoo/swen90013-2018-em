@@ -18,12 +18,12 @@ using Crosstales.FB;
 public class UIController : MonoBehaviour
 {
     // one of these two toggles must be on but cannot be on at the same time    
-    public Toggle bunchrunToggle;
+    public Toggle batchrunToggle;
     public Toggle singlerunToggle;
 
     public Toggle visualizeToggle;
 
-    public bool bunchrunFileLoadSuccess = false;
+    public bool batchrunFileLoadSuccess = false;
 
     // Dropdown menu to select types of leaves
     public Dropdown leafDropdown;
@@ -110,26 +110,26 @@ public class UIController : MonoBehaviour
         }
     }
 
-    public void LoadBunchRunCsvClick()
+    public void LoadBatchRunCsvClick()
     {
         string extensions = "csv";
         string path = FileBrowser.OpenSingleFile("Open File", "", extensions);
         Debug.Log("Selected file: " + path);
-        bunchrunToggle.isOn = true;
+        batchrunToggle.isOn = true;
         // click cancel or didn't choose file
         if (path == "") {
-            bunchrunFileLoadSuccess = false;
+            batchrunFileLoadSuccess = false;
             return;
         }
         string errormsg = "";
-        if (BunchRunCsvLoader.LoadFile(path, out errormsg) != 0)
+        if (BatchRunCsvLoader.LoadFile(path, out errormsg) != 0)
         {
-            bunchrunFileLoadSuccess = false;
+            batchrunFileLoadSuccess = false;
             DisplayMessage(errormsg);
         }
         else
         {
-            bunchrunFileLoadSuccess = true;
+            batchrunFileLoadSuccess = true;
         }                
     }
 
@@ -154,21 +154,21 @@ public class UIController : MonoBehaviour
             SimSettings.SetRunTimesLeft(1);
             SceneManager.LoadScene("Simulation");
         }
-        // If bunch run toggle is choosen
-        else if (bunchrunToggle.isOn)
+        // If batch run toggle is choosen
+        else if (batchrunToggle.isOn)
         {
-            if (!bunchrunFileLoadSuccess)
+            if (!batchrunFileLoadSuccess)
             {
-                message = "Load bunch run data error.";
+                message = "Load batch run data error.";
                 DisplayMessage(message);
                 return;
             }
             SimSettings.SetVisualize(false);
-            SimSettings.SetBunchrun(true);
-            int runRound = BunchRunCsvLoader.bunchrunLeafAndRatio.Keys.Count - SimSettings.GetRunTimeesLeft() + 1;
+            SimSettings.SetBatchrun(true);
+            int runRound = BatchRunCsvLoader.batchrunLeafAndRatio.Keys.Count - SimSettings.GetRunTimeesLeft() + 1;
             Debug.Log("current round = " + runRound);
             Dictionary<LeafData, int> leafSizesAndRatios;
-            BunchRunCsvLoader.bunchrunLeafAndRatio.TryGetValue(runRound, out leafSizesAndRatios);
+            BatchRunCsvLoader.batchrunLeafAndRatio.TryGetValue(runRound, out leafSizesAndRatios);
             SimSettings.SetLeafSizesAndRatios(leafSizesAndRatios);
             SceneManager.LoadScene("Simulation");
         }

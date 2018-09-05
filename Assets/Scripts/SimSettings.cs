@@ -11,8 +11,8 @@ public class SimSettings {
     // Visual simulation settings
     private static bool visualize;
 
-    // Bunch run flag
-    private static bool bunchrun;
+    // Batch run flag
+    private static bool batchrun;
     // Remaining run times
     private static int runTimesLeft = 1;
 
@@ -43,25 +43,25 @@ public class SimSettings {
         SimSettings.visualize = isVisualize;
     }
 
-    // Get bunchrun flag
-    public static bool GetBunchrun()
+    // Get batchrun flag
+    public static bool GetBatchrun()
     {
-        return bunchrun;
+        return batchrun;
     }
 
-    // Set bunchrun flag
-    public static void SetBunchrun(bool isBunchrun)
+    // Set batchrun flag
+    public static void SetBatchrun(bool isBatchrun)
     {
-        bunchrun = isBunchrun;
+        batchrun = isBatchrun;
     }
 
-    // Get bunchrun times
+    // Get batchrun times
     public static int GetRunTimeesLeft()
     {
         return runTimesLeft;
     }
 
-    // Set bunchrun times
+    // Set batchrun times
     public static void SetRunTimesLeft(int runTimesLeft)
     {
         SimSettings.runTimesLeft = runTimesLeft;

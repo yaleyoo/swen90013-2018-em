@@ -74,18 +74,99 @@ public class DensityCalculationCylinder {
     }
 
     /// <summary>
-    /// Checks if the point is in any of the objects
+    /// Checks if the given point is in any of the world objects. Same as above function but
+    /// uses the ray cast method to check whether or not point is inside objects.
+    /// Method adapted from https://answers.unity.com/questions/163864/test-if-point-is-in-collider.html
     /// </summary>
-    /// <param name="point">The point</param>
-    /// <returns>Whether the point is in an object</returns>
-    public bool IsPointInObjects(Vector3 point) {
-        foreach (GameObject obj in this.objectsInWorld) {
-            if (obj.GetComponent<Collider>().bounds.Contains(point)) {
-                return true;
+    /// <param name="point">The point which may be inside a world object</param>
+    /// <returns>True if the point given is inside any world objects</returns>
+    public bool IsPointInObjectsRayCast(Vector3 point)
+    {
+        // Chose a point which will definitely not be inside an object as raycast origin. This is
+        // chosen as a point just above the leaf dropping height
+        Vector3 distantPoint = new Vector3(0, SimSettings.GetDropHeight() + 10, 0);
+
+        // Gets the direction and distance from raycast origin, to the point we are checking
+        Vector3 directionToPoint = point - distantPoint;
+        float distance = directionToPoint.magnitude;
+        directionToPoint.Normalize();
+
+        // Get the number of collisions from the distant point to the point we are checking.
+        // Note this has to be done in both directions due to colliders not being hit from the inside (back face)
+        // and this also RELIES on convex objects in the world, as raycastting will only collide with the same
+        // collider once
+        int hits = 0;
+        hits += Physics.RaycastAll(distantPoint, directionToPoint, distance).Length;
+        hits += Physics.RaycastAll(point, -directionToPoint, distance).Length;
+        // If odd number of hits, then point is in object
+        return (hits % 2) == 1;
+    }
+
+    /// <summary>
+    /// Checks if the given point is in any of the world objects. Uses raycasting as above, but performs the
+    /// cast manually. This allows hitting the same collider more than once, and ensures concave objects
+    /// will be detected correctly as well as convex ones.
+    /// Method adapted from https://answers.unity.com/questions/163864/test-if-point-is-in-collider.html
+    /// </summary>
+    /// <param name="point">The point which may be inside a world object</param>
+    /// <returns>True if the point given is inside any world objects</returns>
+    public bool IsPointInObjectsRayCastConcave(Vector3 point)
+    {
+        // Chose a point which will definitely not be inside an object as raycast origin. This is
+        // chosen as a point just above the leaf dropping height
+        Vector3 distantPoint = new Vector3(0, SimSettings.GetDropHeight() + 10, 0);
+
+        // Gets the direction from raycast origin, to the point we are checking
+        Vector3 direction = point - distantPoint;
+        direction.Normalize();
+
+        // Keeps track of the number of collisions made by the ray cast
+        int collisions = 0;
+
+        // Start ray cast at the distant point, and iterate over collisions towards the point we are checking
+        Vector3 currPoint = distantPoint;
+        while (currPoint != point)
+        {
+            // If there is a ray cast collision, increase the counter appropriately
+            RaycastHit hit;
+            if (Physics.Linecast(currPoint, point, out hit))
+            {
+                collisions++;
+                // Move the current point to *just* after the colision point, to avoid hitting the same collision repeatedly
+                currPoint = hit.point + (direction / 1000.0f);
+            }
+            // No more collisions, current point can be set as the end of ray cast (the point being checked)
+            else
+            {
+                currPoint = point;
             }
         }
 
-        return false;
-    }
+        // Repeat the raycast process in the other direction. As colliders are only hit when tracing "from the outside in", this ensures
+        // that all collisions are detected correctly (back faces also detected)
+        while (currPoint != distantPoint)
+        {
+            RaycastHit hit;
+            if (Physics.Linecast(currPoint, distantPoint, out hit))
+            {
+                collisions++;
+                currPoint = hit.point + (-direction / 100.0f);
+            }
+            else
+            {
+                currPoint = distantPoint;
+            }
+        }
 
+        // If the number of collisions is odd, then point was in an object
+        if (collisions % 2 == 1)
+        {
+            return true;
+        }
+        // If number of collisions is even, then point not in any object
+        else
+        {
+            return false;
+        }
+    }
 }

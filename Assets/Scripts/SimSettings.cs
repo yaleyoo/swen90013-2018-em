@@ -20,7 +20,7 @@ public class SimSettings {
     private static Dictionary<LeafData, int> leafSizesAndRatios;
     private static bool useLeafLimit = true;
     private static int leafLimit = 1000;
-    private static float leafVolumeLimit = 30;
+    private static float leafVolumeLimit = 15;
 
     // Density calculation settings
     private static float densityIgnoreBorder = 10;

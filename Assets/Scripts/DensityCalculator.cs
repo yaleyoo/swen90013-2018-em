@@ -14,22 +14,18 @@ public class DensityCalculator {
     /// <param name="sampleSize">The number of points to sample</param>
     /// <returns></returns>
     public float CalculateDensity(DensityCalculationCylinder calcArea, int sampleSize) {
-        float numPointsInAir = 0;
         float numPointsInLeaves = 0;
 
         for (int i = 0; i < sampleSize; i++) {
             Vector3 pointInCylinder = calcArea.RandomPointInCylinder();
 
-            if (calcArea.IsPointInObjects(pointInCylinder)) {
+            if (calcArea.IsPointInObjectsRayCast(pointInCylinder)) {
                 numPointsInLeaves++;
-            }
-            else {
-                numPointsInAir++;
             }
         }
 
-        if (numPointsInAir > 0) {
-            return numPointsInLeaves / numPointsInAir;
+        if (sampleSize > 0) {
+            return numPointsInLeaves / sampleSize;
         }
         else {
             return 0;

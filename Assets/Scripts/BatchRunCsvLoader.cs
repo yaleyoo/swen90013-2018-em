@@ -1,43 +1,47 @@
-﻿using System;
+﻿/* 
+ * Load the csv file for a batch run
+ */
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
 public class BatchRunCsvLoader
 {
-    // holds leaves and rations for each run. 
-    // key: run round id, the first run round is 1. value: Dictionary of this run's leaves and rations
+    // Holds leaves and ratios for each run. 
+    // key: run round id, the first run round is 1. value: Dictionary of this run's leaves and ratios
     public static Dictionary<int, Dictionary<LeafData, int>> batchrunLeafAndRatio = new Dictionary<int, Dictionary<LeafData, int>>();
 
-    // load csv file. 
+    // Load the csv file. 
     // Path: file path.
     // string: error message. Null if no error.
     // return: 0 for normal. -1 for error.
     public static int LoadFile(string path, out string errorMsg)    {
         batchrunLeafAndRatio.Clear();
         SimSettings.SetRunTimesLeft(0);
-        // holds leaf types (by loading the first row of csv)
+        // Holds leaf types (by loading the first row of csv)
         List<LeafData> leafType = new List<LeafData>();
 
         StreamReader reader = new StreamReader(path, System.Text.Encoding.Default, false);
         int lineNum = 0;
         try
         {
-            // read file line by line
+            // Read file line by line
             while (!reader.EndOfStream)
             {
                 string line = reader.ReadLine();
                 if (!string.IsNullOrEmpty(line.Trim()))
                 {
                     Debug.Log(line);
-                    // slit columns by ',' 
+                    // Split columns by ',' 
                     string[] parts = line.Split(',');
                     int columnNum = 0;
-                    // leaves and ratios of a row
+                    // Leaves and ratios of a row
                     Dictionary<LeafData, int> leafAndRatio = new Dictionary<LeafData, int>();
                     foreach (string columnData in parts)
                     {
-                        // get leaf types from first row
+                        // Get leaf types from first row
                         if (lineNum == 0)
                         {
                             // get leaf object by name.
@@ -60,7 +64,7 @@ public class BatchRunCsvLoader
                             bool result = Int32.TryParse(columnData, out ratio);
                             if (!result)
                             {
-                                errorMsg = "Cannot cast ration " + columnData;
+                                errorMsg = "Cannot cast ratio: " + columnData;
                                 batchrunLeafAndRatio.Clear();
                                 return -1;
                             }
@@ -76,7 +80,7 @@ public class BatchRunCsvLoader
 
                     if (columnNum != leafType.Count)
                     {
-                        errorMsg = "Ration number can't match leaf type number.";
+                        errorMsg = "Ratio number can't match leaf type number.";
                         batchrunLeafAndRatio.Clear();
                         return -1;
                     }
@@ -95,9 +99,9 @@ public class BatchRunCsvLoader
             reader.Close();
         }
 
-        if (lineNum < 1)
+        if (lineNum <= 1)
         {
-            errorMsg = "No ration lines.";
+            errorMsg = "Empty file or No ratio lines.";
             batchrunLeafAndRatio.Clear();
             return -1;
         }

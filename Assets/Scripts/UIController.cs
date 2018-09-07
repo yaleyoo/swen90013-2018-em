@@ -1,12 +1,11 @@
-﻿/*
- * Created by Yuanyu Guo.
- * User interface for select visualization
- * 
- * User interface to select the type of leaf
- *      and set the ratio of leaves
- *      
- * User interface to select number of leaves to drop
+﻿/* 
+ * User interface for select:
+ *      number of leaves to simulate
+ *      single run & batch run
+ *      select the type of leaf with ratio
+ *      visualization
  */
+
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -17,7 +16,7 @@ using Crosstales.FB;
 
 public class UIController : MonoBehaviour
 {
-    // one of these two toggles must be on but cannot be on at the same time    
+    // One of these two toggles must be on but cannot be on at the same time    
     public Toggle batchrunToggle;
     public Toggle singlerunToggle;
 
@@ -46,9 +45,6 @@ public class UIController : MonoBehaviour
 
     // Limit of leaf to be set
     private int leafNum;
-
-    // The total ratio of selected leaves must be equal to 100
-    public static int totalRatio;
 
     // The flag whether the user click the un limited button
     private bool isUnlimited;
@@ -110,22 +106,23 @@ public class UIController : MonoBehaviour
         }
     }
 
+    // Click the button to choose the file
     public void LoadBatchRunCsvClick()
     {
         string extensions = "csv";
         string path = FileBrowser.OpenSingleFile("Open File", "", extensions);
         Debug.Log("Selected file: " + path);
         batchrunToggle.isOn = true;
-        // click cancel or didn't choose file
+        // Click cancel or didn't choose file
         if (path == "") {
             batchrunFileLoadSuccess = false;
             return;
         }
-        string errormsg = "";
-        if (BatchRunCsvLoader.LoadFile(path, out errormsg) != 0)
+        string errorMsg = "";
+        if (BatchRunCsvLoader.LoadFile(path, out errorMsg) != 0)
         {
             batchrunFileLoadSuccess = false;
-            DisplayMessage(errormsg);
+            DisplayMessage(errorMsg);
         }
         else
         {
@@ -144,7 +141,7 @@ public class UIController : MonoBehaviour
             GetLeafShape(typeWithRatio);
             if (leavesAndRatios.Count == 0)
             {
-                message = "Please input leaves and rations.";
+                message = "Please input leaves and ratios.";
                 DisplayMessage(message);
                 return;
             }
@@ -181,11 +178,10 @@ public class UIController : MonoBehaviour
         Application.Quit();
     }
 
+    // Initialisation
     private void Start()
     {
         typeWithRatio = new Dictionary<string, int>();
-
-        totalRatio = 0;
 
         isUnlimited = false;
 
@@ -197,10 +193,11 @@ public class UIController : MonoBehaviour
         InitializeLeafDropdown();
     }
 
+    // Set the ratio of the slider
     public void UpdateRatio()
     {
         //inputRatioText = GetComponent<Text>();
-        inputRatioText.text = Mathf.Round(inputRatioSlider.value).ToString() + "%";
+        inputRatioText.text = Mathf.Round(inputRatioSlider.value).ToString();
     }
     
     /* 
@@ -215,53 +212,37 @@ public class UIController : MonoBehaviour
         // Type conversion, string to int
         if (System.Int32.TryParse(Mathf.Round(inputRatioSlider.value).ToString(), out ratioInt))
         {
-            if (ratioInt > 100)
+            
+            string typeString = leafDropdown.captionText.text;
+
+            // Check if the same leaf type is selected
+            if (typeWithRatio.ContainsKey(typeString))
             {
-                Debug.Log("The ratio cannot be larger than 100.");
-                message = "The ratio cannot be larger than 100.";
+                message = "You have already chosen this type of leaf.\n" +
+                    "Please check your selection.";
                 DisplayMessage(message);
-            }
-            else
-            {
-                string typeString = leafDropdown.captionText.text;
-
-                // Check if the same leaf type is selected
-                if (typeWithRatio.ContainsKey(typeString))
-                {
-                    message = "You have already chosen this type of leaf.\n" +
-                        "Please check your selection.";
-                    DisplayMessage(message);
-                    return;
-                }
-
-                typeWithRatio.Add(typeString, ratioInt);
-
-                // Add a leafButton
-                GameObject newButton = Instantiate(leafButton) as GameObject;
-                LeafButton button = newButton.GetComponent<LeafButton>();
-                button.leafName.text = typeString ;
-                button.leafRatio.text = ratioInt.ToString() + "%";
-                
-                newButton.transform.SetParent(listContent);
-
-
-                // Listen to the leaf button
-                button.onClick.AddListener(
-                        delegate ()
-                        {
-                            leafButtonClicked = button;
-                            LeafButtonClick();
-                        }
-
-                    );
-
-                totalRatio = 0;
-                foreach (KeyValuePair<string, int> pair in typeWithRatio)
-                {
-                    totalRatio += pair.Value;
-                }
+                return;
             }
 
+            typeWithRatio.Add(typeString, ratioInt);
+
+            // Add a leafButton
+            GameObject newButton = Instantiate(leafButton) as GameObject;
+            LeafButton button = newButton.GetComponent<LeafButton>();
+            button.leafName.text = typeString ;
+            button.leafRatio.text = ratioInt.ToString();
+            
+            newButton.transform.SetParent(listContent);
+
+            // Listen to the leaf button
+            button.onClick.AddListener(
+                    delegate ()
+                    {
+                        leafButtonClicked = button;
+                        LeafButtonClick();
+                    }
+
+                );               
         }
         else
         {
@@ -272,6 +253,7 @@ public class UIController : MonoBehaviour
 
     }
 
+    // Click the buttion to delete the selection 
     private void LeafButtonClick()
     {
         message = "Are you sure you want to delete?";
@@ -298,8 +280,6 @@ public class UIController : MonoBehaviour
                 Destroy(o);
             }
         }
-        totalRatio = 0;
-        //leafNum = 0;
     }
 
     // Actions when click unlimited button
@@ -334,12 +314,14 @@ public class UIController : MonoBehaviour
         leafDropdown.captionText.text = type[0];
     }
 
+    // Cancel the deletion
     public void OkOnClick()
     {
         messageBox.gameObject.SetActive(false);
-        Debug.Log("Click OK button");
+        Debug.Log("Click Cancel button");
     }
 
+    // Confirm the deletion 
     public void DeleteOnClick()
     {
         okButtonText.text = "OK";
@@ -347,8 +329,7 @@ public class UIController : MonoBehaviour
         messageBox.gameObject.SetActive(false);
         Destroy(leafButtonClicked.gameObject);
         typeWithRatio.Remove(leafButtonClicked.leafName.text);
-        totalRatio = totalRatio - Int32.Parse(leafButtonClicked.leafRatio.text.Remove(leafButtonClicked.leafRatio.text.Length - 1, 1));
-        Debug.Log("Delete Cancel button");
+        Debug.Log("Delete Delete button");
     }
 
     // Get the the selected LeafData according to the name and saved as an dictionary

@@ -6,15 +6,9 @@
 
 using System.Collections.Generic;
 
-
 public class SimSettings {
     // Visual simulation settings
     private static bool visualize;
-
-    // Batch run flag
-    private static bool batchrun;
-    // Remaining run times
-    private static int runTimesLeft = 1;
 
     // Spacial simulation settings
     private static float dropHeight = 100;
@@ -26,6 +20,11 @@ public class SimSettings {
     private static bool useLeafLimit = true;
     private static int leafLimit = 1000;
     private static float leafVolumeLimit = 30;
+
+    // Batch run setting
+    private static bool batchRun;
+    // Remaining run times
+    private static int runTimesLeft = 1;
 
     // Density calculation settings
     private static float densityIgnoreBorder = 10;
@@ -46,13 +45,13 @@ public class SimSettings {
     // Get batchrun flag
     public static bool GetBatchrun()
     {
-        return batchrun;
+        return batchRun;
     }
 
     // Set batchrun flag
     public static void SetBatchrun(bool isBatchrun)
     {
-        batchrun = isBatchrun;
+        batchRun = isBatchrun;
     }
 
     // Get batchrun times

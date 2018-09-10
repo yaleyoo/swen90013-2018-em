@@ -33,5 +33,9 @@ sysinfo.txt
 *.apk
 *.unitypackage
 
+# Output files
 output.txt
 output.txt.meta
+
+# Project version file
+ProjectVersion.txt

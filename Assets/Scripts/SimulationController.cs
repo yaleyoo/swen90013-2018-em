@@ -94,7 +94,7 @@ public class SimulationController : MonoBehaviour {
                                   );
         float density = denCalc.CalculateDensity(calcArea, SimSettings.GetMonteCarloNumIterations());
         Debug.Log("Density calculated as: " + density);
-        Results.SetDensity(density);
+		Results.addResult (density);
         this.ChangeToOutputScene();
     }
 

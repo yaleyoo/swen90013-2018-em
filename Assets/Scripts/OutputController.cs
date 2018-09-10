@@ -37,9 +37,6 @@ public class OutputController : MonoBehaviour {
                 // set next round leaves and ratios to settings for loading by simulation 
                 SimSettings.SetLeafSizesAndRatios(leafSizesAndRatios);
 
-                // clear resultset
-                Results.ClearResultset();
-
                 // go to simulate next run
                 SceneManager.LoadScene("Simulation");                
             }
@@ -59,12 +56,7 @@ public class OutputController : MonoBehaviour {
     {
         StreamWriter writer = new StreamWriter(pathToOutputFile, false);
         writer.WriteLine("Density");
-
-        // write all results to file
-        foreach (float result in Results.GetRunResultst())
-        {
-            writer.WriteLine(result);
-        }
+        writer.WriteLine(Results.GetAverage());
         writer.Close();
     }
 

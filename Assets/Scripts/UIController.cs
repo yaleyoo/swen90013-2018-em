@@ -109,7 +109,7 @@ public class UIController : MonoBehaviour
     // Click the button to choose the file
     public void LoadBatchRunCsvClick()
     {
-        ResetOnClick();
+        ClearAddedLeafBox();
         string extensions = "csv";
         string path = FileBrowser.OpenSingleFile("Open File", "", extensions);
         Debug.Log("Selected file: " + path);
@@ -155,6 +155,7 @@ public class UIController : MonoBehaviour
         // If batch run toggle is choosen
         else if (batchrunToggle.isOn)
         {
+            ClearAddedLeafBox();
             if (!batchrunFileLoadSuccess)
             {
                 message = "Load batch run data error.";
@@ -358,6 +359,19 @@ public class UIController : MonoBehaviour
 
     public void OnBatchrunToggleChanged(bool check)
     {
-        ResetOnClick();
+        ClearAddedLeafBox();
+    }
+
+    private void ClearAddedLeafBox()
+    {
+        typeWithRatio.Clear();
+        GameObject[] leafButtons = GameObject.FindGameObjectsWithTag("LeafButton");
+        if (leafButtons.Length > 0)
+        {
+            foreach (GameObject o in leafButtons)
+            {
+                Destroy(o);
+            }
+        }
     }
 }

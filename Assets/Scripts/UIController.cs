@@ -109,6 +109,7 @@ public class UIController : MonoBehaviour
     // Click the button to choose the file
     public void LoadBatchRunCsvClick()
     {
+        ResetOnClick();
         string extensions = "csv";
         string path = FileBrowser.OpenSingleFile("Open File", "", extensions);
         Debug.Log("Selected file: " + path);
@@ -353,5 +354,10 @@ public class UIController : MonoBehaviour
         // Bring the components to front
         messageBox.gameObject.transform.SetAsLastSibling();
         messageBoxConent.text = str;
+    }
+
+    public void OnBatchrunToggleChanged(bool check)
+    {
+        ResetOnClick();
     }
 }

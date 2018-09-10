@@ -59,10 +59,11 @@ public class Results {
 	/// then set it to the static variable "standard_deviation".
 	/// </summary>
 	public static void SetSD(){
-		float sum = 0;
+		double sum = 0;
 
 		foreach (int i in resultset) {
-			sum = sum + (i - average);
+			// SD = Sqrt( ∑(xi - avg)^2 / n )
+			sum = sum + Math.Pow((i - average), 2);
 		}
 
 		// calculate the standard deviation 

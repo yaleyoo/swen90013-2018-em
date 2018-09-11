@@ -8,18 +8,18 @@ public class DensityCalculationCylinder {
 
     private GameObject[] objectsInWorld;
     private float cylinderAreaX;
-    private float cylinderAreaY;
+    private float cylinderAreaZ;
 
     /// <summary>
     /// Creates a DensityCalculationCylinder
     /// </summary>
     /// <param name="objects">Objects in the world</param>
-    /// <param name="cylinderAreaX">The X size of the cylinder</param>
-    /// <param name="cylinderAreaY">The Y size of the cylinder</param>
-    public DensityCalculationCylinder(GameObject[] objects, float cylinderAreaX, float cylinderAreaY) {
+    /// <param name="cylinderAreaX">The X value of the cylinder</param>
+    /// <param name="cylinderAreaZ">The Z value of the cylinder</param>
+    public DensityCalculationCylinder(GameObject[] objects, float cylinderAreaX, float cylinderAreaZ) {
         this.objectsInWorld = objects;
         this.cylinderAreaX = cylinderAreaX;
-        this.cylinderAreaY = cylinderAreaY;
+        this.cylinderAreaZ = cylinderAreaZ;
     }
 
     /// <summary>
@@ -47,7 +47,7 @@ public class DensityCalculationCylinder {
     /// </summary>
     /// <param name="obj">The object</param>
     /// <returns>The y value of the lowest point</returns>
-    private float CalcHeight(GameObject obj) {
+    public float CalcHeight(GameObject obj) {
         float height = obj.GetComponent<Collider>().bounds.min.y;
 
         if (height > 0) {
@@ -67,7 +67,7 @@ public class DensityCalculationCylinder {
 
         float x = UnitCirclePoint.x * this.cylinderAreaX;
         float y = Random.Range(0, height);
-        float z = UnitCirclePoint.y * cylinderAreaY;
+        float z = UnitCirclePoint.y * this.cylinderAreaZ;
 
         // unit circle point values are multiplied by the area dimensions that are where the density is calculated
         return new Vector3(x, y, z);

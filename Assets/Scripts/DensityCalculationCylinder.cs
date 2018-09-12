@@ -55,46 +55,10 @@ public class DensityCalculationCylinder {
     }
 
     /// <summary>
-    /// Returns the object with the largest y value
-    /// </summary>
-    /// <returns>The object</returns>
-    public GameObject GetHighestObject() {
-        GameObject highestObj = null;
-
-        foreach (GameObject leaf in this.objectsInWorld) {
-            if (highestObj == null) {
-                highestObj = leaf;
-            }
-            else if (leaf.transform.position.y >= highestObj.transform.position.y) {
-                highestObj = leaf;
-            }
-        }
-
-        return highestObj;
-    }
-
-    /// <summary>
-    /// Returns the y value of lowest point of the object.
-    /// Returns 0 is the lowest point is negative.
-    /// </summary>
-    /// <param name="obj">The object</param>
-    /// <returns>The y value of the lowest point</returns>
-    private float CalcHeight(GameObject obj) {
-        float height = obj.GetComponent<Collider>().bounds.min.y;
-
-        if (height > 0) {
-            return height;
-        }
-
-        return 0f;
-    }
-
-    /// <summary>
     /// Returns a random point within the cylinder
     /// </summary>
     /// <returns>The point</returns>
     public Vector3 RandomPointInCylinder() {
-        //float height = this.CalcHeight(this.GetHighestObject());
         Vector2 UnitCirclePoint = Random.insideUnitCircle;
 
         float x = UnitCirclePoint.x * this.cylinderAreaX;

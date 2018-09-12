@@ -55,21 +55,6 @@ public class DensityCalculationCylinder {
     }
 
     /// <summary>
-    /// Returns a random point within the cylinder
-    /// </summary>
-    /// <returns>The point</returns>
-    public Vector3 RandomPointInCylinder() {
-        Vector2 UnitCirclePoint = Random.insideUnitCircle;
-
-        float x = UnitCirclePoint.x * this.cylinderAreaX;
-        float y = Random.Range(0, this.cylinderHeight);
-        float z = UnitCirclePoint.y * cylinderAreaY;
-
-        // unit circle point values are multiplied by the area dimensions that are where the density is calculated
-        return new Vector3(x, y, z);
-    }
-
-    /// <summary>
     /// Returns a random point within a horizontal slice of the cylinder
     /// </summary>
     /// <param name="numSections">The number of horizontal slices to divide the cylinder into</param>

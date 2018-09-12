@@ -31,8 +31,6 @@ public class DensityCalculator {
                     sliceLeafPointCounts[i]++;
                 }
             }
-
-            Debug.Log("slice " + i + " has points in leaves count: " + sliceLeafPointCounts[i]);
         }
 
         // Density is computed as the number of points in leaves over the number of points in total for each slice.

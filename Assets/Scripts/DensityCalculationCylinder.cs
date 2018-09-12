@@ -9,6 +9,7 @@ public class DensityCalculationCylinder {
     private GameObject[] objectsInWorld;
     private float cylinderAreaX;
     private float cylinderAreaY;
+    private float cylinderHeight;
 
     /// <summary>
     /// Creates a DensityCalculationCylinder
@@ -20,6 +21,37 @@ public class DensityCalculationCylinder {
         this.objectsInWorld = objects;
         this.cylinderAreaX = cylinderAreaX;
         this.cylinderAreaY = cylinderAreaY;
+        this.cylinderHeight = this.ComputeCylinderHeightToUse();
+        Debug.Log("Height of the density calculating cylinder is: " + this.cylinderHeight);
+    }
+
+    /// <summary>
+    /// Computes a height for the cylinder by taking the mean and 2 standard deviations of all the leaf
+    /// heights, lowering teh chance of a stray high leaf affecting the height of the cylinder
+    /// </summary>
+    /// <returns>The height of the cylinder to be used</returns>
+    public float ComputeCylinderHeightToUse()
+    {
+        // Used as sums and then divided to give the mean and standard deviations of leaf heights
+        float avgHeight = 0.0f;
+        float stdDevHeight = 0.0f;
+
+        // Conpute the average height of the leaves (take height to be the leafs lowest point)
+        foreach (GameObject obj in this.objectsInWorld){
+            avgHeight += obj.GetComponent<Collider>().bounds.min.y;
+        }
+        avgHeight /= this.objectsInWorld.Length;
+
+        // Compute the sample standard deviation of the leaf heights
+        foreach (GameObject obj in this.objectsInWorld)
+        {
+            stdDevHeight += Mathf.Pow(obj.GetComponent<Collider>().bounds.min.y - avgHeight, 2);
+        }
+        stdDevHeight = Mathf.Sqrt(stdDevHeight / (this.objectsInWorld.Length-1));
+
+        // Return the height that has 95.45% of the heights in it (2 standard deviations from mean)
+        // This will exclude any potentially not-dropped-yet leaf
+        return avgHeight + 2 * stdDevHeight;
     }
 
     /// <summary>
@@ -62,11 +94,11 @@ public class DensityCalculationCylinder {
     /// </summary>
     /// <returns>The point</returns>
     public Vector3 RandomPointInCylinder() {
-        float height = this.CalcHeight(this.GetHighestObject());
+        //float height = this.CalcHeight(this.GetHighestObject());
         Vector2 UnitCirclePoint = Random.insideUnitCircle;
 
         float x = UnitCirclePoint.x * this.cylinderAreaX;
-        float y = Random.Range(0, height);
+        float y = Random.Range(0, this.cylinderHeight);
         float z = UnitCirclePoint.y * cylinderAreaY;
 
         // unit circle point values are multiplied by the area dimensions that are where the density is calculated
@@ -74,13 +106,13 @@ public class DensityCalculationCylinder {
     }
 
     /// <summary>
-    /// Checks if the given point is in any of the world objects. Same as above function but
-    /// uses the ray cast method to check whether or not point is inside objects.
+    /// Checks if the given point is in any of the world objects. Uses the ray cast method to check 
+    /// whether or not point is inside objects.
     /// Method adapted from https://answers.unity.com/questions/163864/test-if-point-is-in-collider.html
     /// </summary>
     /// <param name="point">The point which may be inside a world object</param>
     /// <returns>True if the point given is inside any world objects</returns>
-    public bool IsPointInObjectsRayCast(Vector3 point)
+    public bool IsPointInObjects(Vector3 point)
     {
         // Chose a point which will definitely not be inside an object as raycast origin. This is
         // chosen as a point just above the leaf dropping height
@@ -100,73 +132,5 @@ public class DensityCalculationCylinder {
         hits += Physics.RaycastAll(point, -directionToPoint, distance).Length;
         // If odd number of hits, then point is in object
         return (hits % 2) == 1;
-    }
-
-    /// <summary>
-    /// Checks if the given point is in any of the world objects. Uses raycasting as above, but performs the
-    /// cast manually. This allows hitting the same collider more than once, and ensures concave objects
-    /// will be detected correctly as well as convex ones.
-    /// Method adapted from https://answers.unity.com/questions/163864/test-if-point-is-in-collider.html
-    /// </summary>
-    /// <param name="point">The point which may be inside a world object</param>
-    /// <returns>True if the point given is inside any world objects</returns>
-    public bool IsPointInObjectsRayCastConcave(Vector3 point)
-    {
-        // Chose a point which will definitely not be inside an object as raycast origin. This is
-        // chosen as a point just above the leaf dropping height
-        Vector3 distantPoint = new Vector3(0, SimSettings.GetDropHeight() + 10, 0);
-
-        // Gets the direction from raycast origin, to the point we are checking
-        Vector3 direction = point - distantPoint;
-        direction.Normalize();
-
-        // Keeps track of the number of collisions made by the ray cast
-        int collisions = 0;
-
-        // Start ray cast at the distant point, and iterate over collisions towards the point we are checking
-        Vector3 currPoint = distantPoint;
-        while (currPoint != point)
-        {
-            // If there is a ray cast collision, increase the counter appropriately
-            RaycastHit hit;
-            if (Physics.Linecast(currPoint, point, out hit))
-            {
-                collisions++;
-                // Move the current point to *just* after the colision point, to avoid hitting the same collision repeatedly
-                currPoint = hit.point + (direction / 1000.0f);
-            }
-            // No more collisions, current point can be set as the end of ray cast (the point being checked)
-            else
-            {
-                currPoint = point;
-            }
-        }
-
-        // Repeat the raycast process in the other direction. As colliders are only hit when tracing "from the outside in", this ensures
-        // that all collisions are detected correctly (back faces also detected)
-        while (currPoint != distantPoint)
-        {
-            RaycastHit hit;
-            if (Physics.Linecast(currPoint, distantPoint, out hit))
-            {
-                collisions++;
-                currPoint = hit.point + (-direction / 100.0f);
-            }
-            else
-            {
-                currPoint = distantPoint;
-            }
-        }
-
-        // If the number of collisions is odd, then point was in an object
-        if (collisions % 2 == 1)
-        {
-            return true;
-        }
-        // If number of collisions is even, then point not in any object
-        else
-        {
-            return false;
-        }
     }
 }

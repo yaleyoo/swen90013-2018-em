@@ -19,7 +19,7 @@ public class DensityCalculator {
         for (int i = 0; i < sampleSize; i++) {
             Vector3 pointInCylinder = calcArea.RandomPointInCylinder();
 
-            if (calcArea.IsPointInObjectsRayCast(pointInCylinder)) {
+            if (calcArea.IsPointInObjects(pointInCylinder)) {
                 numPointsInLeaves++;
             }
         }

@@ -36,11 +36,23 @@ public class DensityCalculationCylinder {
         float avgHeight = 0.0f;
         float stdDevHeight = 0.0f;
 
-        // Conpute the average height of the leaves (take height to be the leafs lowest point)
+        // If no objects, return 0 height and avoid division by zero when computing average
+        if (this.objectsInWorld.Length < 1)
+        {
+            return 0;
+        }
+
+        // Compute the average height of the leaves (take height to be the leafs lowest point)
         foreach (GameObject obj in this.objectsInWorld){
             avgHeight += obj.GetComponent<Collider>().bounds.min.y;
         }
         avgHeight /= this.objectsInWorld.Length;
+
+        // If only 1 object return just the average and avoid division by zero when computing stddev
+        if (this.objectsInWorld.Length < 2)
+        {
+            return avgHeight;
+        }
 
         // Compute the sample standard deviation of the leaf heights
         foreach (GameObject obj in this.objectsInWorld)

@@ -33,6 +33,7 @@ public class SimulationController : MonoBehaviour {
             this.CreateLeaf();
         }
         else if (this.HasEnded()) {
+            this.FreezeAll(this.leaves);
             this.CalculateDensity(this.leaves);
         }
     }
@@ -83,9 +84,22 @@ public class SimulationController : MonoBehaviour {
     }
 
     /// <summary>
+    /// Freezes all the given leaves so that they are not moving during density calculation
+    /// </summary>
+    /// <param name="leaves">All of the leaves in the world</param>
+    public void FreezeAll(GameObject[] leaves)
+    {
+        foreach(GameObject lf in leaves)
+        {
+            lf.GetComponent<Leaf>().FreezeLeaf();
+        }
+    }
+
+    /// <summary>
     /// Calculates the density of leaves and changes to the output scene
     /// to display the results
     /// </summary>
+    /// <param name="leaves">All the current leaf objects in the world</param>
     private void CalculateDensity(GameObject[] leaves) {
         // Time how long it takes for the density to be computed (for optimisation use)
         stopWatch.Start();
@@ -105,6 +119,43 @@ public class SimulationController : MonoBehaviour {
 
         Results.addResult (density);
         this.ChangeToOutputScene();
+    }
+
+    /// <summary>
+    /// Used as a base line for volume density estimation, primarily for debugging. Compute the density
+    /// by taking the volume of all leaves with centers within the computing area, and dividing by cylinder volume.
+    /// Should always slightly over estimate volume due to parts of leaves sticking out of the calculating area
+    /// that are still considered in the ratio
+    /// </summary>
+    /// <param name="leaves">All the current leaf objects in the world</param>
+    private void CalculateDensityBaseline(GameObject[] leaves)
+    {
+        // Create cylinder to get the height to use
+        DensityCalculationCylinder calcArea = new DensityCalculationCylinder(
+                                    leaves,
+                                    (this.dropAreaX - this.densityIgnoreBorder),
+                                    (this.dropAreaY - this.densityIgnoreBorder)
+                                  );
+        float cylHeight = calcArea.ComputeCylinderHeightToUse();
+
+        // Sum the volumes of leaves whose center point is within the cylinder elipse base
+        float leafVol = 0.0f;
+        foreach (GameObject lf in leaves)
+        {
+            if (Mathf.Abs(lf.GetComponent<Collider>().bounds.center.x) < ((this.dropAreaX - this.densityIgnoreBorder)) &&
+                Mathf.Abs(lf.GetComponent<Collider>().bounds.center.z) < ((this.dropAreaY - this.densityIgnoreBorder)) &&
+                lf.GetComponent<Collider>().bounds.center.y < cylHeight)
+            {
+                leafVol += lf.GetComponent<Leaf>().GetVolume();
+            }
+        }
+
+        // Compute the cylinder volume
+        float cylVol = cylHeight * (Mathf.PI * (this.dropAreaX - this.densityIgnoreBorder) * (this.dropAreaY - this.densityIgnoreBorder));
+
+        // Console log the density
+        Debug.Log(string.Format("Baseline volume density calculated as {0}",
+                                System.Math.Round(leafVol/cylVol, 6)));
     }
 
     /// <summary>

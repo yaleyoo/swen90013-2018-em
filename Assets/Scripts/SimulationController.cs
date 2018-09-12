@@ -95,7 +95,7 @@ public class SimulationController : MonoBehaviour {
                                     (this.dropAreaX - this.densityIgnoreBorder),
                                     (this.dropAreaY - this.densityIgnoreBorder)
                                   );
-        float density = denCalc.CalculateDensity(calcArea, SimSettings.GetMonteCarloNumIterations());
+        float density = denCalc.CalculateDensity(calcArea, SimSettings.GetMonteCarloNumIterations(), SimSettings.GetNumCylinderSlices());
 
         // Console log the density and the time it took to compute
         stopWatch.Stop();

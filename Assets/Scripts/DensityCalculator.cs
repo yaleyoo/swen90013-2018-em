@@ -13,21 +13,44 @@ public class DensityCalculator {
     /// <param name="calcArea">The area to calculate the density for</param>
     /// <param name="sampleSize">The number of points to sample</param>
     /// <returns></returns>
-    public float CalculateDensity(DensityCalculationCylinder calcArea, int sampleSize) {
-        float numPointsInLeaves = 0;
+    public float CalculateDensity(DensityCalculationCylinder calcArea, int sliceSampleSize, int numSlices) {
+        // An array of counter, keeping track of how many random points happen to be in leaves, in each of the cylinder slices
+        int[] sliceLeafPointCounts = new int[numSlices];
 
-        for (int i = 0; i < sampleSize; i++) {
-            Vector3 pointInCylinder = calcArea.RandomPointInCylinder();
+        // First loop each slice
+        for (int i=0; i < sliceLeafPointCounts.Length; i++)
+        {
+            // Initialise number of points in leaves to 0
+            sliceLeafPointCounts[i] = 0;
 
-            if (calcArea.IsPointInObjects(pointInCylinder)) {
-                numPointsInLeaves++;
+            // For each random point in the current slice, check if its in a leaf, and if so add it to the current slices counter
+            for (int j=0; j < sliceSampleSize; j++)
+            {
+                Vector3 pointInCylinderSlice = calcArea.RandomPointInCylinderSlice(numSlices, i);
+                if (calcArea.IsPointInObjects(pointInCylinderSlice)){
+                    sliceLeafPointCounts[i]++;
+                }
             }
+
+            Debug.Log("slice " + i + " has points in leaves count: " + sliceLeafPointCounts[i]);
         }
 
-        if (sampleSize > 0) {
-            return numPointsInLeaves / sampleSize;
+        // Density is computed as the number of points in leaves over the number of points in total for each slice.
+        // The densities in the slices are then averaged for a final value
+        if (sliceSampleSize > 0) {
+
+            // Add density of each slice to sum
+            float densitySum = 0.0f;
+            for (int i=0; i< sliceLeafPointCounts.Length; i++)
+            {
+                densitySum += (sliceLeafPointCounts[i] / (float)sliceSampleSize);
+            }
+
+            // Divide and return sum for density
+            return densitySum / sliceLeafPointCounts.Length;
         }
-        else {
+        else
+        {
             return 0;
         }
     }

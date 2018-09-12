@@ -70,6 +70,27 @@ public class DensityCalculationCylinder {
     }
 
     /// <summary>
+    /// Returns a random point within a horizontal slice of the cylinder
+    /// </summary>
+    /// <param name="numSections">The number of horizontal slices to divide the cylinder into</param>
+    /// <param name="sectionIndex">The index of the slice to generate the point in. Indices start at 0, which represents the bottom slice</param>
+    /// <returns>The random point</returns>
+    public Vector3 RandomPointInCylinderSlice(int numSlices, int sliceIndex)
+    {
+        Vector2 UnitCirclePoint = Random.insideUnitCircle;
+
+        float startHeight = sliceIndex * (this.cylinderHeight / numSlices);
+        float endHeight = startHeight + (this.cylinderHeight / numSlices);
+
+        // unit circle point values are multiplied by the area dimensions that are where the density is calculated
+        float x = UnitCirclePoint.x * this.cylinderAreaX;
+        float y = Random.Range(startHeight, endHeight);
+        float z = UnitCirclePoint.y * cylinderAreaY;
+        
+        return new Vector3(x, y, z);
+    }
+
+    /// <summary>
     /// Checks if the given point is in any of the world objects. Uses the ray cast method to check 
     /// whether or not point is inside objects.
     /// Method adapted from https://answers.unity.com/questions/163864/test-if-point-is-in-collider.html

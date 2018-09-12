@@ -24,7 +24,8 @@ public class SimSettings {
 
     // Density calculation settings
     private static float densityIgnoreBorder = 10;
-    private static int monteCarloNumIterations = 10000;
+    private static int monteCarloNumIterations = 1000;
+    private static int numCylinderSlices = 10;
 
     // Get visualization flag
     public static bool GetVisualize()
@@ -120,8 +121,15 @@ public class SimSettings {
     }
 
     // Get the number of iterations to run the monte carlo method when calculating the leaf litter density (uses volume intersaction)
+    // This is the number of points sampled in EACH horizontal slice of the cylinder (numCylinderSlices)
     public static int GetMonteCarloNumIterations()
     {
         return monteCarloNumIterations;
+    }
+
+    // Get the number of horizontal slices to split the density calculation cylinder into and average the result over
+    public static int GetNumCylinderSlices()
+    {
+        return numCylinderSlices;
     }
 }

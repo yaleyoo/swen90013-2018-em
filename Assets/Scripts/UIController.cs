@@ -49,6 +49,11 @@ public class UIController : MonoBehaviour
     // The flag whether the user click the un limited button
     private bool isUnlimited;
 
+    // InputField for simulation times of mulitrun with same parameters
+    public InputField simulationTimesField;
+
+    // Simulation times for multirun
+    private int SimulationTimes;
 
     // Component for message box
     // String to save the warning message
@@ -65,9 +70,7 @@ public class UIController : MonoBehaviour
     public Text okButtonText;
     public Button deleteButton;
 
-    ProgressBarController progress;
-
-
+   
     // Initialisation
     private void Start()
     {
@@ -167,6 +170,9 @@ public class UIController : MonoBehaviour
                 DisplayMessage(message);
                 return;
             }
+            SimSettings.SetSimulationTimes(1);
+            SimSettings.ResetSimulationTimesLeft();
+
             SimSettings.SetLeafSizesAndRatios(leavesAndRatios);
             // set visualize flag according to visualizeToggle's status
             SimSettings.SetVisualize(visualizeToggle.isOn);            
@@ -177,6 +183,18 @@ public class UIController : MonoBehaviour
         else if (batchrunToggle.isOn)
         {
             ClearAddedLeafBox();
+
+            if (!System.Int32.TryParse(simulationTimesField.text, out SimulationTimes))
+            {
+                message = "Invalid simulation number. Please enter an interger.";
+                DisplayMessage(message);
+                return;
+            }
+            else
+            {
+                SimSettings.SetSimulationTimes(SimulationTimes);
+                SimSettings.ResetSimulationTimesLeft();
+            }
 
             if (!batchrunFileLoadSuccess)
             {

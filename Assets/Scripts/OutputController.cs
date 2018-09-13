@@ -12,7 +12,12 @@ public class OutputController : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-        if (SimSettings.GetRunTimeesLeft() > 0)
+        if (SimSettings.DecreaseSimulationTimesLeft())
+        {
+            int runRound = BatchRunCsvLoader.batchrunLeafAndRatio.Keys.Count - SimSettings.GetRunTimeesLeft() + 1;
+            SceneManager.LoadScene("Simulation");
+        }
+        else
         {
             // first calculate the results
             // note: only average for single-run now
@@ -22,6 +27,7 @@ public class OutputController : MonoBehaviour {
             // Print the results to the screen
             string result = "Volume density of leaf litter (as ratio):\n" + System.Math.Round(Results.GetAverage(), 6).ToString();
             GameObject.FindGameObjectWithTag("OutputText").GetComponent<Text>().text = result;
+            Results.ClearResultSet();
 
             //decrease remaining run times 
             SimSettings.SetRunTimesLeft(SimSettings.GetRunTimeesLeft() - 1);
@@ -37,6 +43,7 @@ public class OutputController : MonoBehaviour {
                 // set next round leaves and ratios to settings for loading by simulation 
                 SimSettings.SetLeafSizesAndRatios(leafSizesAndRatios);
 
+                SimSettings.ResetSimulationTimesLeft();
                 // go to simulate next run
                 SceneManager.LoadScene("Simulation");                
             }
@@ -64,8 +71,14 @@ public class OutputController : MonoBehaviour {
     private void WriteResultsToFile()
     {
         StreamWriter writer = new StreamWriter(pathToOutputFile, false);
-        writer.WriteLine("Density");
-        writer.WriteLine(Results.GetAverage());
+        writer.WriteLine("Density average");
+
+        // Write all results to file
+        foreach (float result in Results.GetBatchRunResults())
+        {
+            writer.WriteLine(result);
+        }
+
         writer.Close();
     }
 

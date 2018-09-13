@@ -61,7 +61,7 @@ public class DensityCalculationCylinder {
         }
         stdDevHeight = Mathf.Sqrt(stdDevHeight / (this.objectsInWorld.Length-1));
 
-        // Return the height that has 95.45% of the heights in it (2 standard deviations from mean)
+        // Return the height that has ~97.5% of the heights in it (0 to 2 standard deviations from mean)
         // This will exclude any potentially not-dropped-yet leaf
         return avgHeight + 2 * stdDevHeight;
     }

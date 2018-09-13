@@ -12,7 +12,13 @@ public class OutputController : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-        if (SimSettings.GetRunTimeesLeft() > 0)
+        if (SimSettings.DecreaseSimulationTimesLeft())
+        {
+            int runRound = BatchRunCsvLoader.batchrunLeafAndRatio.Keys.Count - SimSettings.GetRunTimeesLeft() + 1;
+            Debug.Log("current round = " + runRound + " , " + SimSettings.GetSimulationTimesLeft() + " simulations to go.");            
+            SceneManager.LoadScene("Simulation");
+        }
+        else
         {
             // first calculate the results
             // note: only average for single-run now
@@ -22,11 +28,12 @@ public class OutputController : MonoBehaviour {
             // Print the results to the screen
             string result = "Volume density of leaf litter (as ratio):\n" + System.Math.Round(Results.GetAverage(), 6).ToString();
             GameObject.FindGameObjectWithTag("OutputText").GetComponent<Text>().text = result;
+            Results.ClearResultSet();
 
             //decrease remaining run times 
             SimSettings.SetRunTimesLeft(SimSettings.GetRunTimeesLeft() - 1);
             // has remaining run times 
-            if (SimSettings.GetRunTimeesLeft() > 0)                
+            if (SimSettings.GetRunTimeesLeft() > 0)
             {
                 // get next round number
                 int runRound = BatchRunCsvLoader.batchrunLeafAndRatio.Keys.Count - SimSettings.GetRunTimeesLeft() + 1;
@@ -36,9 +43,9 @@ public class OutputController : MonoBehaviour {
                 BatchRunCsvLoader.batchrunLeafAndRatio.TryGetValue(runRound, out leafSizesAndRatios);
                 // set next round leaves and ratios to settings for loading by simulation 
                 SimSettings.SetLeafSizesAndRatios(leafSizesAndRatios);
-
+                SimSettings.ResetSimulationTimesLeft();
                 // go to simulate next run
-                SceneManager.LoadScene("Simulation");                
+                SceneManager.LoadScene("Simulation");
             }
             else
             {
@@ -46,18 +53,21 @@ public class OutputController : MonoBehaviour {
                 Debug.Log("Writing results to file ...");
                 WriteResultsToFile();
                 Debug.Log("Done.");
-            }                
-        }
-        
-	}
+            }
+        }             
+    }
 
     // Write the saved result to the output file specified in the sim settings
     private void WriteResultsToFile()
     {
         StreamWriter writer = new StreamWriter(pathToOutputFile, false);
-        writer.WriteLine("Density");
-        writer.WriteLine(Results.GetAverage());
+        writer.WriteLine("Density average");
+
+        // write all results to file
+        foreach (float result in Results.GetBatchRunResults())
+        {
+            writer.WriteLine(result);
+        }
         writer.Close();
     }
-
 }

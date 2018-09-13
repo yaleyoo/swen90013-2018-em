@@ -43,8 +43,14 @@ public class UIController : MonoBehaviour
     // InputField on the canvas
     public InputField leafNumField;
 
+    // Simulation times for each single run in batch run
+    public InputField simulationTimesField;
+
     // Limit of leaf to be set
     private int leafNum;
+
+    // Simulation times for each single run in batch run
+    private int simulationTimes;
 
     // The flag whether the user click the un limited button
     private bool isUnlimited;
@@ -146,6 +152,10 @@ public class UIController : MonoBehaviour
                 DisplayMessage(message);
                 return;
             }
+
+            SimSettings.SetSimulationTimes(1);
+            SimSettings.ResetSimulationTimesLeft();
+
             SimSettings.SetLeafSizesAndRatios(leavesAndRatios);
             // set visualize flag according to visualizeToggle's status
             SimSettings.SetVisualize(visualizeToggle.isOn);            
@@ -156,6 +166,18 @@ public class UIController : MonoBehaviour
         else if (batchrunToggle.isOn)
         {
             ClearAddedLeafBox();
+            if (!System.Int32.TryParse(simulationTimesField.text, out simulationTimes))
+            {
+                message = "Invalid simulation number. Please enter integer.";
+                DisplayMessage(message);
+                return;
+            }
+            else
+            {
+                SimSettings.SetSimulationTimes(simulationTimes);
+                SimSettings.ResetSimulationTimesLeft();
+            }
+
             if (!batchrunFileLoadSuccess)
             {
                 message = "Load batch run data error.";

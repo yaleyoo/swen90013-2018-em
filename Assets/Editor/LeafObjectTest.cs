@@ -9,29 +9,49 @@ using System.Collections;
 public class LeafObjectTest {
 	
 	[Test]
-	public void LeafSetAndGetName() {
+	public void FlatLeafSetAndGetName() {
 		//Arrage
-		GameObject gm = GameObject.Instantiate((GameObject)Resources.Load("Leaf"), new Vector3(0,10,0), Quaternion.Euler(0,0,0));
+		GameObject gm = GameObject.Instantiate((GameObject)Resources.Load("FlatLeaf"), new Vector3(0,10,0), Quaternion.Euler(0,0,0));
 		string leafName="";
 		//Act
-		gm.GetComponent<Leaf>().SetName("LeafName");
+		gm.GetComponent<Leaf>().SetName("FlatLeafName");
 		leafName = gm.GetComponent<Leaf> ().GetName ();
 		//Assert
-		Assert.AreEqual(leafName, "LeafName");
+		Assert.AreEqual(leafName, "FlatLeafName");
 	}
 
 	[Test]
-	public void LeafSetAndGetSize() {
-		GameObject gm = GameObject.Instantiate((GameObject)Resources.Load("Leaf"), new Vector3(0,10,0), Quaternion.Euler(0,0,0));
+	public void RoundLeafSetAndGetName() {
+		//Arrage
+		GameObject gm = GameObject.Instantiate((GameObject)Resources.Load("RoundLeaf"), new Vector3(0,10,0), Quaternion.Euler(0,0,0));
+		string leafName="";
+		//Act
+		gm.GetComponent<Leaf>().SetName("RoundLeafName");
+		leafName = gm.GetComponent<Leaf> ().GetName ();
+		//Assert
+		Assert.AreEqual(leafName, "RoundLeafName");
+	}
+
+	[Test]
+	public void FlatLeafSetAndGetSize() {
+		GameObject gm = GameObject.Instantiate((GameObject)Resources.Load("FlatLeaf"), new Vector3(0,10,0), Quaternion.Euler(0,0,0));
 		gm.GetComponent<Leaf> ().SetSize (0, 10, 0);
 		Vector3 v = new Vector3 (10, 0, 0);
+		Assert.AreEqual (v, gm.GetComponent<Leaf> ().GetSize ());
+
+	}
+	[Test]
+	public void RoundLeafSetAndGetSize() {
+		GameObject gm = GameObject.Instantiate((GameObject)Resources.Load("RoundLeaf"), new Vector3(0,10,0), Quaternion.Euler(0,0,0));
+		gm.GetComponent<Leaf> ().SetSize (0, 10, 0);
+		Vector3 v = new Vector3 (0, 10, 0);
 		Assert.AreEqual (v, gm.GetComponent<Leaf> ().GetSize ());
 
 	}
 
     [Test]
     public void LeafCheckIfMoving() {
-        GameObject gm = GameObject.Instantiate((GameObject)Resources.Load("Leaf"), new Vector3(0, 10, 0), Quaternion.Euler(0, 0, 0));
+        GameObject gm = GameObject.Instantiate((GameObject)Resources.Load("FlatLeaf"), new Vector3(0, 10, 0), Quaternion.Euler(0, 0, 0));
         Leaf leaf = gm.GetComponent<Leaf>();
 
         float speed = 0.5f;
@@ -44,7 +64,7 @@ public class LeafObjectTest {
 
     [Test]
     public void LeafCheckIfNotMoving() {
-        GameObject gm = GameObject.Instantiate((GameObject)Resources.Load("Leaf"), new Vector3(0, 10, 0), Quaternion.Euler(0, 0, 0));
+        GameObject gm = GameObject.Instantiate((GameObject)Resources.Load("FlatLeaf"), new Vector3(0, 10, 0), Quaternion.Euler(0, 0, 0));
         Leaf leaf = gm.GetComponent<Leaf>();
 
         float speed = 0.4f;

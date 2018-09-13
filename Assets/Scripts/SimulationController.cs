@@ -1,5 +1,7 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.SceneManagement;
+
 
 /// <summary>
 /// Controls the running of the simulation
@@ -21,7 +23,7 @@ public class SimulationController : MonoBehaviour {
     // Use this for initialization
     void Start() {
         this.leafGen = new LeafGenerator(SimSettings.GetLeafSizesAndRatios(), this.dropAreaX, this.dropAreaY, this.height);
-        this.denCalc = new DensityCalculator();
+        this.denCalc = new DensityCalculator();        
     }
 
     // Update is called once per frame

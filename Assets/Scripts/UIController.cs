@@ -65,6 +65,27 @@ public class UIController : MonoBehaviour
     public Text okButtonText;
     public Button deleteButton;
 
+    ProgressBarController progress;
+
+
+    // Initialisation
+    private void Start()
+    {
+        typeWithRatio = new Dictionary<string, int>();
+
+        isUnlimited = false;
+
+        messageBox.gameObject.SetActive(false);
+
+        message = "";
+
+        // Add the type to the dropdown menu
+        InitializeLeafDropdown();
+
+        // Hide the progress bar canvas
+        ProgressBarController.progressBar.gameObject.SetActive(false);
+    }
+
 
     // Invoke when Start button clicked
     public void StartOnClick()
@@ -156,6 +177,7 @@ public class UIController : MonoBehaviour
         else if (batchrunToggle.isOn)
         {
             ClearAddedLeafBox();
+
             if (!batchrunFileLoadSuccess)
             {
                 message = "Load batch run data error.";
@@ -178,21 +200,6 @@ public class UIController : MonoBehaviour
     {
         Debug.Log("quit");
         Application.Quit();
-    }
-
-    // Initialisation
-    private void Start()
-    {
-        typeWithRatio = new Dictionary<string, int>();
-
-        isUnlimited = false;
-
-        messageBox.gameObject.SetActive(false);
-
-        message = "";
-
-        // Add the type to the dropdown menu
-        InitializeLeafDropdown();
     }
 
     // Set the ratio of the slider

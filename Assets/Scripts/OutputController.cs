@@ -46,6 +46,15 @@ public class OutputController : MonoBehaviour {
                 Debug.Log("Writing results to file ...");
                 WriteResultsToFile();
                 Debug.Log("Done.");
+
+                if (SimSettings.GetBatchrun())
+                {
+                    // Avoid the progress bar stop at 99%
+                    ProgressBarController.progressBar.gameObject.SetActive(true);
+                    ProgressBarController.progressBar.progressImg.fillAmount = 100;
+                    ProgressBarController.progressBar.proText.text = "DONE";
+                }
+
             }                
         }
         

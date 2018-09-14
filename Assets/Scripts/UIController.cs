@@ -20,6 +20,9 @@ public class UIController : MonoBehaviour
     public Toggle batchrunToggle;
     public Toggle singlerunToggle;
 
+    public GameObject singleRunPanel;
+    public GameObject batchRunPanel;
+
     public Toggle visualizeToggle;
 
     public bool batchrunFileLoadSuccess = false;
@@ -137,14 +140,28 @@ public class UIController : MonoBehaviour
         }                
     }
 
+    public void BatchRunToggleClick()
+    {
+        batchRunPanel.gameObject.SetActive(true);
+        singleRunPanel.gameObject.SetActive(false);
+    }
+
+    public void SingleToggleClick()
+    {
+        batchRunPanel.gameObject.SetActive(false);
+        singleRunPanel.gameObject.SetActive(true);
+    }
+
+
     // Load the simulation
     private void ChangeScene()
     {
         // If single run toggle is choosen
-        if (singlerunToggle.isOn)
-        {            
+        if (singlerunToggle.isOn && batchrunToggle.isOn == false)
+        {
             // To pass the dictionary leavesAndRatios to the LeafGenerator
             // Get the LeafShap based on the leaf name
+
             GetLeafShape(typeWithRatio);
             if (leavesAndRatios.Count == 0)
             {
@@ -163,7 +180,7 @@ public class UIController : MonoBehaviour
             SceneManager.LoadScene("Simulation");
         }
         // If batch run toggle is choosen
-        else if (batchrunToggle.isOn)
+        else if (batchrunToggle.isOn && singlerunToggle.isOn == false)
         {
             ClearAddedLeafBox();
             if (!System.Int32.TryParse(simulationTimesField.text, out simulationTimes))
@@ -212,6 +229,9 @@ public class UIController : MonoBehaviour
         messageBox.gameObject.SetActive(false);
 
         message = "";
+
+        batchRunPanel.gameObject.SetActive(false);
+        singleRunPanel.gameObject.SetActive(true);
 
         // Add the type to the dropdown menu
         InitializeLeafDropdown();

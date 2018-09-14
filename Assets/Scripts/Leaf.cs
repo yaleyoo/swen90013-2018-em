@@ -3,7 +3,7 @@
 /// <summary>
 /// Represents a leaf object
 /// </summary>
-public abstract class Leaf : MonoBehaviour {
+public class Leaf : MonoBehaviour {
 
     // Minimum movement to be considered to be moving
     private const float MOVEMENT_MINIMUM = 0.5f;
@@ -73,19 +73,25 @@ public abstract class Leaf : MonoBehaviour {
     /// <param name="thickness">The thickness</param>
     /// <param name="width">The width</param>
     /// <param name="length">The length</param>
-    public abstract void SetSize(float thickness, float width, float length);
+    public void SetSize(float thickness, float width, float length)
+    {
+        this.transform.Find("Cylinder").transform.localScale = new Vector3(width, thickness, length);
+    }
 
-    /// <summary>
     /// Get the size of this leaf
     /// </summary>
     /// <returns>The size</returns>
     public Vector3 GetSize() {
-        return this.transform.localScale;
+        return this.transform.Find("Cylinder").transform.localScale;
     }
 
     /// <summary>
     /// Get the volume of this leaf
     /// </summary>
     /// <returns>The volume</returns>
-    public abstract float GetVolume();
+    public float GetVolume()
+    {
+        Vector3 scale = this.transform.Find("Cylinder").transform.localScale; ;
+        return Mathf.PI * (scale.x / 2f) * (scale.z / 2f) * scale.y;
+    }
 }

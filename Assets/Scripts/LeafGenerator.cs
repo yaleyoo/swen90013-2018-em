@@ -6,7 +6,8 @@ using UnityEngine;
 /// </summary>
 public class LeafGenerator {
 
-    private const string ROUND_LEAF = "round";
+    private const int MaxYPosition = 24;
+    private const int MaxZPosition = 14;
 
     private int totalRatioWeights;
     private float dropAreaX;
@@ -46,33 +47,35 @@ public class LeafGenerator {
     /// <param name="visualize">Should the leaf be visable</param>
     /// <returns>The leaf instantiated</returns>
     public GameObject GetNextLeaf(bool visualize) {
-        GameObject leaf = null;
 
         LeafData nextLeafShape = this.GetLeafData(this.leafShapes);
         Vector3 leafData = nextLeafShape.GetConcreteLeafSize();
 
-        switch (nextLeafShape.LeafForm.ToLower()) {
-            case ROUND_LEAF:
-                leaf = Resources.Load("RoundLeaf") as GameObject;
-                break;
-            default:
-                leaf = Resources.Load("FlatLeaf") as GameObject;
-                break;
-        }
+        Vector3 randomPoint = this.GetRandomPointInDropArea(this.dropAreaX, this.dropAreaY, this.height);     
 
-        Vector3 randomPoint = this.GetRandomPointInDropArea(this.dropAreaX, this.dropAreaY, this.height);
-        leaf = GameObject.Instantiate(leaf, randomPoint, Quaternion.identity);
+        GameObject model = new GameObject();
+        model.tag = "Leaf";
+        model.name = "Leaf";
+        model.transform.localScale = new Vector3(1, 1, 1);
+        model.transform.localPosition = randomPoint;
+        model.AddComponent<Rigidbody>();
+        Leaf leaf = model.AddComponent<Leaf>();
+        leaf.SetName(nextLeafShape.Name);
 
-        leaf.GetComponent<Leaf>().SetName(nextLeafShape.Name);
-        leaf.GetComponent<Leaf>().SetSize(leafData.x, leafData.y, leafData.z);
-        leaf.GetComponent<MeshRenderer>().material.color = this.leafColorer.GetColor(nextLeafShape);
-        leaf.transform.eulerAngles = this.GetRandomAngle();
+        GameObject cylinder = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+        cylinder.transform.SetParent(model.transform);
+        cylinder.transform.localPosition = new Vector3(0, 0, 0);
+        leaf.SetSize(leafData.x, leafData.y, leafData.z);
+        cylinder.GetComponent<MeshRenderer>().material.color = this.leafColorer.GetColor(nextLeafShape);
+        Object.Destroy(cylinder.GetComponent<CapsuleCollider>());
+        cylinder.GetComponent<Renderer>().enabled = visualize;
+        this.Bend(cylinder.GetComponent<MeshFilter>().mesh);
 
-        if (!visualize) {
-            leaf.GetComponent<Renderer>().enabled = false;
-        }
+        this.AddCollider(cylinder.transform.localScale, cylinder.GetComponent<MeshFilter>().mesh, model.transform);
 
-        return leaf;
+        model.transform.eulerAngles = this.GetRandomAngle();
+
+        return model;
     }
 
     /// <summary>
@@ -116,5 +119,52 @@ public class LeafGenerator {
         }
 
         return new LeafData();
+    }
+
+    /// <summary>
+    /// Bend the leaf randomly
+    /// </summary>
+    /// <param name="meshToBend">Mesh for the rendering of the leaf</param>
+    private void Bend(Mesh meshToBend)
+    {
+        float gamma = Random.Range(1.0f, 500.0f);
+        Vector3[] verts = meshToBend.vertices;
+        for (int i = 0; i < verts.Length; i++)
+        {
+            verts[i].y += verts[i].z * verts[i].z * gamma;
+        }
+        meshToBend.vertices = verts;
+        meshToBend.RecalculateBounds();
+        meshToBend.RecalculateNormals();
+    }
+
+    /// <summary>
+    /// Add colliders to the leaf
+    /// </summary>
+    /// <param name="renderScale">Size of the leaf</param>
+    /// <param name="renderMesh">Mesh for the rendering of the leaf</param>
+    /// <param name="parentTransform">Transform of the parent object</param>
+    private void AddCollider(Vector3 renderScale, Mesh renderMesh, Transform parentTransform)
+    {
+        float deltaY = renderScale.y * (renderMesh.vertices[MaxYPosition].y - 1);
+        float deltaZ = renderScale.z * renderMesh.vertices[MaxZPosition].z;
+        float angleRight = (float)Mathf.Atan2(deltaY, deltaZ) * Mathf.Rad2Deg;
+        float angleLeft = (float)Mathf.Atan2(deltaY, -deltaZ) * Mathf.Rad2Deg;
+
+        GameObject leftCollider = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        leftCollider.name = "leftCollider";
+        leftCollider.transform.SetParent(parentTransform);
+        leftCollider.transform.localPosition = new Vector3(0, deltaY / 3, 0.25f * renderScale.z);
+        leftCollider.transform.localScale = new Vector3(renderScale.x, 2 * renderScale.y, renderScale.z / 2);
+        leftCollider.transform.localEulerAngles = new Vector3(angleLeft, 0, 0);
+        Object.Destroy(leftCollider.GetComponent<MeshRenderer>());
+
+        GameObject rightCollider = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        rightCollider.name = "rightCollider";
+        rightCollider.transform.SetParent(parentTransform);
+        rightCollider.transform.localPosition = new Vector3(0, deltaY / 3, -0.25f * renderScale.z);
+        rightCollider.transform.localScale = new Vector3(renderScale.x, 2 * renderScale.y, renderScale.z / 2);
+        rightCollider.transform.localEulerAngles = new Vector3(angleRight, 0, 0);
+        Object.Destroy(rightCollider.GetComponent<MeshRenderer>());
     }
 }

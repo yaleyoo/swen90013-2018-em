@@ -48,10 +48,18 @@ public class DensityCalculationCylinder {
     /// <param name="obj">The object</param>
     /// <returns>The y value of the lowest point</returns>
     private float CalcHeight(GameObject obj) {
-        float height = obj.GetComponent<Collider>().bounds.min.y;
-
-        if (height > 0) {
-            return height;
+        if (obj.tag == "Leaf")
+        {
+            float leftHeight = obj.transform.Find("leftCollider").GetComponent<Collider>().bounds.min.y;
+            float rightHeight = obj.transform.Find("rightCollider").GetComponent<Collider>().bounds.min.y;
+            if (leftHeight > rightHeight && rightHeight > 0)
+            {
+                return rightHeight;
+            }
+            if (leftHeight < rightHeight && leftHeight > 0)
+            {
+                return leftHeight;
+            }
         }
 
         return 0f;

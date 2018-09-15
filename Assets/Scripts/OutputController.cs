@@ -25,10 +25,9 @@ public class OutputController : MonoBehaviour {
             //       lack standard-deviation and median
             Results.SetAverage();
 
-            // Print the results to the screen
-            string result = "Volume density of leaf litter (as ratio):\n" + System.Math.Round(Results.GetAverage(), 6).ToString();
-            GameObject.FindGameObjectWithTag("OutputText").GetComponent<Text>().text = result;
-            Results.ClearResultSet();
+        // Print the results to the screen
+		string result = "Volume density of leaf litter:\n(leaf volume)/(total volume) = " + System.Math.Round(Results.GetAverage(), 6).ToString();
+        GameObject.FindGameObjectWithTag("OutputText").GetComponent<Text>().text = result;
 
             //decrease remaining run times 
             SimSettings.SetRunTimesLeft(SimSettings.GetRunTimeesLeft() - 1);

@@ -35,6 +35,14 @@ public class Leaf : MonoBehaviour {
     }
 
     /// <summary>
+    /// Disables the physics movement of the leaf. Done either when leaf stops moving, or when simulation deemed finished
+    /// </summary>
+    public void FreezeLeaf()
+    {
+        this.GetComponent<Rigidbody>().isKinematic = true;
+    }
+
+    /// <summary>
     /// Check if a leaf is moving or not based on it's speed and angular velocity
     /// is above a minimum threshold.
     /// </summary>
@@ -93,5 +101,28 @@ public class Leaf : MonoBehaviour {
     {
         Vector3 scale = this.transform.Find("Cylinder").transform.localScale; ;
         return Mathf.PI * (scale.x / 2f) * (scale.z / 2f) * scale.y;
+    }
+
+    /// <summary>
+    /// Get the world position of the lowest point in the leaf
+    /// </summary>
+    /// <returns>The lowest height</returns>
+    public float GetLowestHeight()
+    {
+        float height = this.transform.Find("leftCollider").GetComponent<Collider>().bounds.min.y;
+        if (height < this.transform.Find("rightCollider").GetComponent<Collider>().bounds.min.y)
+        {
+            return height;
+        }
+        return this.transform.Find("rightCollider").GetComponent<Collider>().bounds.min.y;
+    }
+
+    /// <summary>
+    /// Get the world position of the center point of the leaf
+    /// </summary>
+    /// <returns>The center point</returns>
+    public Vector3 GetCenter()
+    {
+        return (this.transform.Find("leftCollider").GetComponent<Collider>().bounds.center + this.transform.Find("rightCollider").GetComponent<Collider>().bounds.center) / 2;
     }
 }

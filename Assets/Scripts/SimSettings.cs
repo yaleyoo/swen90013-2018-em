@@ -6,7 +6,6 @@
 
 using System.Collections.Generic;
 
-
 public class SimSettings {
     // Visual simulation settings
     private static bool visualize;
@@ -22,10 +21,53 @@ public class SimSettings {
     private static int leafLimit = 1000;
     private static float leafVolumeLimit = 15;
 
+    // Batch run setting
+    private static bool batchRun;
+    // Remaining run times
+    private static int runTimesLeft = 1;
+
+    // Simulation times for single run in batch run
+    private static int simulationTimes = 10;
+    // Simulation times left
+    private static int simulationTimesLeft = 10;
+
     // Density calculation settings
     private static float densityIgnoreBorder = 10;
     private static int monteCarloNumIterations = 1000;
     private static int numCylinderSlices = 10;
+
+    // Set Simulation times
+    public static void SetSimulationTimes(int simulationTimes)
+    {
+        SimSettings.simulationTimes = simulationTimes;
+    }
+
+    // Set batchrun times
+    public static int GetSimulationTimesLeft()
+    {
+        return simulationTimesLeft;
+    }
+
+    // return true if simulationTimesLeft > 1 and decrease simulationTimesLeft by 1
+    // NOT > 0 because the first run did not decrease the number
+    public static bool DecreaseSimulationTimesLeft()
+    {
+        if (simulationTimesLeft > 1)
+        {
+            simulationTimesLeft = simulationTimesLeft - 1;
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    // Reset simulationTimesLeft
+    public static void ResetSimulationTimesLeft()
+    {
+        simulationTimesLeft = simulationTimes;
+    }
+
 
     // Get visualization flag
     public static bool GetVisualize()
@@ -37,6 +79,30 @@ public class SimSettings {
     public static void SetVisualize(bool isVisualize)
     {
         SimSettings.visualize = isVisualize;
+    }
+
+    // Get batchrun flag
+    public static bool GetBatchrun()
+    {
+        return batchRun;
+    }
+
+    // Set batchrun flag
+    public static void SetBatchrun(bool isBatchrun)
+    {
+        batchRun = isBatchrun;
+    }
+
+    // Get batchrun times
+    public static int GetRunTimeesLeft()
+    {
+        return runTimesLeft;
+    }
+
+    // Set batchrun times
+    public static void SetRunTimesLeft(int runTimesLeft)
+    {
+        SimSettings.runTimesLeft = runTimesLeft;
     }
 
     // Check if a leaf limit exists

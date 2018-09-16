@@ -18,10 +18,13 @@ public class Results {
 
 	private static float median;
 
-	/// <summary>
-	/// a resultset used to store all density results
-	/// </summary>
-	private static List<float> resultset = new List<float>();
+    // store results for batch run, each element is a single run result
+    private static List<float> batchrunResults = new List<float>();
+
+    /// <summary>
+    /// a resultset used to store all density results
+    /// </summary>
+    private static List<float> resultset = new List<float>();
 
 	/// <summary>
 	/// Gets the value of average density.
@@ -44,7 +47,10 @@ public class Results {
 		}
 
 		average = sum / resultset.Count;
-	}
+
+        // Add this average to batch run result
+        batchrunResults.Add(average);
+    }
 
 	/// <summary>
 	/// Gets the Standard Deviation.
@@ -107,5 +113,17 @@ public class Results {
 	public static void addResult(float rs){
 		resultset.Add (rs);
 	}
+
+    // Clear resultset
+    public static void ClearResultSet()
+    {
+        resultset.Clear();
+    }
+
+    // Get BatchRunResults list
+    public static List<float> GetBatchRunResults()
+    {
+        return batchrunResults;
+    }
 
 }

@@ -9,6 +9,7 @@ public class DensityCalculationCylinder {
     private GameObject[] objectsInWorld;
     private float cylinderAreaX;
     private float cylinderAreaY;
+    private float cylinderHeight;
 
     /// <summary>
     /// Creates a DensityCalculationCylinder
@@ -20,72 +21,98 @@ public class DensityCalculationCylinder {
         this.objectsInWorld = objects;
         this.cylinderAreaX = cylinderAreaX;
         this.cylinderAreaY = cylinderAreaY;
+        this.cylinderHeight = this.ComputeCylinderHeightToUse();
+        Debug.Log("Height of the density calculating cylinder is: " + this.cylinderHeight);
     }
 
     /// <summary>
-    /// Returns the object with the largest y value
+    /// Computes a height for the cylinder by taking the mean and 2 standard deviations of all the leaf
+    /// heights, lowering teh chance of a stray high leaf affecting the height of the cylinder
     /// </summary>
-    /// <returns>The object</returns>
-    public GameObject GetHighestObject() {
-        GameObject highestObj = null;
+    /// <returns>The height of the cylinder to be used</returns>
+    public float ComputeCylinderHeightToUse()
+    {
+        // Used as sums and then divided to give the mean and standard deviations of leaf heights
+        float avgHeight = 0.0f;
+        float stdDevHeight = 0.0f;
 
-        foreach (GameObject leaf in this.objectsInWorld) {
-            if (highestObj == null) {
-                highestObj = leaf;
-            }
-            else if (leaf.transform.position.y >= highestObj.transform.position.y) {
-                highestObj = leaf;
-            }
+        // If no objects, return 0 height and avoid division by zero when computing average
+        if (this.objectsInWorld.Length < 1)
+        {
+            return 0;
         }
 
-        return highestObj;
-    }
+        // Compute the average height of the leaves (take height to be the leafs lowest point)
+        foreach (GameObject obj in this.objectsInWorld){
+            avgHeight += obj.GetComponent<Collider>().bounds.min.y;
+        }
+        avgHeight /= this.objectsInWorld.Length;
 
-    /// <summary>
-    /// Returns the y value of lowest point of the object.
-    /// Returns 0 is the lowest point is negative.
-    /// </summary>
-    /// <param name="obj">The object</param>
-    /// <returns>The y value of the lowest point</returns>
-    private float CalcHeight(GameObject obj) {
-        float height = obj.GetComponent<Collider>().bounds.min.y;
-
-        if (height > 0) {
-            return height;
+        // If only 1 object return just the average and avoid division by zero when computing stddev
+        if (this.objectsInWorld.Length < 2)
+        {
+            return avgHeight;
         }
 
-        return 0f;
+        // Compute the sample standard deviation of the leaf heights
+        foreach (GameObject obj in this.objectsInWorld)
+        {
+            stdDevHeight += Mathf.Pow(obj.GetComponent<Collider>().bounds.min.y - avgHeight, 2);
+        }
+        stdDevHeight = Mathf.Sqrt(stdDevHeight / (this.objectsInWorld.Length-1));
+
+        // Return the height that has ~97.5% of the heights in it (0 to 2 standard deviations from mean)
+        // This will exclude any potentially not-dropped-yet leaf
+        return avgHeight + 2 * stdDevHeight;
     }
 
     /// <summary>
-    /// Returns a random point within the cylinder
+    /// Returns a random point within a horizontal slice of the cylinder
     /// </summary>
-    /// <returns>The point</returns>
-    public Vector3 RandomPointInCylinder() {
-        float height = this.CalcHeight(this.GetHighestObject());
+    /// <param name="numSections">The number of horizontal slices to divide the cylinder into</param>
+    /// <param name="sectionIndex">The index of the slice to generate the point in. Indices start at 0, which represents the bottom slice</param>
+    /// <returns>The random point</returns>
+    public Vector3 RandomPointInCylinderSlice(int numSlices, int sliceIndex)
+    {
         Vector2 UnitCirclePoint = Random.insideUnitCircle;
 
-        float x = UnitCirclePoint.x * this.cylinderAreaX;
-        float y = Random.Range(0, height);
-        float z = UnitCirclePoint.y * cylinderAreaY;
+        float startHeight = sliceIndex * (this.cylinderHeight / numSlices);
+        float endHeight = startHeight + (this.cylinderHeight / numSlices);
 
         // unit circle point values are multiplied by the area dimensions that are where the density is calculated
+        float x = UnitCirclePoint.x * this.cylinderAreaX;
+        float y = Random.Range(startHeight, endHeight);
+        float z = UnitCirclePoint.y * cylinderAreaY;
+        
         return new Vector3(x, y, z);
     }
 
     /// <summary>
-    /// Checks if the point is in any of the objects
+    /// Checks if the given point is in any of the world objects. Uses the ray cast method to check 
+    /// whether or not point is inside objects.
+    /// Method adapted from https://answers.unity.com/questions/163864/test-if-point-is-in-collider.html
     /// </summary>
-    /// <param name="point">The point</param>
-    /// <returns>Whether the point is in an object</returns>
-    public bool IsPointInObjects(Vector3 point) {
-        foreach (GameObject obj in this.objectsInWorld) {
-            if (obj.GetComponent<Collider>().bounds.Contains(point)) {
-                return true;
-            }
-        }
+    /// <param name="point">The point which may be inside a world object</param>
+    /// <returns>True if the point given is inside any world objects</returns>
+    public bool IsPointInObjects(Vector3 point)
+    {
+        // Chose a point which will definitely not be inside an object as raycast origin. This is
+        // chosen as a point just above the leaf dropping height
+        Vector3 distantPoint = new Vector3(0, SimSettings.GetDropHeight() + 10, 0);
 
-        return false;
+        // Gets the direction and distance from raycast origin, to the point we are checking
+        Vector3 directionToPoint = point - distantPoint;
+        float distance = directionToPoint.magnitude;
+        directionToPoint.Normalize();
+
+        // Get the number of collisions from the distant point to the point we are checking.
+        // Note this has to be done in both directions due to colliders not being hit from the inside (back face)
+        // and this also RELIES on convex objects in the world, as raycastting will only collide with the same
+        // collider once
+        int hits = 0;
+        hits += Physics.RaycastAll(distantPoint, directionToPoint, distance).Length;
+        hits += Physics.RaycastAll(point, -directionToPoint, distance).Length;
+        // If odd number of hits, then point is in object
+        return (hits % 2) == 1;
     }
-
 }

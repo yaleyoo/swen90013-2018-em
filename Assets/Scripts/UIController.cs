@@ -87,6 +87,10 @@ public class UIController : MonoBehaviour
 
         // Hide the progress bar canvas
         ProgressBarController.progressBar.gameObject.SetActive(false);
+
+        // Set the default input value
+        leafNumField.text = "5000";
+        simulationTimesField.text = "10";
     }
 
 
@@ -155,6 +159,22 @@ public class UIController : MonoBehaviour
         }                
     }
 
+    // Simulate several times with the same ratios
+    private void MultiRun()
+    {
+        if (!System.Int32.TryParse(simulationTimesField.text, out SimulationTimes))
+        {
+            message = "Invalid simulation number. Please enter an interger.";
+            DisplayMessage(message);
+            return;
+        }
+        else
+        {
+            SimSettings.SetSimulationTimes(SimulationTimes);
+            SimSettings.ResetSimulationTimesLeft();
+        }
+    }
+
     // Load the simulation
     private void ChangeScene()
     {
@@ -170,8 +190,12 @@ public class UIController : MonoBehaviour
                 DisplayMessage(message);
                 return;
             }
-            SimSettings.SetSimulationTimes(1);
-            SimSettings.ResetSimulationTimesLeft();
+
+            // Multirun
+            MultiRun();
+
+            //SimSettings.SetSimulationTimes(1);
+            //SimSettings.ResetSimulationTimesLeft();
 
             SimSettings.SetLeafSizesAndRatios(leavesAndRatios);
             // set visualize flag according to visualizeToggle's status
@@ -184,17 +208,7 @@ public class UIController : MonoBehaviour
         {
             ClearAddedLeafBox();
 
-            if (!System.Int32.TryParse(simulationTimesField.text, out SimulationTimes))
-            {
-                message = "Invalid simulation number. Please enter an interger.";
-                DisplayMessage(message);
-                return;
-            }
-            else
-            {
-                SimSettings.SetSimulationTimes(SimulationTimes);
-                SimSettings.ResetSimulationTimesLeft();
-            }
+            MultiRun();
 
             if (!batchrunFileLoadSuccess)
             {

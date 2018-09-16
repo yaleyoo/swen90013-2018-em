@@ -54,14 +54,17 @@ public class OutputController : MonoBehaviour {
                 WriteResultsToFile();
                 Debug.Log("Done.");
 
-                if (SimSettings.GetBatchrun())
-                {
-                    // Avoid the progress bar stop at 99%
-                    ProgressBarController.progressBar.gameObject.SetActive(true);
-                    ProgressBarController.progressBar.progressImg.fillAmount = 100;
-                    ProgressBarController.progressBar.proText.text = "DONE";
-                }
+                // Avoid the progress bar stop at 99%, inidiate the simulation done
+                ProgressBarController.progressBar.gameObject.SetActive(true);
+                ProgressBarController.progressBar.progressImg.fillAmount = 100;
+                ProgressBarController.progressBar.proText.text = "DONE";   
 
+                // Change the title of the single run
+                if (!SimSettings.GetBatchrun())
+                {
+                    ProgressBarController.progressBar.proTitle.text = "Simulations Finished.";
+                }
+               
             }                
         }
         

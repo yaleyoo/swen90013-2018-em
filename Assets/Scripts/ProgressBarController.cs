@@ -20,6 +20,9 @@ public class ProgressBarController : MonoBehaviour {
     // The text to show the percentage
     public Text proText;
 
+    // The title of the progress bar
+    public Text proTitle;
+
     // The integer to contral the width of the progressImg;
     public int curProValue = 0;
 

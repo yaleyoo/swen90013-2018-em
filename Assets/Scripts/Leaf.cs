@@ -20,7 +20,7 @@ public abstract class Leaf : MonoBehaviour {
 
             // If the leaf is not moving disable physics movement
             if (!IsMoving(speed, angularVelocity)) {
-                this.GetComponent<Rigidbody>().isKinematic = true;
+                FreezeLeaf();
             }
             tick = 0;
         }
@@ -32,6 +32,14 @@ public abstract class Leaf : MonoBehaviour {
         if (this.transform.position.y < -10) {
             Destroy(this.gameObject);
         }
+    }
+
+    /// <summary>
+    /// Disables the physics movement of the leaf. Done either when leaf stops moving, or when simulation deemed finished
+    /// </summary>
+    public void FreezeLeaf()
+    {
+        this.GetComponent<Rigidbody>().isKinematic = true;
     }
 
     /// <summary>

@@ -3,7 +3,7 @@
 /// <summary>
 /// Represents a leaf object
 /// </summary>
-public abstract class Leaf : MonoBehaviour {
+public class Leaf : MonoBehaviour {
 
     // Minimum movement to be considered to be moving
     private const float MOVEMENT_MINIMUM = 0.5f;
@@ -32,6 +32,14 @@ public abstract class Leaf : MonoBehaviour {
         if (this.transform.position.y < -10) {
             Destroy(this.gameObject);
         }
+    }
+
+    /// <summary>
+    /// Disables the physics movement of the leaf. Done either when leaf stops moving, or when simulation deemed finished
+    /// </summary>
+    public void FreezeLeaf()
+    {
+        this.GetComponent<Rigidbody>().isKinematic = true;
     }
 
     /// <summary>
@@ -73,19 +81,48 @@ public abstract class Leaf : MonoBehaviour {
     /// <param name="thickness">The thickness</param>
     /// <param name="width">The width</param>
     /// <param name="length">The length</param>
-    public abstract void SetSize(float thickness, float width, float length);
+    public void SetSize(float thickness, float width, float length)
+    {
+        this.transform.Find("Cylinder").transform.localScale = new Vector3(width, thickness, length);
+    }
 
-    /// <summary>
     /// Get the size of this leaf
     /// </summary>
     /// <returns>The size</returns>
     public Vector3 GetSize() {
-        return this.transform.localScale;
+        return this.transform.Find("Cylinder").transform.localScale;
     }
 
     /// <summary>
     /// Get the volume of this leaf
     /// </summary>
     /// <returns>The volume</returns>
-    public abstract float GetVolume();
+    public float GetVolume()
+    {
+        Vector3 scale = this.transform.Find("Cylinder").transform.localScale; ;
+        return Mathf.PI * (scale.x / 2f) * (scale.z / 2f) * scale.y;
+    }
+
+    /// <summary>
+    /// Get the world position of the lowest point in the leaf
+    /// </summary>
+    /// <returns>The lowest height</returns>
+    public float GetLowestHeight()
+    {
+        float height = this.transform.Find("leftCollider").GetComponent<Collider>().bounds.min.y;
+        if (height < this.transform.Find("rightCollider").GetComponent<Collider>().bounds.min.y)
+        {
+            return height;
+        }
+        return this.transform.Find("rightCollider").GetComponent<Collider>().bounds.min.y;
+    }
+
+    /// <summary>
+    /// Get the world position of the center point of the leaf
+    /// </summary>
+    /// <returns>The center point</returns>
+    public Vector3 GetCenter()
+    {
+        return (this.transform.Find("leftCollider").GetComponent<Collider>().bounds.center + this.transform.Find("rightCollider").GetComponent<Collider>().bounds.center) / 2;
+    }
 }

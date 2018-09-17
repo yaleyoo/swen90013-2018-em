@@ -1,5 +1,7 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.SceneManagement;
+
 
 /// <summary>
 /// Controls the running of the simulation
@@ -18,10 +20,39 @@ public class SimulationController : MonoBehaviour {
     private float height = SimSettings.GetDropHeight();
     private float densityIgnoreBorder = SimSettings.GetDensityIgnoreBorder();
 
+    // Parameters to update the progress bar
+    private int targetValueOnce = 100;
+    private int runCount = 0;
+    private int totalProgress = 100;
+
+    private System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
+
     // Use this for initialization
     void Start() {
         this.leafGen = new LeafGenerator(SimSettings.GetLeafSizesAndRatios(), this.dropAreaX, this.dropAreaY, this.height);
         this.denCalc = new DensityCalculator();
+
+
+
+        // Batuch Run
+        if (SimSettings.GetBatchrun())
+        {
+            // Initialise the parameter for progres bar
+            if (BatchRunCsvLoader.batchrunLeafAndRatio.Count != 0)
+            {
+                targetValueOnce = 100 / BatchRunCsvLoader.batchrunLeafAndRatio.Count;
+            }
+            runCount = BatchRunCsvLoader.batchrunLeafAndRatio.Count - SimSettings.GetRunTimeesLeft() + 1;
+            totalProgress = targetValueOnce * runCount;
+
+            // Show the progress bar
+            ProgressBarController.progressBar.gameObject.SetActive(true);
+        }
+        else
+        {
+            ProgressBarController.progressBar.gameObject.SetActive(false);
+        }
+
     }
 
     // Update is called once per frame
@@ -30,9 +61,23 @@ public class SimulationController : MonoBehaviour {
         if (this.CanCreateLeaf()) {
             this.CreateLeaf();
         }
-        else if (this.hasEnded(this.leaves)) {
+        else if (this.HasEnded()) {
+            this.FreezeAll(this.leaves);
             this.CalculateDensity(this.leaves);
         }
+
+        LoadingProgressBar();
+    }
+
+    // The method to update the porgress bar
+    private void LoadingProgressBar()
+    {
+        if (ProgressBarController.progressBar.curProValue < totalProgress)
+        {
+            ProgressBarController.progressBar.curProValue++;
+        }
+        ProgressBarController.progressBar.progressImg.fillAmount = ProgressBarController.progressBar.curProValue / 100f;
+        ProgressBarController.progressBar.proText.text = ProgressBarController.progressBar.curProValue + "%";
     }
 
     /// <summary>
@@ -81,19 +126,78 @@ public class SimulationController : MonoBehaviour {
     }
 
     /// <summary>
+    /// Freezes all the given leaves so that they are not moving during density calculation
+    /// </summary>
+    /// <param name="leaves">All of the leaves in the world</param>
+    public void FreezeAll(GameObject[] leaves)
+    {
+        foreach(GameObject lf in leaves)
+        {
+            lf.GetComponent<Leaf>().FreezeLeaf();
+        }
+    }
+
+    /// <summary>
     /// Calculates the density of leaves and changes to the output scene
     /// to display the results
     /// </summary>
+    /// <param name="leaves">All the current leaf objects in the world</param>
     private void CalculateDensity(GameObject[] leaves) {
+        // Time how long it takes for the density to be computed (for optimisation use)
+        stopWatch.Start();
+
         DensityCalculationCylinder calcArea = new DensityCalculationCylinder(
                                     leaves,
                                     (this.dropAreaX - this.densityIgnoreBorder),
                                     (this.dropAreaY - this.densityIgnoreBorder)
                                   );
-        float density = denCalc.CalculateDensity(calcArea, SimSettings.GetMonteCarloNumIterations());
-        Debug.Log("Density calculated as: " + density);
-		Results.addResult (density);
+        float density = denCalc.CalculateDensity(calcArea, SimSettings.GetMonteCarloNumIterations(), SimSettings.GetNumCylinderSlices());
+
+        // Console log the density and the time it took to compute
+        stopWatch.Stop();
+        Debug.Log(string.Format("Density calculated as {0} in {1} seconds.",
+                                System.Math.Round(density, 6),
+                                System.Math.Round(stopWatch.ElapsedMilliseconds / 1000.0, 6)));
+
+        Results.addResult (density);
         this.ChangeToOutputScene();
+    }
+
+    /// <summary>
+    /// Used as a base line for volume density estimation, primarily for debugging. Compute the density
+    /// by taking the volume of all leaves with centers within the computing area, and dividing by cylinder volume.
+    /// Should always slightly over estimate volume due to parts of leaves sticking out of the calculating area
+    /// that are still considered in the ratio
+    /// </summary>
+    /// <param name="leaves">All the current leaf objects in the world</param>
+    private void CalculateDensityBaseline(GameObject[] leaves)
+    {
+        // Create cylinder to get the height to use
+        DensityCalculationCylinder calcArea = new DensityCalculationCylinder(
+                                    leaves,
+                                    (this.dropAreaX - this.densityIgnoreBorder),
+                                    (this.dropAreaY - this.densityIgnoreBorder)
+                                  );
+        float cylHeight = calcArea.ComputeCylinderHeightToUse();
+
+        // Sum the volumes of leaves whose center point is within the cylinder elipse base
+        float leafVol = 0.0f;
+        foreach (GameObject lf in leaves)
+        {
+            if (Mathf.Abs(lf.GetComponent<Leaf>().GetCenter().x) < ((this.dropAreaX - this.densityIgnoreBorder)) &&
+                Mathf.Abs(lf.GetComponent<Leaf>().GetCenter().z) < ((this.dropAreaY - this.densityIgnoreBorder)) &&
+                lf.GetComponent<Leaf>().GetCenter().y < cylHeight)
+            {
+                leafVol += lf.GetComponent<Leaf>().GetVolume();
+            }
+        }
+
+        // Compute the cylinder volume
+        float cylVol = cylHeight * (Mathf.PI * (this.dropAreaX - this.densityIgnoreBorder) * (this.dropAreaY - this.densityIgnoreBorder));
+
+        // Console log the density
+        Debug.Log(string.Format("Baseline volume density calculated as {0}",
+                                System.Math.Round(leafVol/cylVol, 6)));
     }
 
     /// <summary>
@@ -101,13 +205,48 @@ public class SimulationController : MonoBehaviour {
     /// </summary>
     /// <param name="leaves">List of all leaves in the world</param>
     /// <returns>Whether all leaves have been frozen</returns>
-    public bool hasEnded(GameObject[] leaves) {
+    public bool HasEnded(GameObject[] leaves) {
         foreach (GameObject leaf in leaves) {
             if (!leaf.GetComponent<Rigidbody>().isKinematic) {
                 return false;
             }
         }
         return true;
+    }
+
+    /// <summary>
+    /// Alternative stopping check. Returns true when the time since it's first call is longer than
+    /// twice the time a leaf takes to fall to teh ground from the dropping height. Twice the time is used
+    /// as a safe measure
+    /// </summary>
+    /// <returns>
+    /// Whether or not the time between the first call and the current call of this method exceeds twice the
+    /// time it takes a single leaf to fall from the dropping height to the ground
+    /// </returns>
+    public bool HasEnded()
+    {
+        // On fist call of the method, start running teh stopwatch, and return false
+        if (!this.stopWatch.IsRunning)
+        {
+            this.stopWatch.Start();
+            return false;
+        }
+
+        // Not the first time method run, get time for a leaf to fall, and time since first call of method
+        double timeToFall = System.Math.Sqrt(SimSettings.GetDropHeight() / System.Math.Abs(Physics.gravity.y));
+        double secondsSinceLastLeaf = this.stopWatch.ElapsedMilliseconds / 1000.0;
+
+        // Reset the stopwatch if enough time has elapsed, and return true
+        if (secondsSinceLastLeaf > timeToFall*2)
+        {
+            stopWatch.Stop();
+            stopWatch.Reset();
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     /// <summary>

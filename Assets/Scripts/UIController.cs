@@ -194,13 +194,9 @@ public class UIController : MonoBehaviour
             // Multirun
             MultiRun();
 
-            //SimSettings.SetSimulationTimes(1);
-            //SimSettings.ResetSimulationTimesLeft();
-
             SimSettings.SetLeafSizesAndRatios(leavesAndRatios);
             // set visualize flag according to visualizeToggle's status
             SimSettings.SetVisualize(visualizeToggle.isOn);            
-            SimSettings.SetRunTimesLeft(1);
             SceneManager.LoadScene("Simulation");
         }
         // If batch run toggle is choosen

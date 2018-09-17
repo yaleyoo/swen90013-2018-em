@@ -43,18 +43,17 @@ public class UIController : MonoBehaviour
     // InputField on the canvas
     public InputField leafNumField;
 
-    // Simulation times for each single run in batch run
-    public InputField simulationTimesField;
-
     // Limit of leaf to be set
     private int leafNum;
-
-    // Simulation times for each single run in batch run
-    private int simulationTimes;
 
     // The flag whether the user click the un limited button
     private bool isUnlimited;
 
+    // InputField for simulation times of mulitrun with same parameters
+    public InputField simulationTimesField;
+
+    // Simulation times for multirun
+    private int SimulationTimes;
 
     // Component for message box
     // String to save the warning message
@@ -70,6 +69,29 @@ public class UIController : MonoBehaviour
 
     public Text okButtonText;
     public Button deleteButton;
+
+   
+    // Initialisation
+    private void Start()
+    {
+        typeWithRatio = new Dictionary<string, int>();
+
+        isUnlimited = false;
+
+        messageBox.gameObject.SetActive(false);
+
+        message = "";
+
+        // Add the type to the dropdown menu
+        InitializeLeafDropdown();
+
+        // Hide the progress bar canvas
+        ProgressBarController.progressBar.gameObject.SetActive(false);
+
+        // Set the default input value
+        leafNumField.text = "5000";
+        simulationTimesField.text = "10";
+    }
 
 
     // Invoke when Start button clicked
@@ -137,6 +159,22 @@ public class UIController : MonoBehaviour
         }                
     }
 
+    // Simulate several times with the same ratios
+    private void MultiRun()
+    {
+        if (!System.Int32.TryParse(simulationTimesField.text, out SimulationTimes))
+        {
+            message = "Invalid simulation number. Please enter an interger.";
+            DisplayMessage(message);
+            return;
+        }
+        else
+        {
+            SimSettings.SetSimulationTimes(SimulationTimes);
+            SimSettings.ResetSimulationTimesLeft();
+        }
+    }
+
     // Load the simulation
     private void ChangeScene()
     {
@@ -153,30 +191,20 @@ public class UIController : MonoBehaviour
                 return;
             }
 
-            SimSettings.SetSimulationTimes(1);
-            SimSettings.ResetSimulationTimesLeft();
+            // Multirun
+            MultiRun();
 
             SimSettings.SetLeafSizesAndRatios(leavesAndRatios);
             // set visualize flag according to visualizeToggle's status
             SimSettings.SetVisualize(visualizeToggle.isOn);            
-            SimSettings.SetRunTimesLeft(1);
             SceneManager.LoadScene("Simulation");
         }
         // If batch run toggle is choosen
         else if (batchrunToggle.isOn)
         {
             ClearAddedLeafBox();
-            if (!System.Int32.TryParse(simulationTimesField.text, out simulationTimes))
-            {
-                message = "Invalid simulation number. Please enter integer.";
-                DisplayMessage(message);
-                return;
-            }
-            else
-            {
-                SimSettings.SetSimulationTimes(simulationTimes);
-                SimSettings.ResetSimulationTimesLeft();
-            }
+
+            MultiRun();
 
             if (!batchrunFileLoadSuccess)
             {
@@ -200,21 +228,6 @@ public class UIController : MonoBehaviour
     {
         Debug.Log("quit");
         Application.Quit();
-    }
-
-    // Initialisation
-    private void Start()
-    {
-        typeWithRatio = new Dictionary<string, int>();
-
-        isUnlimited = false;
-
-        messageBox.gameObject.SetActive(false);
-
-        message = "";
-
-        // Add the type to the dropdown menu
-        InitializeLeafDropdown();
     }
 
     // Set the ratio of the slider

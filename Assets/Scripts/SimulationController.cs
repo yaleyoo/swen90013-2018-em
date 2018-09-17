@@ -20,12 +20,39 @@ public class SimulationController : MonoBehaviour {
     private float height = SimSettings.GetDropHeight();
     private float densityIgnoreBorder = SimSettings.GetDensityIgnoreBorder();
 
+    // Parameters to update the progress bar
+    private int targetValueOnce = 100;
+    private int runCount = 0;
+    private int totalProgress = 100;
+
     private System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
 
     // Use this for initialization
     void Start() {
         this.leafGen = new LeafGenerator(SimSettings.GetLeafSizesAndRatios(), this.dropAreaX, this.dropAreaY, this.height);
-        this.denCalc = new DensityCalculator();        
+        this.denCalc = new DensityCalculator();
+
+
+
+        // Batuch Run
+        if (SimSettings.GetBatchrun())
+        {
+            // Initialise the parameter for progres bar
+            if (BatchRunCsvLoader.batchrunLeafAndRatio.Count != 0)
+            {
+                targetValueOnce = 100 / BatchRunCsvLoader.batchrunLeafAndRatio.Count;
+            }
+            runCount = BatchRunCsvLoader.batchrunLeafAndRatio.Count - SimSettings.GetRunTimeesLeft() + 1;
+            totalProgress = targetValueOnce * runCount;
+
+            // Show the progress bar
+            ProgressBarController.progressBar.gameObject.SetActive(true);
+        }
+        else
+        {
+            ProgressBarController.progressBar.gameObject.SetActive(false);
+        }
+
     }
 
     // Update is called once per frame
@@ -38,6 +65,19 @@ public class SimulationController : MonoBehaviour {
             this.FreezeAll(this.leaves);
             this.CalculateDensity(this.leaves);
         }
+
+        LoadingProgressBar();
+    }
+
+    // The method to update the porgress bar
+    private void LoadingProgressBar()
+    {
+        if (ProgressBarController.progressBar.curProValue < totalProgress)
+        {
+            ProgressBarController.progressBar.curProValue++;
+        }
+        ProgressBarController.progressBar.progressImg.fillAmount = ProgressBarController.progressBar.curProValue / 100f;
+        ProgressBarController.progressBar.proText.text = ProgressBarController.progressBar.curProValue + "%";
     }
 
     /// <summary>

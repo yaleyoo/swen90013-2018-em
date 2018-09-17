@@ -15,7 +15,6 @@ public class OutputController : MonoBehaviour {
         if (SimSettings.DecreaseSimulationTimesLeft())
         {
             int runRound = BatchRunCsvLoader.batchrunLeafAndRatio.Keys.Count - SimSettings.GetRunTimeesLeft() + 1;
-            Debug.Log("current round = " + runRound + " , " + SimSettings.GetSimulationTimesLeft() + " simulations to go.");            
             SceneManager.LoadScene("Simulation");
         }
         else
@@ -24,15 +23,16 @@ public class OutputController : MonoBehaviour {
             // note: only average for single-run now
             //       lack standard-deviation and median
             Results.SetAverage();
-
-        // Print the results to the screen
-		string result = "Volume density of leaf litter:\n(leaf volume)/(total volume) = " + System.Math.Round(Results.GetAverage(), 6).ToString();
-        GameObject.FindGameObjectWithTag("OutputText").GetComponent<Text>().text = result;
+            
+            // Print the results to the screen
+		    string result = "Volume density of leaf litter:\n(leaf volume)/(total volume) = " + System.Math.Round(Results.GetAverage(), 6).ToString();
+            GameObject.FindGameObjectWithTag("OutputText").GetComponent<Text>().text = result;
+            Results.ClearResultSet();
 
             //decrease remaining run times 
             SimSettings.SetRunTimesLeft(SimSettings.GetRunTimeesLeft() - 1);
             // has remaining run times 
-            if (SimSettings.GetRunTimeesLeft() > 0)
+            if (SimSettings.GetRunTimeesLeft() > 0)                
             {
                 // get next round number
                 int runRound = BatchRunCsvLoader.batchrunLeafAndRatio.Keys.Count - SimSettings.GetRunTimeesLeft() + 1;
@@ -42,9 +42,10 @@ public class OutputController : MonoBehaviour {
                 BatchRunCsvLoader.batchrunLeafAndRatio.TryGetValue(runRound, out leafSizesAndRatios);
                 // set next round leaves and ratios to settings for loading by simulation 
                 SimSettings.SetLeafSizesAndRatios(leafSizesAndRatios);
+
                 SimSettings.ResetSimulationTimesLeft();
                 // go to simulate next run
-                SceneManager.LoadScene("Simulation");
+                SceneManager.LoadScene("Simulation");                
             }
             else
             {
@@ -52,9 +53,22 @@ public class OutputController : MonoBehaviour {
                 Debug.Log("Writing results to file ...");
                 WriteResultsToFile();
                 Debug.Log("Done.");
-            }
-        }             
-    }
+
+                // Avoid the progress bar stop at 99%, inidiate the simulation done
+                ProgressBarController.progressBar.gameObject.SetActive(true);
+                ProgressBarController.progressBar.progressImg.fillAmount = 100;
+                ProgressBarController.progressBar.proText.text = "DONE";   
+
+                // Change the title of the single run
+                if (!SimSettings.GetBatchrun())
+                {
+                    ProgressBarController.progressBar.proTitle.text = "Simulations Finished.";
+                }
+               
+            }                
+        }
+        
+	}
 
     // Write the saved result to the output file specified in the sim settings
     private void WriteResultsToFile()
@@ -62,11 +76,13 @@ public class OutputController : MonoBehaviour {
         StreamWriter writer = new StreamWriter(pathToOutputFile, false);
         writer.WriteLine("Density average");
 
-        // write all results to file
+        // Write all results to file
         foreach (float result in Results.GetBatchRunResults())
         {
             writer.WriteLine(result);
         }
+
         writer.Close();
     }
+
 }

@@ -184,9 +184,9 @@ public class SimulationController : MonoBehaviour {
         float leafVol = 0.0f;
         foreach (GameObject lf in leaves)
         {
-            if (Mathf.Abs(lf.GetComponent<Collider>().bounds.center.x) < ((this.dropAreaX - this.densityIgnoreBorder)) &&
-                Mathf.Abs(lf.GetComponent<Collider>().bounds.center.z) < ((this.dropAreaY - this.densityIgnoreBorder)) &&
-                lf.GetComponent<Collider>().bounds.center.y < cylHeight)
+            if (Mathf.Abs(lf.GetComponent<Leaf>().GetCenter().x) < ((this.dropAreaX - this.densityIgnoreBorder)) &&
+                Mathf.Abs(lf.GetComponent<Leaf>().GetCenter().z) < ((this.dropAreaY - this.densityIgnoreBorder)) &&
+                lf.GetComponent<Leaf>().GetCenter().y < cylHeight)
             {
                 leafVol += lf.GetComponent<Leaf>().GetVolume();
             }

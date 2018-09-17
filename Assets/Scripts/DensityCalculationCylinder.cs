@@ -4,7 +4,8 @@
 /// Reprsents the volume that the density calculator compares with the 
 /// volume of leaves.
 /// </summary>
-public class DensityCalculationCylinder {
+public class DensityCalculationCylinder
+{
 
     private GameObject[] objectsInWorld;
     private float cylinderAreaX;
@@ -17,7 +18,8 @@ public class DensityCalculationCylinder {
     /// <param name="objects">Objects in the world</param>
     /// <param name="cylinderAreaX">The X size of the cylinder</param>
     /// <param name="cylinderAreaY">The Y size of the cylinder</param>
-    public DensityCalculationCylinder(GameObject[] objects, float cylinderAreaX, float cylinderAreaY) {
+    public DensityCalculationCylinder(GameObject[] objects, float cylinderAreaX, float cylinderAreaY)
+    {
         this.objectsInWorld = objects;
         this.cylinderAreaX = cylinderAreaX;
         this.cylinderAreaY = cylinderAreaY;
@@ -43,8 +45,9 @@ public class DensityCalculationCylinder {
         }
 
         // Compute the average height of the leaves (take height to be the leafs lowest point)
-        foreach (GameObject obj in this.objectsInWorld){
-            avgHeight += obj.GetComponent<Collider>().bounds.min.y;
+        foreach (GameObject obj in this.objectsInWorld)
+        {
+            avgHeight += obj.GetComponent<Leaf>().GetLowestHeight(); 
         }
         avgHeight /= this.objectsInWorld.Length;
 
@@ -57,9 +60,9 @@ public class DensityCalculationCylinder {
         // Compute the sample standard deviation of the leaf heights
         foreach (GameObject obj in this.objectsInWorld)
         {
-            stdDevHeight += Mathf.Pow(obj.GetComponent<Collider>().bounds.min.y - avgHeight, 2);
+            stdDevHeight += Mathf.Pow(obj.GetComponent<Leaf>().GetLowestHeight() - avgHeight, 2);
         }
-        stdDevHeight = Mathf.Sqrt(stdDevHeight / (this.objectsInWorld.Length-1));
+        stdDevHeight = Mathf.Sqrt(stdDevHeight / (this.objectsInWorld.Length - 1));
 
         // Return the height that has ~97.5% of the heights in it (0 to 2 standard deviations from mean)
         // This will exclude any potentially not-dropped-yet leaf
@@ -83,7 +86,7 @@ public class DensityCalculationCylinder {
         float x = UnitCirclePoint.x * this.cylinderAreaX;
         float y = Random.Range(startHeight, endHeight);
         float z = UnitCirclePoint.y * cylinderAreaY;
-        
+
         return new Vector3(x, y, z);
     }
 

@@ -115,6 +115,7 @@ public class DensityCalculationCylinder
         int hits = 0;
         hits += Physics.RaycastAll(distantPoint, directionToPoint, distance).Length;
         hits += Physics.RaycastAll(point, -directionToPoint, distance).Length;
+
         // If odd number of hits, then point is in object
         return (hits % 2) == 1;
     }

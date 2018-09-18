@@ -3,6 +3,7 @@ using NUnit.Framework;
 
 public class DensityCalculationCylinderTest {
 
+    // Test that the height of the cylinder is within two standard deviations of the mean height of leaves
 	[Test]
 	public void DensityCalculationCylinderCylinderHeightTest() {
         GameObject[] leaves = new GameObject[5];
@@ -34,6 +35,7 @@ public class DensityCalculationCylinderTest {
         Assert.IsTrue(height >= 50 && height <= 52);
     }
 
+    // Test that the random point is within the cylinder
     [Test]
     public void DensityCalculationCylinderRandomPointTest() {
         GameObject[] leaves = new GameObject[5];
@@ -68,6 +70,7 @@ public class DensityCalculationCylinderTest {
         Assert.IsTrue(point.y >= 20 && point.y <= 30);
     }
 
+    // Test that a point is in the object or not
     [Test]
     public void DensityCalculationCylinderPointInObjectsTest() {
         GameObject[] leaves = new GameObject[5];

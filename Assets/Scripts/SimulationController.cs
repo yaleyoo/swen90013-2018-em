@@ -32,17 +32,18 @@ public class SimulationController : MonoBehaviour {
         this.leafGen = new LeafGenerator(SimSettings.GetLeafSizesAndRatios(), this.dropAreaX, this.dropAreaY, this.height);
         this.denCalc = new DensityCalculator();
 
-
-
         // Batuch Run
         if (SimSettings.GetBatchrun())
         {
             // Initialise the parameter for progres bar
+            runCount = SimSettings.GetCurrentSimulationTimes();
+            runCount++;
+            SimSettings.SetCurrentSimulationTimes(runCount);
+
             if (BatchRunCsvLoader.batchrunLeafAndRatio.Count != 0)
             {
-                targetValueOnce = 100 / BatchRunCsvLoader.batchrunLeafAndRatio.Count;
+                targetValueOnce = 100 / (BatchRunCsvLoader.batchrunLeafAndRatio.Count * SimSettings.GetSimulationTimes());
             }
-            runCount = BatchRunCsvLoader.batchrunLeafAndRatio.Count - SimSettings.GetRunTimeesLeft() + 1;
             totalProgress = targetValueOnce * runCount;
 
             // Show the progress bar

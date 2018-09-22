@@ -58,12 +58,6 @@ public class OutputController : MonoBehaviour {
                 ProgressBarController.progressBar.gameObject.SetActive(true);
                 ProgressBarController.progressBar.progressImg.fillAmount = 100;
                 ProgressBarController.progressBar.proText.text = "DONE";   
-
-                // Change the title of the single run
-                if (!SimSettings.GetBatchrun())
-                {
-                    ProgressBarController.progressBar.proTitle.text = "Simulations Finished.";
-                }
                
             }                
         }

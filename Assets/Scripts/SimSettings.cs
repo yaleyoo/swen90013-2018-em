@@ -30,6 +30,8 @@ public class SimSettings {
     private static int simulationTimes = 10;
     // Simulation times left
     private static int simulationTimesLeft = 10;
+    // Count the simulation times 
+    private static int currentSimulationTimes = 0;
 
     // Density calculation settings
     private static float densityIgnoreBorder = 10;
@@ -40,6 +42,12 @@ public class SimSettings {
     public static void SetSimulationTimes(int simulationTimes)
     {
         SimSettings.simulationTimes = simulationTimes;
+    }
+
+    // Get Simulation times
+    public static int GetSimulationTimes()
+    {
+        return simulationTimes;
     }
 
     // Set batchrun times
@@ -197,5 +205,17 @@ public class SimSettings {
     public static int GetNumCylinderSlices()
     {
         return numCylinderSlices;
+    }
+
+    // Set the current simulation times
+    public static void SetCurrentSimulationTimes(int currentSimulationTimes) 
+    {
+        SimSettings.currentSimulationTimes = currentSimulationTimes;
+    }
+
+    // Get the current simulation times
+    public static int GetCurrentSimulationTimes()
+    {
+        return currentSimulationTimes;
     }
 }

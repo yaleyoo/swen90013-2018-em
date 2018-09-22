@@ -91,6 +91,11 @@ public class UIController : MonoBehaviour
         // Set the default input value
         leafNumField.text = "5000";
         simulationTimesField.text = "10";
+
+        // Reset the progress bar 
+        ProgressBarController.progressBar.curProValue = 0;
+        ProgressBarController.progressBar.progressImg.fillAmount = 0;
+        ProgressBarController.progressBar.proText.text = ProgressBarController.progressBar.curProValue + "%";
     }
 
 
@@ -191,8 +196,8 @@ public class UIController : MonoBehaviour
                 return;
             }
 
-            // Multirun
-            MultiRun();
+            SimSettings.SetSimulationTimes(1);
+            SimSettings.ResetSimulationTimesLeft();
 
             SimSettings.SetLeafSizesAndRatios(leavesAndRatios);
             // set visualize flag according to visualizeToggle's status

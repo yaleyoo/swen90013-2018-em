@@ -189,6 +189,7 @@ public class UIController : MonoBehaviour
             // To pass the dictionary leavesAndRatios to the LeafGenerator
             // Get the LeafShap based on the leaf name
             GetLeafShape(typeWithRatio);
+            SimSettings.SetBatchrun(false);
             if (leavesAndRatios.Count == 0)
             {
                 message = "Please input leaves and ratios.";

@@ -22,7 +22,7 @@ public class SimSettings {
     private static float leafVolumeLimit = 15;
 
     // Batch run setting
-    private static bool batchRun;
+    private static bool batchRun = false;
     // Remaining run times
     private static int runTimesLeft = 1;
 

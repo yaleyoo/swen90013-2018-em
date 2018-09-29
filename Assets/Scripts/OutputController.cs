@@ -4,11 +4,21 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using Mono.Data.Sqlite; 
+using System.Data;
+using System;
 
 public class OutputController : MonoBehaviour {
 
     // Path to file where output will be saved
     private string pathToOutputFile = "Assets/Resources/output.txt";
+
+	// Path to database where output will be saved
+	private string dbPath; 
+
+	// Objects for connecting Sqlite database
+	SqliteConnection sqlConn;
+	SqliteCommand sqlCmd;
 
     // Use this for initialization
     void Start () {
@@ -20,11 +30,11 @@ public class OutputController : MonoBehaviour {
         else
         {
             // first calculate the results
-            // note: only average for single-run now
-            //       lack standard-deviation and median
             Results.SetAverage();
-            
-            // Print the results to the screen
+			Results.SetSD();
+			Results.SetMedian();
+
+            // Print the average density result to the screen
 		    string result = "Volume density of leaf litter:\n(leaf volume)/(total volume) = " + System.Math.Round(Results.GetAverage(), 6).ToString();
             GameObject.FindGameObjectWithTag("OutputText").GetComponent<Text>().text = result;
             Results.ClearResultSet();
@@ -49,8 +59,26 @@ public class OutputController : MonoBehaviour {
             }
             else
             {
-                // Save the results to a file
-                Debug.Log("Writing results to file ...");
+                // Save the results to database
+                Debug.Log("Prepare to write results to database ...");
+				// Form the database location
+				dbPath = "data source=" + Application.dataPath + "/database.db";
+
+				try{
+					// Create connection with database
+					sqlConn = new SqliteConnection(dbPath);
+					sqlConn.Open();
+					Debug.Log("Database open successfully");
+					sqlCmd = sqlConn.CreateCommand();
+					Debug.Log("Writing results to database ...");
+					// Write the results into database
+					WriteResultsToDb();
+					Debug.Log("Done. All results are saved in database");
+				}
+				catch(System.Exception e){
+					Debug.LogError ("Failed to open database!" + e.ToString ());
+				}
+
                 WriteResultsToFile();
                 Debug.Log("Done.");
 
@@ -71,7 +99,7 @@ public class OutputController : MonoBehaviour {
         writer.WriteLine("Density average");
 
         // Write all results to file
-        foreach (float result in Results.GetBatchRunResults())
+		foreach (float result in Results.GetBatchRunAve())
         {
             writer.WriteLine(result);
         }
@@ -79,4 +107,31 @@ public class OutputController : MonoBehaviour {
         writer.Close();
     }
 
+	// Write the saved results to database
+	private void WriteResultsToDb(){
+
+		List<float> aveList = new List<float>();
+		List<double> staDevList = new List<double>();
+		List<float> medList = new List<float>();
+
+		// Create lists for saving each type of data
+		aveList = Results.GetBatchRunAve();
+		staDevList = Results.GetBatchRunStaDev();
+		medList = Results.GetBatchRunMed();
+
+		// Form the query statement and write data into database
+		for (int i = 0; i < aveList.Count; i++) {
+
+			// Form the query and the command to be executed
+			string val = "VALUES (" + aveList[i] + ", " + staDevList[i] + ", " + medList[i] + ")";
+			sqlCmd.CommandText = "INSERT INTO ResultOut " + "(averageDensity, stddevDensity, median) " + val;
+
+			// Execute query
+			sqlCmd.ExecuteNonQuery();
+		}
+
+		// Release the lock and close the database
+		sqlCmd.Dispose();
+		sqlConn.Close();
+	}
 }

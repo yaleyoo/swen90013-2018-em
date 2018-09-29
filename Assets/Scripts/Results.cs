@@ -18,8 +18,14 @@ public class Results {
 
 	private static float median;
 
-    // store results for batch run, each element is a single run result
-    private static List<float> batchrunResults = new List<float>();
+    // store results for batch run, each element is a single run result of average
+    private static List<float> batchrunAve = new List<float>();
+
+	// store results for batch run strandard deviation
+	private static List<double> batchrunStaDev = new List<double>();
+
+	// store results for batch run median
+	private static List<float> batchrunMed = new List<float>();
 
     /// <summary>
     /// a resultset used to store all density results
@@ -49,7 +55,7 @@ public class Results {
 		average = sum / resultset.Count;
 
         // Add this average to batch run result
-        batchrunResults.Add(average);
+		batchrunAve.Add(average);
     }
 
 	/// <summary>
@@ -75,7 +81,7 @@ public class Results {
 		// calculate the standard deviation 
 		// then set the value
 		standard_deviation = System.Math.Sqrt (sum / resultset.Count);
-
+		batchrunStaDev.Add (standard_deviation);
 	}
 
 	/// <summary>
@@ -104,6 +110,7 @@ public class Results {
 
 		// set the value of median
 		median = resultset[index];
+		batchrunMed.Add (median);
 	}
 
 	/// <summary>
@@ -120,10 +127,21 @@ public class Results {
         resultset.Clear();
     }
 
-    // Get BatchRunResults list
-    public static List<float> GetBatchRunResults()
+    // Get the list of batch run average
+    public static List<float> GetBatchRunAve()
     {
-        return batchrunResults;
+		return batchrunAve;
     }
 
+	// Get the list of batch run standard deviation
+	public static List<double> GetBatchRunStaDev()
+	{
+		return batchrunStaDev;
+	}
+
+	// Get the list of batch run standard median
+	public static List<float> GetBatchRunMed()
+	{
+		return batchrunMed;
+	}
 }

@@ -13,6 +13,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 using Crosstales.FB;
+using System.IO;
 
 public class UIController : MonoBehaviour
 {
@@ -96,6 +97,57 @@ public class UIController : MonoBehaviour
         ProgressBarController.progressBar.curProValue = 0;
         ProgressBarController.progressBar.progressImg.fillAmount = 0;
         ProgressBarController.progressBar.proText.text = ProgressBarController.progressBar.curProValue + "%";
+
+        // Scan the command line parameters, and if a batch file was passed this way, read it and being simulation auotmatically
+        RunBatchFromCommandLine();
+    }
+
+    /// <summary>
+    /// Reads commandline arguments, search for a -batch flag and batch run filepath. If found, automatically begins a 
+    /// batch run with the supplied batch file
+    /// </summary>
+    public void RunBatchFromCommandLine()
+    {
+        // Read the command line arguments, and search for -batch flag
+        string[] args = Environment.GetCommandLineArgs();
+        string batchFile = "";
+        for (int i = 0; i < (args.Length - 1); i++)
+        {
+            // If found -batch flag, next argument should be the batch filepath, save it
+            if (args[i] == "-batch")
+            {
+                batchFile = args[i + 1];
+                break;
+            }
+        }
+
+        // If no batch filepath was given, return without beginning cmdln batch run
+        if (batchFile == "")
+        {
+            return;
+        // If one was passed but the file doesn't exist, warn the user, and return without starting the batch run
+        } else if (!File.Exists(batchFile))
+        {
+            DisplayMessage("Batch file passed via commandline does not exist!");
+            return;
+        }
+
+        // If a batch filepath was supplied, try to load it with the batch run loader
+        string errorMsg = "";
+        // If failed, display error and don't start batch automatically
+        if (BatchRunCsvLoader.LoadFile(batchFile, out errorMsg) != 0)
+        {
+            batchrunFileLoadSuccess = false;
+            DisplayMessage(errorMsg);
+        }
+        // If succeeded, automatically set the batch toggle to true, the visualise toggle to false, and being the batch simulation
+        else
+        {
+            batchrunFileLoadSuccess = true;
+            batchrunToggle.isOn = true;
+            visualizeToggle.isOn = false;
+            this.ChangeScene();
+        }
     }
 
 
@@ -147,6 +199,7 @@ public class UIController : MonoBehaviour
         string path = FileBrowser.OpenSingleFile("Open File", "", extensions);
         Debug.Log("Selected file: " + path);
         batchrunToggle.isOn = true;
+        visualizeToggle.isOn = false;
         // Click cancel or didn't choose file
         if (path == "") {
             batchrunFileLoadSuccess = false;

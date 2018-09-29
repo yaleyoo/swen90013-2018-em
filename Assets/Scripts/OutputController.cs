@@ -57,7 +57,13 @@ public class OutputController : MonoBehaviour {
                 // Avoid the progress bar stop at 99%, inidiate the simulation done
                 ProgressBarController.progressBar.gameObject.SetActive(true);
                 ProgressBarController.progressBar.progressImg.fillAmount = 100;
-                ProgressBarController.progressBar.proText.text = "DONE";   
+                ProgressBarController.progressBar.proText.text = "DONE";
+
+                // If the simulation was run as a batch run from command line, once done and written results, exit the process.
+                if (SimSettings.GetWasRunWithFlags())
+                {
+                    Application.Quit();
+                }
                
             }                
         }

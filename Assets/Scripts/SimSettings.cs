@@ -21,8 +21,11 @@ public class SimSettings {
     private static int leafLimit = 1000;
     private static float leafVolumeLimit = 15;
 
+    // Command line settings
+    private static bool wasRunWithFlags = false;
+
     // Batch run setting
-    private static bool batchRun;
+    private static bool batchRun = false;
     // Remaining run times
     private static int runTimesLeft = 1;
 
@@ -217,5 +220,17 @@ public class SimSettings {
     public static int GetCurrentSimulationTimes()
     {
         return currentSimulationTimes;
+    }
+
+    // Set whether or not the program was run with flags (i.e. via the command line)
+    public static void SetWasRunWithFlags(bool wasRunWithFlags)
+    {
+        SimSettings.wasRunWithFlags = wasRunWithFlags;
+    }
+
+    // Check if the program was run with command line arguments
+    public static bool GetWasRunWithFlags()
+    {
+        return wasRunWithFlags;
     }
 }

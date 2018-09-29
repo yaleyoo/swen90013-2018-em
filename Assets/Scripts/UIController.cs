@@ -146,6 +146,12 @@ public class UIController : MonoBehaviour
             batchrunFileLoadSuccess = true;
             batchrunToggle.isOn = true;
             visualizeToggle.isOn = false;
+
+            // Mark that the program was run from the command line. This is checked when simulation complete, and exits the process
+            // on completion if it is true (after writing results).
+            SimSettings.SetWasRunWithFlags(true);
+
+            // Begins the sim
             this.ChangeScene();
         }
     }

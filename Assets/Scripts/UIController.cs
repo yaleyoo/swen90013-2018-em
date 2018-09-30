@@ -337,9 +337,9 @@ public class UIController : MonoBehaviour
     private void InitializeLeafDropdown()
     {
         // Read leaf trait csv
-        CSVImporter.ReadCsv();
+		DataImporter.ReadDatabase();
 
-        foreach (LeafData l in CSVImporter.Leaves)
+		foreach (LeafData l in DataImporter.Leaves)
         {
             type.Add(l.Name);
         }
@@ -382,7 +382,7 @@ public class UIController : MonoBehaviour
 
         foreach (KeyValuePair<string, int> pair in typeWithRatio)
         {
-            temp = CSVImporter.Leaves.Find((LeafData l) => l.Name == pair.Key);
+			temp = DataImporter.Leaves.Find((LeafData l) => l.Name == pair.Key);
             leavesAndRatios.Add(temp, pair.Value);
             Debug.Log(temp.Name + ":" + pair.Value);
         }

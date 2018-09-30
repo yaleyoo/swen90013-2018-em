@@ -10,15 +10,12 @@ using System;
 
 public class OutputController : MonoBehaviour {
 
-    // Path to file where output will be saved
-    private string pathToOutputFile = "Assets/Resources/output.txt";
-
 	// Path to database where output will be saved
 	private string dbPath; 
 
 	// Objects for connecting Sqlite database
-	SqliteConnection sqlConn;
-	SqliteCommand sqlCmd;
+	private SqliteConnection sqlConn;
+	private SqliteCommand sqlCmd;
 
     // Use this for initialization
     void Start () {
@@ -29,7 +26,7 @@ public class OutputController : MonoBehaviour {
         }
         else
         {
-            // first calculate the results
+            // first calculate the average, standard deviation and median
             Results.SetAverage();
 			Results.SetSD();
 			Results.SetMedian();
@@ -60,27 +57,7 @@ public class OutputController : MonoBehaviour {
             else
             {
                 // Save the results to database
-                Debug.Log("Prepare to write results to database ...");
-				// Form the database location
-				dbPath = "data source=" + Application.dataPath + "/database.db";
-
-				try{
-					// Create connection with database
-					sqlConn = new SqliteConnection(dbPath);
-					sqlConn.Open();
-					Debug.Log("Database open successfully");
-					sqlCmd = sqlConn.CreateCommand();
-					Debug.Log("Writing results to database ...");
-					// Write the results into database
-					WriteResultsToDb();
-					Debug.Log("Done. All results are saved in database");
-				}
-				catch(System.Exception e){
-					Debug.LogError ("Failed to open database!" + e.ToString ());
-				}
-
-                WriteResultsToFile();
-                Debug.Log("Done.");
+				WriteResultsToDb();
 
                 // Avoid the progress bar stop at 99%, inidiate the simulation done
                 ProgressBarController.progressBar.gameObject.SetActive(true);
@@ -91,22 +68,7 @@ public class OutputController : MonoBehaviour {
         }
         
 	}
-
-    // Write the saved result to the output file specified in the sim settings
-    private void WriteResultsToFile()
-    {
-        StreamWriter writer = new StreamWriter(pathToOutputFile, false);
-        writer.WriteLine("Density average");
-
-        // Write all results to file
-		foreach (float result in Results.GetBatchRunAve())
-        {
-            writer.WriteLine(result);
-        }
-
-        writer.Close();
-    }
-
+		
 	// Write the saved results to database
 	private void WriteResultsToDb(){
 
@@ -119,19 +81,41 @@ public class OutputController : MonoBehaviour {
 		staDevList = Results.GetBatchRunStaDev();
 		medList = Results.GetBatchRunMed();
 
-		// Form the query statement and write data into database
-		for (int i = 0; i < aveList.Count; i++) {
+		// Form the database location: both works on Mac or Windows PC
+		dbPath = "data source=" + Application.dataPath + "/database.db";
+		Debug.Log("Prepare to write results to database ...");
 
-			// Form the query and the command to be executed
-			string val = "VALUES (" + aveList[i] + ", " + staDevList[i] + ", " + medList[i] + ")";
-			sqlCmd.CommandText = "INSERT INTO ResultOut " + "(averageDensity, stddevDensity, median) " + val;
+		try{
+			// Create connection with database
+			sqlConn = new SqliteConnection(dbPath);
 
-			// Execute query
-			sqlCmd.ExecuteNonQuery();
+			// Open database
+			sqlConn.Open();
+			Debug.Log("Database open successfully");
+
+			// Initialise the command
+			sqlCmd = sqlConn.CreateCommand();
+			Debug.Log("Writing results to database ...");
+
+			// Form the query statement and write data into database
+			for (int i = 0; i < aveList.Count; i++) {
+
+				// Form the query statement and the command to be executed, only "average", "standard deviation" and 
+				// "median" are inserted into database
+				string val = "VALUES (" + aveList[i] + ", " + staDevList[i] + ", " + medList[i] + ")";
+				sqlCmd.CommandText = "INSERT INTO ResultOut " + "(averageDensity, stddevDensity, median) " + val;
+
+				// Execute query 
+				sqlCmd.ExecuteNonQuery();
+			}
+
+			// Release the lock and close the database
+			sqlCmd.Dispose();
+			sqlConn.Close();
 		}
-
-		// Release the lock and close the database
-		sqlCmd.Dispose();
-		sqlConn.Close();
+		catch(System.Exception e){
+			Debug.LogError ("Failed to open database \n" + e.ToString ());
+		}
+		Debug.Log("Done. All results are saved in database. The location is : " + Application.dataPath + "/database.db");
 	}
 }

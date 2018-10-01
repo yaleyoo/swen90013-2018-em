@@ -20,8 +20,10 @@ public class UIController : MonoBehaviour
     public Toggle batchrunToggle;
     public Toggle singlerunToggle;
 
+    // Whether visualized or not for single run
     public Toggle visualizeToggle;
 
+    // Indicate whether loading batch run file successfully
     public bool batchrunFileLoadSuccess = false;
 
     // Dropdown menu to select types of leaves
@@ -61,16 +63,15 @@ public class UIController : MonoBehaviour
     public Image messageBox;
     public Text messageBoxConent;
 
-    // Component for ListView
+    // Component for ListView of selected leaves 
     public GameObject leafButton;
     public Transform listContent;
+    // Save the clicked leaf button for deletion 
     private LeafButton leafButtonClicked;
-
-
+    
     public Text okButtonText;
     public Button deleteButton;
-
-   
+       
     // Initialisation
     private void Start()
     {
@@ -98,51 +99,158 @@ public class UIController : MonoBehaviour
         ProgressBarController.progressBar.proText.text = ProgressBarController.progressBar.curProValue + "%";
     }
 
+    /*********************************
+     * Single run part start
+     * *******************************
+     **/
+    // Read leaf name from csv and add them to the dropdown menu
+    private void InitializeLeafDropdown()
+    {
+        // Read leaf trait csv
+        CSVImporter.ReadCsv();
 
-    // Invoke when Start button clicked
-    public void StartOnClick()
-    {      
-        // Actions to submit the number of leaves
-        // Check if input leaf limit is valid
-        if (System.Int32.TryParse(leafNumField.text, out leafNum))
+        foreach (LeafData l in CSVImporter.Leaves)
         {
-            // Check if inputed leaf number is greater than 0
-            if (leafNum >= 0)
-            {
-                Debug.Log("You selected " + leafNum + " leafs.");
-                SimSettings.SetLeafLimit(leafNum);
-
-                ChangeScene();
-            }
-            else
-            {
-                Debug.Log("Invalid number.");
-
-                message = "Invalid number. Please check the leaf quantity.";
-                DisplayMessage(message);
-            }
+            type.Add(l.Name);
         }
-        // Click the unlimited button, nothing in input field
-        else if (isUnlimited == true)
+
+        leafDropdown.options.Clear();
+        Dropdown.OptionData tempData;
+        for (int i = 0; i < type.Count; i++)
         {
-           
-            ChangeScene();
-            
+            tempData = new Dropdown.OptionData();
+            tempData.text = type[i];
+            leafDropdown.options.Add(tempData);
+        }
+        // Update the name show on the label of dropdown
+        leafDropdown.captionText.text = type[0];
+    }
+
+    // Set the ratio of the slider
+    public void UpdateRatio()
+    {
+        //inputRatioText = GetComponent<Text>();
+        inputRatioText.text = Mathf.Round(inputRatioSlider.value).ToString();
+    }
+
+    /* 
+     * The response of clicking add button.
+     * Display the selected type with ratio 
+     *      and add to the dictionary which just save the name and ratio.
+     */
+    public void ConfirmOnClick()
+    {
+        // The int number to save the ratio of each type
+        int ratioInt = 0;
+        // Type conversion, string to int
+        if (System.Int32.TryParse(Mathf.Round(inputRatioSlider.value).ToString(), out ratioInt))
+        {
+
+            string typeString = leafDropdown.captionText.text;
+
+            // Check if the same leaf type is selected
+            if (typeWithRatio.ContainsKey(typeString))
+            {
+                message = "You have already chosen this type of leaf.\n" +
+                    "Please check your selection.";
+                DisplayMessage(message);
+                return;
+            }
+
+            typeWithRatio.Add(typeString, ratioInt);
+
+            // Add a leafButton
+            GameObject newButton = Instantiate(leafButton) as GameObject;
+            LeafButton button = newButton.GetComponent<LeafButton>();
+            button.leafName.text = typeString;
+            button.leafRatio.text = ratioInt.ToString();
+
+            newButton.transform.SetParent(listContent);
+
+            // Listen to the leaf button
+            button.onClick.AddListener(
+                    delegate ()
+                    {
+                        leafButtonClicked = button;
+                        LeafButtonClick();
+                    }
+                );
         }
         else
         {
-            Debug.Log("Invalid input.\n"
-                + "Please check the leaf quantity. ");
-
-            message = "Invalid number. Please check the leaf quantity.";
+            Debug.Log("Please check the ratio.");
+            message = "Please check the ratio.";
             DisplayMessage(message);
         }
+
     }
 
+    // Click the buttion to delete the selection 
+    private void LeafButtonClick()
+    {
+        message = "Are you sure you want to delete?";
+        okButtonText.text = "Cancel";
+        deleteButton.gameObject.SetActive(true);
+        DisplayMessage(message);
+    }
+
+    // Confirm the deletion 
+    public void DeleteOnClick()
+    {
+        okButtonText.text = "OK";
+        deleteButton.gameObject.SetActive(false);
+        messageBox.gameObject.SetActive(false);
+        Destroy(leafButtonClicked.gameObject);
+        typeWithRatio.Remove(leafButtonClicked.leafName.text);
+        Debug.Log("Delete Delete button");
+    }
+
+    /*
+     * The response of clicking reset button.
+     * Reset all setting
+     * Clear the dictionary typeWithRatio and the display text
+     */
+    public void ResetOnClick()
+    {
+        typeWithRatio.Clear();
+        leafNumField.text = "";
+        isUnlimited = false;
+        GameObject[] leafButtons = GameObject.FindGameObjectsWithTag("LeafButton");
+        if (leafButtons.Length > 0)
+        {
+            foreach (GameObject o in leafButtons)
+            {
+                Destroy(o);
+            }
+        }
+    }
+    
+    // Clear all selected leaves
+    private void ClearSelectedLeaves()
+    {
+        typeWithRatio.Clear();
+        GameObject[] leafButtons = GameObject.FindGameObjectsWithTag("LeafButton");
+        if (leafButtons.Length > 0)
+        {
+            foreach (GameObject o in leafButtons)
+            {
+                Destroy(o);
+            }
+        }
+    }
+    /*********************************
+     * single run part end
+     * *******************************
+     **/
+
+    /*********************************
+     * Batch run part start
+     * *******************************
+     **/
     // Click the button to choose the file
     public void LoadBatchRunCsvClick()
     {
-        ClearAddedLeafBox();
+        ClearSelectedLeaves();
         string extensions = "csv";
         string path = FileBrowser.OpenSingleFile("Open File", "", extensions);
         Debug.Log("Selected file: " + path);
@@ -180,12 +288,62 @@ public class UIController : MonoBehaviour
         }
     }
 
+    public void OnBatchrunToggleChanged(bool check)
+    {
+        ClearSelectedLeaves();
+    }
+    /*******************************
+     * Batch run part end
+     * *****************************
+     **/
+
+
+    // Invoke when Start button clicked
+    public void StartOnClick()
+    {
+        // Actions to submit the number of leaves
+        // Check if input leaf limit is valid
+        if (System.Int32.TryParse(leafNumField.text, out leafNum))
+        {
+            // Check if inputed leaf number is greater than 0
+            if (leafNum >= 0)
+            {
+                Debug.Log("You selected " + leafNum + " leafs.");
+                SimSettings.SetLeafLimit(leafNum);
+
+                ChangeScene();
+            }
+            else
+            {
+                Debug.Log("Invalid number.");
+
+                message = "Invalid number. Please check the leaf quantity.";
+                DisplayMessage(message);
+            }
+        }
+        // Click the unlimited button, nothing in input field
+        else if (isUnlimited == true)
+        {
+
+            ChangeScene();
+
+        }
+        else
+        {
+            Debug.Log("Invalid input.\n"
+                + "Please check the leaf quantity. ");
+
+            message = "Invalid number. Please check the leaf quantity.";
+            DisplayMessage(message);
+        }
+    }
+
     // Load the simulation
     private void ChangeScene()
     {
         // If single run toggle is choosen
         if (singlerunToggle.isOn)
-        {            
+        {
             // To pass the dictionary leavesAndRatios to the LeafGenerator
             // Get the LeafShap based on the leaf name
             GetLeafShape(typeWithRatio);
@@ -202,13 +360,13 @@ public class UIController : MonoBehaviour
 
             SimSettings.SetLeafSizesAndRatios(leavesAndRatios);
             // set visualize flag according to visualizeToggle's status
-            SimSettings.SetVisualize(visualizeToggle.isOn);            
+            SimSettings.SetVisualize(visualizeToggle.isOn);
             SceneManager.LoadScene("Simulation");
         }
         // If batch run toggle is choosen
         else if (batchrunToggle.isOn)
         {
-            ClearAddedLeafBox();
+            ClearSelectedLeaves();
 
             MultiRun();
 
@@ -229,102 +387,6 @@ public class UIController : MonoBehaviour
         }
     }
 
-    // Invoke when Quit button clicked
-    public void QuitOnClick()
-    {
-        Debug.Log("quit");
-        Application.Quit();
-    }
-
-    // Set the ratio of the slider
-    public void UpdateRatio()
-    {
-        //inputRatioText = GetComponent<Text>();
-        inputRatioText.text = Mathf.Round(inputRatioSlider.value).ToString();
-    }
-    
-    /* 
-     * The response of clicking add button.
-     * Display the selected type with ratio 
-     *      and add to the dictionary which just save the name and ratio.
-     */
-    public void ConfirmOnClick()
-    {
-        // The int number to save the ratio of each type
-        int ratioInt = 0;
-        // Type conversion, string to int
-        if (System.Int32.TryParse(Mathf.Round(inputRatioSlider.value).ToString(), out ratioInt))
-        {
-            
-            string typeString = leafDropdown.captionText.text;
-
-            // Check if the same leaf type is selected
-            if (typeWithRatio.ContainsKey(typeString))
-            {
-                message = "You have already chosen this type of leaf.\n" +
-                    "Please check your selection.";
-                DisplayMessage(message);
-                return;
-            }
-
-            typeWithRatio.Add(typeString, ratioInt);
-
-            // Add a leafButton
-            GameObject newButton = Instantiate(leafButton) as GameObject;
-            LeafButton button = newButton.GetComponent<LeafButton>();
-            button.leafName.text = typeString ;
-            button.leafRatio.text = ratioInt.ToString();
-            
-            newButton.transform.SetParent(listContent);
-
-            // Listen to the leaf button
-            button.onClick.AddListener(
-                    delegate ()
-                    {
-                        leafButtonClicked = button;
-                        LeafButtonClick();
-                    }
-
-                );               
-        }
-        else
-        {
-            Debug.Log("Please check the ratio.");
-            message = "Please check the ratio.";
-            DisplayMessage(message);
-        }
-
-    }
-
-    // Click the buttion to delete the selection 
-    private void LeafButtonClick()
-    {
-        message = "Are you sure you want to delete?";
-        okButtonText.text = "Cancel";
-        deleteButton.gameObject.SetActive(true);
-        DisplayMessage(message);
-    }
-
-    /*
-     * The response of clicking reset button.
-     * Reset all setting
-     * Clear the dictionary typeWithRatio and the display text
-     */
-    public void ResetOnClick()
-    {
-        typeWithRatio.Clear();
-        leafNumField.text = "";
-        isUnlimited = false;
-        GameObject[] leafButtons = GameObject.FindGameObjectsWithTag("LeafButton");
-        if (leafButtons.Length > 0)
-        {
-            foreach (GameObject o in leafButtons)
-            {
-                Destroy(o);
-            }
-        }
-    }
-
     // Actions when click unlimited button
     public void UnlimitedOnClick()
     {
@@ -334,27 +396,24 @@ public class UIController : MonoBehaviour
         leafNumField.text = "Set as Unlimited";
     }
 
-    // Read leaf name from csv and add them to the dropdown menu
-    private void InitializeLeafDropdown()
+    // Invoke when Quit button clicked
+    public void QuitOnClick()
     {
-        // Read leaf trait csv
-        CSVImporter.ReadCsv();
+        Debug.Log("quit");
+        Application.Quit();
+    }
 
-        foreach (LeafData l in CSVImporter.Leaves)
-        {
-            type.Add(l.Name);
-        }
-
-        leafDropdown.options.Clear();
-        Dropdown.OptionData tempData;
-        for (int i = 0; i < type.Count; i++)
-        {
-            tempData = new Dropdown.OptionData();
-            tempData.text = type[i];
-            leafDropdown.options.Add(tempData);
-        }
-        // Update the name show on the label of dropdown
-        leafDropdown.captionText.text = type[0];
+    /************************
+     * Message box part start
+     * ********************
+    **/
+    // The method to disaplay the message box
+    private void DisplayMessage(string str)
+    {
+        messageBox.gameObject.SetActive(true);
+        // Bring the components to front
+        messageBox.gameObject.transform.SetAsLastSibling();
+        messageBoxConent.text = str;
     }
 
     // Cancel the deletion
@@ -363,17 +422,11 @@ public class UIController : MonoBehaviour
         messageBox.gameObject.SetActive(false);
         Debug.Log("Click Cancel button");
     }
+    /************************
+     * Message box part end
+     * *********************
+    **/
 
-    // Confirm the deletion 
-    public void DeleteOnClick()
-    {
-        okButtonText.text = "OK";
-        deleteButton.gameObject.SetActive(false);
-        messageBox.gameObject.SetActive(false);
-        Destroy(leafButtonClicked.gameObject);
-        typeWithRatio.Remove(leafButtonClicked.leafName.text);
-        Debug.Log("Delete Delete button");
-    }
 
     // Get the the selected LeafData according to the name and saved as an dictionary
     private void GetLeafShape(Dictionary<string, int> nameDictionary)
@@ -386,33 +439,6 @@ public class UIController : MonoBehaviour
             temp = CSVImporter.Leaves.Find((LeafData l) => l.Name == pair.Key);
             leavesAndRatios.Add(temp, pair.Value);
             Debug.Log(temp.Name + ":" + pair.Value);
-        }
-    }
-
-    // The method to disaplay the message box
-    private void DisplayMessage(string str)
-    {
-        messageBox.gameObject.SetActive(true);
-        // Bring the components to front
-        messageBox.gameObject.transform.SetAsLastSibling();
-        messageBoxConent.text = str;
-    }
-
-    public void OnBatchrunToggleChanged(bool check)
-    {
-        ClearAddedLeafBox();
-    }
-
-    private void ClearAddedLeafBox()
-    {
-        typeWithRatio.Clear();
-        GameObject[] leafButtons = GameObject.FindGameObjectsWithTag("LeafButton");
-        if (leafButtons.Length > 0)
-        {
-            foreach (GameObject o in leafButtons)
-            {
-                Destroy(o);
-            }
         }
     }
 }

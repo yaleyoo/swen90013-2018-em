@@ -17,6 +17,9 @@ public class OutputController : MonoBehaviour {
 	private SqliteConnection sqlConn;
 	private SqliteCommand sqlCmd;
 
+	// The time that each line will run
+	private int numOfRuns = SimSettings.GetSimulationTimes();
+
     // Use this for initialization
     void Start () {
         if (SimSettings.DecreaseSimulationTimesLeft())
@@ -100,11 +103,11 @@ public class OutputController : MonoBehaviour {
 			// Form the query statement and write data into database
 			for (int i = 0; i < aveList.Count; i++) {
 
-				// Form the query statement and the command to be executed, only "average", "standard deviation" and 
-				// "median" are inserted into database
-				string val = "VALUES (" + aveList[i] + ", " + staDevList[i] + ", " + medList[i] + ")";
-				sqlCmd.CommandText = "INSERT INTO ResultOut " + "(averageDensity, stddevDensity, median) " + val;
-
+				// Form the query statement and the command to be executed
+				string val = "VALUES (" + aveList[i] + ", " + staDevList[i] + ", "
+										+ medList[i] + ", " + numOfRuns + ")";
+				sqlCmd.CommandText = "INSERT INTO ResultOut " + 
+									 "(averageDensity, stddevDensity, median, numbersRuns) " + val;
 				// Execute query 
 				sqlCmd.ExecuteNonQuery();
 			}
@@ -116,6 +119,7 @@ public class OutputController : MonoBehaviour {
 		catch(System.Exception e){
 			Debug.LogError ("Failed to open database \n" + e.ToString ());
 		}
-		Debug.Log("Done. All results are saved in database. The location is : " + Application.dataPath + "/database.db");
+		Debug.Log("Done. All results are saved in database. " +
+				  "The location is : " + Application.dataPath + "/database.db");
 	}
 }

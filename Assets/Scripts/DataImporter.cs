@@ -53,6 +53,7 @@ public class DataImporter {
 		try{
 			// Form the path of database
 			dbPath = "data source=" + Application.dataPath + "/database.db";
+			Debug.Log("Database location is : " + Application.dataPath + "/database.db");
 
 			// Create the database connection
 			sqlConn = new SqliteConnection (dbPath);
@@ -70,7 +71,7 @@ public class DataImporter {
 			Debug.Log("Reading leaf trait from database ...");
 			dbReader = sqlCmd.ExecuteReader();
 			while (dbReader.Read ()) {
-				// Form a record becomes a line
+				// Form a record to a line
 				string line = "";
 				for (int i = 0; i < dbReader.FieldCount - 1; i++) {
 					// Directly transfer the first two columns to string 

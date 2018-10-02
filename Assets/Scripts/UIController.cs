@@ -184,5 +184,4 @@ public class UIController : MonoBehaviour
     {
         singleRunUIController.Reset();
     }
-
 }

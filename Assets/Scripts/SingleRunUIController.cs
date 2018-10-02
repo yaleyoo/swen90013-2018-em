@@ -148,9 +148,7 @@ public class SingleRunUIController : MonoBehaviour {
         typeWithRatio.Remove(leafButtonClicked.leafName.text);
         Debug.Log("Delete Delete button");
     }
-
-    
-
+       
     // Clear all selected leaves
     public void ClearSelectedLeaves()
     {
@@ -200,7 +198,6 @@ public class SingleRunUIController : MonoBehaviour {
             Debug.Log(temp.Name + ":" + pair.Value);
         }
     }
-
 
     /*
      * The response of clicking reset button.

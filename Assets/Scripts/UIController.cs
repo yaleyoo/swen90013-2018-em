@@ -107,9 +107,9 @@ public class UIController : MonoBehaviour
     private void InitializeLeafDropdown()
     {
         // Read leaf trait csv
-        CSVImporter.ReadCsv();
+		DataImporter.ReadDatabase();
 
-        foreach (LeafData l in CSVImporter.Leaves)
+		foreach (LeafData l in DataImporter.Leaves)
         {
             type.Add(l.Name);
         }

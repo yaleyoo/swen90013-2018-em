@@ -10,25 +10,11 @@ using System.Globalization;
 using System.Linq;
 using UnityEngine;
 using Mono.Data.Sqlite; 
-using System.Data;
-using System;
 
 public class DataImporter {
 
-//    // Name of the csv file; must be located in the Resources folder
-//    private static string CSV_PATH = "Data/LeafTraits";
-
-	// Path of database location
+	// Path for database location
 	private static string dbPath;
-
-	// Database reader for reading data
-	private static SqliteDataReader dbReader;
-
-	// Objects for connecting Sqlite database
-	private static SqliteConnection sqlConn;
-
-	// Objects for database operation command
-	private static SqliteCommand sqlCmd;
 
     // Scaling factor of leaf sizes to our simulation units
     private static float SCALE = 0.1f;
@@ -40,69 +26,43 @@ public class DataImporter {
     public static List<LeafData> ReadDatabase() {
         // Initialise leaf list, this will also reset the list if being called again to re-load from database
 		DataImporter.Leaves = new List<LeafData>();
-
 		// Lines for saving data in each row
 		string[] lines;
-
 		// Temporary List for dealing with different types between SqliteDataReader and list
 		List<string> lineList = new List<string>();
-
-		// Add the first row into list
+		// Form the path of database
+		dbPath = "data source=" + Application.dataPath + "/database.db";
+		// Create the database connection
+		DatabaseOperator.ConnAndOpenDB (dbPath);
+		// Read leaf traits from table LeafType
+		SqliteDataReader dbReader = DatabaseOperator.ReadLeafTraits("LeafType");
+		// Add the first row into the list
 		lineList.Add ("Name,Leaf Form,Thickness,Thickness_Range,Width,Width_Range,Length,Length_Range");
 
-		try{
-			// Form the path of database
-			dbPath = "data source=" + Application.dataPath + "/database.db";
-			Debug.Log("Database location is : " + Application.dataPath + "/database.db");
-
-			// Create the database connection
-			sqlConn = new SqliteConnection (dbPath);
-			sqlConn.Open();
-			Debug.Log("Database is opened");
-
-			// Initialise the sql command
-			sqlCmd = sqlConn.CreateCommand();
-
-			// Form the sql command
-			string cmdText = "SELECT name, leafForm, thickness, thicknessRange, width, widthRange, len, lenRange From LeafType";
-			sqlCmd.CommandText = cmdText;
-
-			// Execute query statement and read the data from database
-			Debug.Log("Reading leaf trait from database ...");
-			dbReader = sqlCmd.ExecuteReader();
-			while (dbReader.Read ()) {
-				// Form a record to a line
-				string line = "";
-				for (int i = 0; i < dbReader.FieldCount - 1; i++) {
-					// Directly transfer the first two columns to string 
-					if(i < 2)						
-						line += dbReader[i].ToString () + ",";
-					else
-						// Keep the precision of the double type 
-						line += dbReader.GetDouble(i).ToString("0.#########") + ",";
-				}
-				// Add the last data row without ","
-				line += dbReader.GetDouble(dbReader.FieldCount - 1).ToString("0.#########");
-
-				// Save each record into lineList
-				lineList.Add (line);
+		while (dbReader.Read ()) {
+			// Form a record to a line
+			string line = "";
+			for (int i = 0; i < dbReader.FieldCount - 1; i++) {
+				// Directly transfer the first two columns to string 
+				if(i < 2)						
+					line += dbReader[i].ToString () + ",";
+				else
+					// Keep the precision of the double type 
+					line += dbReader.GetDouble(i).ToString("0.#########") + ",";
 			}
-			// Release the lock and close the database
-			dbReader.Close();
-			dbReader = null;
-			sqlCmd.Dispose();
-			sqlCmd = null;
-			sqlConn.Close();
-			sqlConn = null;
-			Debug.Log("Database is closed");
-		}
-		catch(System.Exception e){
-			Debug.LogError ("Failed to read data from database! \n" + e.ToString ());
+			// Add the last data row without comma
+			line += dbReader.GetDouble(dbReader.FieldCount - 1).ToString("0.#########");
+
+			// Save each record into lineList
+			lineList.Add (line);
 		}
 
+		// Close database
+		DatabaseOperator.CloseConnection ();
 		// Keep the null row for line ending encoding and transfer list into string[]
 		lineList.Add ("");
 		lines = lineList.ToArray ();
+		Debug.Log("Leaf traits loading completed. \n");
 
         // For each line except first (header) parse individual sections, and add a new leaf shape to the list
         foreach (string line in lines.Skip(1)) {

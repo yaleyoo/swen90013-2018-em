@@ -4,21 +4,8 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
-using Mono.Data.Sqlite; 
-using System.Data;
-using System;
 
 public class OutputController : MonoBehaviour {
-
-	// Path to database where output will be saved
-	private string dbPath; 
-
-	// Objects for connecting Sqlite database
-	private SqliteConnection sqlConn;
-	private SqliteCommand sqlCmd;
-
-	// The time that each line will run
-	private int numOfRuns = SimSettings.GetSimulationTimes();
 
     // Use this for initialization
     void Start () {
@@ -75,51 +62,30 @@ public class OutputController : MonoBehaviour {
 	// Write the saved results to database
 	private void WriteResultsToDb(){
 
+		// Create lists for saving each type of data
 		List<float> aveList = new List<float>();
 		List<double> staDevList = new List<double>();
 		List<float> medList = new List<float>();
 
-		// Create lists for saving each type of data
+		// Get average, standard deviation and median from Results class
 		aveList = Results.GetBatchRunAve();
 		staDevList = Results.GetBatchRunStaDev();
 		medList = Results.GetBatchRunMed();
 
+		// Get the time that each line will run
+		int numOfRuns = SimSettings.GetSimulationTimes();
+
 		// Form the database location: both works on Mac or Windows PC
-		dbPath = "data source=" + Application.dataPath + "/database.db";
-		Debug.Log("Prepare to write results to database ...");
+		string dbPath = "data source=" + Application.dataPath + "/database.db";
 
-		try{
-			// Create connection with database
-			sqlConn = new SqliteConnection(dbPath);
+		// Create database connection and open database
+		DatabaseOperator.ConnAndOpenDB (dbPath);
+		// Insert the results into table ResultOut 
+		DatabaseOperator.InsertResults ("ResultOut", aveList, staDevList, medList, numOfRuns);
+		// Close the database
+		DatabaseOperator.CloseConnection ();
 
-			// Open database
-			sqlConn.Open();
-			Debug.Log("Database open successfully");
-
-			// Initialise the command
-			sqlCmd = sqlConn.CreateCommand();
-			Debug.Log("Writing results to database ...");
-
-			// Form the query statement and write data into database
-			for (int i = 0; i < aveList.Count; i++) {
-
-				// Form the query statement and the command to be executed
-				string val = "VALUES (" + aveList[i] + ", " + staDevList[i] + ", "
-										+ medList[i] + ", " + numOfRuns + ")";
-				sqlCmd.CommandText = "INSERT INTO ResultOut " + 
-									 "(averageDensity, stddevDensity, median, numbersRuns) " + val;
-				// Execute query 
-				sqlCmd.ExecuteNonQuery();
-			}
-
-			// Release the lock and close the database
-			sqlCmd.Dispose();
-			sqlConn.Close();
-		}
-		catch(System.Exception e){
-			Debug.LogError ("Failed to open database \n" + e.ToString ());
-		}
-		Debug.Log("Done. All results are saved in database. " +
-				  "The location is : " + Application.dataPath + "/database.db");
+		Debug.Log("Done. All results are saved in database. \n" +
+			"The location is : " + Application.dataPath + "/database.db");
 	}
 }

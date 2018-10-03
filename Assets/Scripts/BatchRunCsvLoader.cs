@@ -105,6 +105,13 @@ public class BatchRunCsvLoader
             batchrunLeafAndRatio.Clear();
             return -1;
         }
+
+		// Passing input data (LeafData and ratios) to DatabaseOperator
+		Dictionary<LeafData, int> leafAndRatios;
+		for (int i = 1; i <= batchrunLeafAndRatio.Keys.Count; i++) {
+			batchrunLeafAndRatio.TryGetValue (i, out leafAndRatios);
+			DatabaseOperator.RecordBatchRunLeafTypeAndRatio (leafAndRatios);
+		}
         // set runtimes
         SimSettings.SetRunTimesLeft(batchrunLeafAndRatio.Count);
         Debug.Log("GetRunTimes = " + SimSettings.GetRunTimeesLeft());            

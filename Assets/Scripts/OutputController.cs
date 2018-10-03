@@ -80,9 +80,15 @@ public class OutputController : MonoBehaviour {
 
 		// Create database connection and open database
 		DatabaseOperator.ConnAndOpenDB (dbPath);
+		// Get the last record id from Resultout
+		int startId = DatabaseOperator.GetLastIdFromResultOut();
 		// Insert the results into table ResultOut 
-		DatabaseOperator.InsertResults ("ResultOut", aveList, staDevList, medList, numOfRuns);
-		// Close the database
+		DatabaseOperator.InsValToResultsOut ("ResultOut", aveList, staDevList, medList, numOfRuns);
+		// Get all leaftype id and their ratios
+		DatabaseOperator.GetLeafIdFromLeafType ();
+		// Insert the values into table RatioMap
+		DatabaseOperator.InsValToRatioMap ("RatioMap", startId);
+		// Close database
 		DatabaseOperator.CloseConnection ();
 
 		Debug.Log("Done. All results are saved in database. \n" +

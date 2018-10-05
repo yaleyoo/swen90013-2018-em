@@ -122,7 +122,6 @@ public class SingleRunUIController : MonoBehaviour {
         }
         else
         {
-            Debug.Log("Please check the ratio.");
             message = "Please check the ratio.";
             uiController.DisplayMessage(message);
         }
@@ -146,7 +145,6 @@ public class SingleRunUIController : MonoBehaviour {
         uiController.messageBox.gameObject.SetActive(false);
         Destroy(leafButtonClicked.gameObject);
         typeWithRatio.Remove(leafButtonClicked.leafName.text);
-        Debug.Log("Delete Delete button");
     }
        
     // Clear all selected leaves

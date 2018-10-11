@@ -23,10 +23,14 @@ public class DensityCalculatorTest{
 	[OneTimeSetUp]
 	public void Init(){
 		
-		GameObject[] leaves = new GameObject[5];
+		setGameObject (5);
+	}
+
+	public void setGameObject(int n){
+		GameObject[] leaves = new GameObject[n];
 
 		// Last leaf will be the highest
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < n; i++) {
 			GameObject leaf = new GameObject();
 			leaf.transform.position = new Vector3(0, i * 10, 0);
 			leaf.AddComponent<Leaf>();
@@ -61,6 +65,36 @@ public class DensityCalculatorTest{
 		float valueReturn = dc.CalculateDensity (this.calcArea, 0, this.numSlices);
 
 		Assert.IsTrue (0==valueReturn);
+	}
+
+	/// <summary>
+	/// Greaters than zero test.
+	/// the value returned should be greater than 0. 
+	/// </summary>
+	[Test]
+	public void GreaterThanZeroTest(){
+		DensityCalculator dc = new DensityCalculator ();
+		float valueReturn = dc.CalculateDensity (this.calcArea, this.sliceSampleSize, this.numSlices);
+
+		Assert.IsTrue (valueReturn > 0);
+	}
+
+	[Test]
+	public void IncrementalResultTest(){
+		ArrayList result = new ArrayList ();
+		int n = 5;
+		DensityCalculator dc = new DensityCalculator ();
+
+		do {
+			float valueReturn = dc.CalculateDensity (this.calcArea, 0, this.numSlices);
+			result.Add (valueReturn);
+			n++;
+			setGameObject(n);
+		} while(n == 10);
+
+		for (int i = 0; i < result.Count - 1; i++) {
+			Assert.IsTrue ( (float)result [i + 1] > (float)result [i]);
+		}
 	}
 
 	// A UnityTest behaves like a coroutine in PlayMode

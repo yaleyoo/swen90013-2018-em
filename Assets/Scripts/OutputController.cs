@@ -49,10 +49,13 @@ public class OutputController : MonoBehaviour {
                 // Save the results to database
 				WriteResultsToDb();
 
-                // Avoid the progress bar stop at 99%, inidiate the simulation done
-                ProgressBarController.progressBar.gameObject.SetActive(true);
-                ProgressBarController.progressBar.progressImg.fillAmount = 100;
-                ProgressBarController.progressBar.proText.text = "DONE";   
+                // If it's a batchrun, show progress bar instead of the result
+                if (SimSettings.GetBatchrun()){
+                    // Avoid the progress bar stop at 99%, inidiate the simulation done
+                    ProgressBarController.progressBar.gameObject.SetActive(true);
+                    ProgressBarController.progressBar.progressImg.fillAmount = 100;
+                    ProgressBarController.progressBar.proText.text = "DONE";  
+                } 
                
             }                
         }

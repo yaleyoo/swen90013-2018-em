@@ -110,7 +110,7 @@ public class BatchRunCsvLoader
 		Dictionary<LeafData, int> leafAndRatios;
 		for (int i = 1; i <= batchrunLeafAndRatio.Keys.Count; i++) {
 			batchrunLeafAndRatio.TryGetValue (i, out leafAndRatios);
-			DatabaseOperator.RecordBatchRunLeafTypeAndRatio (leafAndRatios);
+			DatabaseOperator.RecordLeafTypeAndRatio (leafAndRatios);
 		}
         // set runtimes
         SimSettings.SetRunTimesLeft(batchrunLeafAndRatio.Count);

@@ -117,7 +117,7 @@ public class DatabaseOperator {
 	}
 
 	// Record the input leafData and ratio
-	public static void RecordBatchRunLeafTypeAndRatio(Dictionary<LeafData, int> leafAndRatio){
+	public static void RecordLeafTypeAndRatio(Dictionary<LeafData, int> leafAndRatio){
 
 		foreach (LeafData leaf in leafAndRatio.Keys) {
 			
@@ -147,6 +147,14 @@ public class DatabaseOperator {
 			return Convert.ToInt32(reader[0]);
 		else
 			return 0;
+	}
+
+	// Clear all lists
+	public static void Clear(){
+		
+		leafTypeIdList.Clear();
+		leafNameList.Clear();
+		leafRatioList.Clear();
 	}
 }
 

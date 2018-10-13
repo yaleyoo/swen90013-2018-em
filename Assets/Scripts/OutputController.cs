@@ -93,6 +93,8 @@ public class OutputController : MonoBehaviour {
 		DatabaseOperator.InsValToRatioMap ("RatioMap", startId);
 		// Close database
 		DatabaseOperator.CloseConnection ();
+		// Clear all lists
+		DatabaseOperator.Clear();
 
 		Debug.Log("Done. All results are saved in database. \n" +
 			"The location is : " + Application.dataPath + "/database.db");

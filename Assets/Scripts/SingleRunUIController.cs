@@ -47,13 +47,13 @@ public class SingleRunUIController : MonoBehaviour {
         InitializeLeafDropdown();
     }
 
-    // Read leaf name from csv and add them to the dropdown menu
+    // Read leaf name from database and add them to the dropdown menu
     private void InitializeLeafDropdown()
     {
-        // Read leaf trait csv
-        CSVImporter.ReadCsv();
+        // Read leaf trait database
+		DataImporter.ReadDatabase();
 
-        foreach (LeafData l in CSVImporter.Leaves)
+		foreach (LeafData l in DataImporter.Leaves)
         {
             type.Add(l.Name);
         }
@@ -178,6 +178,7 @@ public class SingleRunUIController : MonoBehaviour {
         SimSettings.ResetSimulationTimesLeft();
 
         SimSettings.SetLeafSizesAndRatios(leavesAndRatios);
+		DatabaseOperator.RecordLeafTypeAndRatio (leavesAndRatios);
         // set visualize flag according to visualizeToggle's status
         SimSettings.SetVisualize(visualizeToggle.isOn);
         SceneManager.LoadScene("Simulation");
@@ -191,7 +192,7 @@ public class SingleRunUIController : MonoBehaviour {
 
         foreach (KeyValuePair<string, int> pair in typeWithRatio)
         {
-            temp = CSVImporter.Leaves.Find((LeafData l) => l.Name == pair.Key);
+			temp = DataImporter.Leaves.Find((LeafData l) => l.Name == pair.Key);
             leavesAndRatios.Add(temp, pair.Value);
             Debug.Log(temp.Name + ":" + pair.Value);
         }

@@ -9,6 +9,8 @@ using UnityEngine.SceneManagement;
 public class SimulationController : MonoBehaviour {
 
     private const string OUTPUT_SCENE = "Output";
+    private const float LEAF_SPAWN_TIME = 0.25f;
+    private const float BATCH_RUN_TIMESCALE = 8f;
 
     private LeafGenerator leafGen;
     private DensityCalculator denCalc;
@@ -25,6 +27,8 @@ public class SimulationController : MonoBehaviour {
     private int runCount = 0;
     private int totalProgress = 100;
 
+    private float leafSpawnTimer = LEAF_SPAWN_TIME;
+
     private System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
 
     // Use this for initialization
@@ -33,36 +37,38 @@ public class SimulationController : MonoBehaviour {
         this.denCalc = new DensityCalculator();
 
         // Batuch Run
-        if (SimSettings.GetBatchrun())
-        {
+        if (SimSettings.GetBatchrun()) {
             // Initialise the parameter for progres bar
             runCount = SimSettings.GetCurrentSimulationTimes();
             runCount++;
             SimSettings.SetCurrentSimulationTimes(runCount);
 
-            if (BatchRunCsvLoader.batchrunLeafAndRatio.Count != 0)
-            {
+            if (BatchRunCsvLoader.batchrunLeafAndRatio.Count != 0) {
                 targetValueOnce = 100 / (BatchRunCsvLoader.batchrunLeafAndRatio.Count * SimSettings.GetSimulationTimes());
             }
             totalProgress = targetValueOnce * runCount;
 
+            this.SetTimeScale(BATCH_RUN_TIMESCALE);
+
             // Show the progress bar
             ProgressBarController.progressBar.gameObject.SetActive(true);
         }
-        else
-        {
+        else {
             ProgressBarController.progressBar.gameObject.SetActive(false);
         }
 
     }
 
-    // Update is called once per frame
-    void Update() {
-        this.leaves = GameObject.FindGameObjectsWithTag("Leaf");
-        if (this.CanCreateLeaf()) {
+    void FixedUpdate() {
+
+        leafSpawnTimer -= Time.deltaTime;
+
+        if (this.CanCreateLeaf() && leafSpawnTimer <= 0) {
             this.CreateLeaf();
+            leafSpawnTimer = LEAF_SPAWN_TIME;
         }
         else if (this.HasEnded()) {
+            this.leaves = GameObject.FindGameObjectsWithTag("Leaf");
             this.FreezeAll(this.leaves);
             this.CalculateDensity(this.leaves);
         }
@@ -71,10 +77,8 @@ public class SimulationController : MonoBehaviour {
     }
 
     // The method to update the porgress bar
-    private void LoadingProgressBar()
-    {
-        if (ProgressBarController.progressBar.curProValue < totalProgress)
-        {
+    private void LoadingProgressBar() {
+        if (ProgressBarController.progressBar.curProValue < totalProgress) {
             ProgressBarController.progressBar.curProValue++;
         }
         ProgressBarController.progressBar.progressImg.fillAmount = ProgressBarController.progressBar.curProValue / 100f;
@@ -130,10 +134,8 @@ public class SimulationController : MonoBehaviour {
     /// Freezes all the given leaves so that they are not moving during density calculation
     /// </summary>
     /// <param name="leaves">All of the leaves in the world</param>
-    public void FreezeAll(GameObject[] leaves)
-    {
-        foreach(GameObject lf in leaves)
-        {
+    public void FreezeAll(GameObject[] leaves) {
+        foreach (GameObject lf in leaves) {
             lf.GetComponent<Leaf>().FreezeLeaf();
         }
     }
@@ -160,7 +162,7 @@ public class SimulationController : MonoBehaviour {
                                 System.Math.Round(density, 6),
                                 System.Math.Round(stopWatch.ElapsedMilliseconds / 1000.0, 6)));
 
-        Results.addResult (density);
+        Results.addResult(density);
         this.ChangeToOutputScene();
     }
 
@@ -171,8 +173,7 @@ public class SimulationController : MonoBehaviour {
     /// that are still considered in the ratio
     /// </summary>
     /// <param name="leaves">All the current leaf objects in the world</param>
-    private void CalculateDensityBaseline(GameObject[] leaves)
-    {
+    private void CalculateDensityBaseline(GameObject[] leaves) {
         // Create cylinder to get the height to use
         DensityCalculationCylinder calcArea = new DensityCalculationCylinder(
                                     leaves,
@@ -183,12 +184,10 @@ public class SimulationController : MonoBehaviour {
 
         // Sum the volumes of leaves whose center point is within the cylinder elipse base
         float leafVol = 0.0f;
-        foreach (GameObject lf in leaves)
-        {
+        foreach (GameObject lf in leaves) {
             if (Mathf.Abs(lf.GetComponent<Leaf>().GetCenter().x) < ((this.dropAreaX - this.densityIgnoreBorder)) &&
                 Mathf.Abs(lf.GetComponent<Leaf>().GetCenter().z) < ((this.dropAreaY - this.densityIgnoreBorder)) &&
-                lf.GetComponent<Leaf>().GetCenter().y < cylHeight)
-            {
+                lf.GetComponent<Leaf>().GetCenter().y < cylHeight) {
                 leafVol += lf.GetComponent<Leaf>().GetVolume();
             }
         }
@@ -198,7 +197,7 @@ public class SimulationController : MonoBehaviour {
 
         // Console log the density
         Debug.Log(string.Format("Baseline volume density calculated as {0}",
-                                System.Math.Round(leafVol/cylVol, 6)));
+                                System.Math.Round(leafVol / cylVol, 6)));
     }
 
     /// <summary>
@@ -224,11 +223,9 @@ public class SimulationController : MonoBehaviour {
     /// Whether or not the time between the first call and the current call of this method exceeds twice the
     /// time it takes a single leaf to fall from the dropping height to the ground
     /// </returns>
-    public bool HasEnded()
-    {
+    public bool HasEnded() {
         // On fist call of the method, start running teh stopwatch, and return false
-        if (!this.stopWatch.IsRunning)
-        {
+        if (!this.stopWatch.IsRunning) {
             this.stopWatch.Start();
             return false;
         }
@@ -238,14 +235,12 @@ public class SimulationController : MonoBehaviour {
         double secondsSinceLastLeaf = this.stopWatch.ElapsedMilliseconds / 1000.0;
 
         // Reset the stopwatch if enough time has elapsed, and return true
-        if (secondsSinceLastLeaf > timeToFall*2)
-        {
+        if (secondsSinceLastLeaf > timeToFall * 2 && !this.CanCreateLeaf()) {
             stopWatch.Stop();
             stopWatch.Reset();
             return true;
         }
-        else
-        {
+        else {
             return false;
         }
     }
@@ -255,5 +250,23 @@ public class SimulationController : MonoBehaviour {
     /// </summary>
     public void ChangeToOutputScene() {
         SceneManager.LoadScene(OUTPUT_SCENE);
+    }
+
+    /// <summary>
+    /// Reset time scale back to normal (1f)
+    /// </summary>
+    public void SetTimeScaleNormal() {
+        Time.timeScale = 1f;
+    }
+
+    /// <summary>
+    /// Multiply time scale by scale.
+    /// A scale between 0 and 1 will slow the simulation.
+    /// A scale greater than 1 will speed up the simulation
+    /// (don't go crazy though, I find the maximum is 8 on my desktop machine).
+    /// </summary>
+    /// <param name="scale"></param>
+    public void SetTimeScale(float scale) {
+        Time.timeScale = scale;
     }
 }

@@ -7,9 +7,6 @@ using UnityEngine.SceneManagement;
 
 public class OutputController : MonoBehaviour {
 
-    // Path to file where output will be saved
-    private string pathToOutputFile = "Assets/Resources/output.txt";
-
     // Use this for initialization
     void Start () {
         if (SimSettings.DecreaseSimulationTimesLeft())
@@ -19,12 +16,12 @@ public class OutputController : MonoBehaviour {
         }
         else
         {
-            // first calculate the results
-            // note: only average for single-run now
-            //       lack standard-deviation and median
+            // first calculate the average, standard deviation and median
             Results.SetAverage();
-            
-            // Print the results to the screen
+			Results.SetSD();
+			Results.SetMedian();
+
+            // Print the average density result to the screen
 		    string result = "Volume density of leaf litter:\n(leaf volume)/(total volume) = " + System.Math.Round(Results.GetAverage(), 6).ToString();
             GameObject.FindGameObjectWithTag("OutputText").GetComponent<Text>().text = result;
             Results.ClearResultSet();
@@ -49,40 +46,76 @@ public class OutputController : MonoBehaviour {
             }
             else
             {
-                // Save the results to a file
-                Debug.Log("Writing results to file ...");
-                WriteResultsToFile();
-                Debug.Log("Done.");
+                // Save the results to database
+				WriteResultsToDb();
 
-                // Avoid the progress bar stop at 99%, inidiate the simulation done
-                ProgressBarController.progressBar.gameObject.SetActive(true);
-                ProgressBarController.progressBar.progressImg.fillAmount = 100;
-                ProgressBarController.progressBar.proText.text = "DONE";
+                // TODO here
+//<<<<<<< HEAD
+//                // Avoid the progress bar stop at 99%, inidiate the simulation done
+//                ProgressBarController.progressBar.gameObject.SetActive(true);
+//                ProgressBarController.progressBar.progressImg.fillAmount = 100;
+//                ProgressBarController.progressBar.proText.text = "DONE";
 
-                // If the simulation was run as a batch run from command line, once done and written results, exit the process.
-                if (SimSettings.GetWasRunWithFlags())
-                {
-                    Application.Quit();
+//                // If the simulation was run as a batch run from command line, once done and written results, exit the process.
+//                if (SimSettings.GetWasRunWithFlags())
+//                {
+//                    Application.Quit();
+//                }
+//=======
+                // If it's a batchrun, show progress bar instead of the result
+                if (SimSettings.GetBatchrun()){
+                    // Avoid the progress bar stop at 99%, inidiate the simulation done
+                    ProgressBarController.progressBar.gameObject.SetActive(true);
+                    ProgressBarController.progressBar.progressImg.fillAmount = 100;
+                    ProgressBarController.progressBar.proText.text = "DONE";
+
+                    // If the simulation was run as a batch run from command line, once done and written results, exit the process.
+                    if (SimSettings.GetWasRunWithFlags())
+                    {
+                        Application.Quit();
+                    }
                 }
-               
-            }                
+
+            }
         }
         
 	}
+		
+	// Write the saved results to database
+	private void WriteResultsToDb(){
 
-    // Write the saved result to the output file specified in the sim settings
-    private void WriteResultsToFile()
-    {
-        StreamWriter writer = new StreamWriter(pathToOutputFile, false);
-        writer.WriteLine("Density average");
+		// Create lists for saving each type of data
+		List<float> aveList = new List<float>();
+		List<double> staDevList = new List<double>();
+		List<float> medList = new List<float>();
 
-        // Write all results to file
-        foreach (float result in Results.GetBatchRunResults())
-        {
-            writer.WriteLine(result);
-        }
+		// Get average, standard deviation and median from Results class
+		aveList = Results.GetBatchRunAve();
+		staDevList = Results.GetBatchRunStaDev();
+		medList = Results.GetBatchRunMed();
 
-        writer.Close();
-    }
+		// Get the time that each line will run
+		int numOfRuns = SimSettings.GetSimulationTimes();
 
+		// Form the database location: both works on Mac or Windows PC
+		string dbPath = "data source=" + Application.dataPath + "/database.db";
+
+		// Create database connection and open database
+		DatabaseOperator.ConnAndOpenDB (dbPath);
+		// Get the last record id from Resultout
+		int startId = DatabaseOperator.GetLastIdFromResultOut();
+		// Insert the results into table ResultOut 
+		DatabaseOperator.InsValToResultsOut ("ResultOut", aveList, staDevList, medList, numOfRuns);
+		// Get all leaftype id and their ratios
+		DatabaseOperator.GetLeafIdFromLeafType ();
+		// Insert the values into table RatioMap
+		DatabaseOperator.InsValToRatioMap ("RatioMap", startId);
+		// Close database
+		DatabaseOperator.CloseConnection ();
+		// Clear all lists
+		DatabaseOperator.Clear();
+
+		Debug.Log("Done. All results are saved in database. \n" +
+			"The location is : " + Application.dataPath + "/database.db");
+	}
 }

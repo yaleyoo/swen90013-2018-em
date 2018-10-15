@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.37311926, g: 0.38073996, b: 0.35872698, a: 1}
+  m_IndirectSpecularColor: {r: 0.37311992, g: 0.38074034, b: 0.35872713, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -110,8 +110,6 @@ NavMeshSettings:
     manualTileSize: 0
     tileSize: 256
     accuratePlacement: 0
-    debug:
-      m_Flags: 0
   m_NavMeshData: {fileID: 0}
 --- !u!1001 &36515843
 Prefab:
@@ -1054,7 +1052,7 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1966181418}
+      - m_Target: {fileID: 1966181421}
         m_MethodName: UpdateRatio
         m_Mode: 1
         m_Arguments:
@@ -1457,6 +1455,7 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
+  m_StereoMirrorMode: 0
 --- !u!4 &249843509
 Transform:
   m_ObjectHideFlags: 0
@@ -3090,7 +3089,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Batch Run Progress
+  m_Text: Batch Run Loading ...
 --- !u!222 &780870390
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -5183,7 +5182,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1966181418}
+      - m_Target: {fileID: 1966181421}
         m_MethodName: ConfirmOnClick
         m_Mode: 1
         m_Arguments:
@@ -6889,7 +6888,18 @@ MonoBehaviour:
   m_Group: {fileID: 115046767}
   onValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1966181420}
+        m_MethodName: OnBatchrunToggleChanged
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Toggle+ToggleEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
   m_IsOn: 0
@@ -6969,7 +6979,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1966181418}
+      - m_Target: {fileID: 1966181421}
         m_MethodName: DeleteOnClick
         m_Mode: 1
         m_Arguments:
@@ -7494,7 +7504,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1966181418}
+      - m_Target: {fileID: 1966181420}
         m_MethodName: LoadBatchRunCsvClick
         m_Mode: 1
         m_Arguments:
@@ -8359,9 +8369,11 @@ GameObject:
   m_Component:
   - component: {fileID: 1966181419}
   - component: {fileID: 1966181418}
+  - component: {fileID: 1966181420}
+  - component: {fileID: 1966181421}
   m_Layer: 0
   m_Name: Controller
-  m_TagString: Untagged
+  m_TagString: MenuController
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -8379,17 +8391,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   batchrunToggle: {fileID: 1617224695}
   singlerunToggle: {fileID: 111885470}
-  visualizeToggle: {fileID: 140933380}
-  batchrunFileLoadSuccess: 0
-  leafDropdown: {fileID: 1148679503}
-  inputRatioSlider: {fileID: 171979961}
-  inputRatioText: {fileID: 199428958}
   leafNumField: {fileID: 887925360}
-  simulationTimesField: {fileID: 1321274613}
   messageBox: {fileID: 1230414029}
   messageBoxConent: {fileID: 1298445753}
-  leafButton: {fileID: 1791777198202678, guid: 5853cabacad19ca4db4d6b79685ebf5c, type: 2}
-  listContent: {fileID: 1266682586}
   okButtonText: {fileID: 1388411022}
   deleteButton: {fileID: 1653230259}
 --- !u!4 &1966181419
@@ -8405,6 +8409,36 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1966181420
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1966181417}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15fa3a38a2ed59044b2f70c0a5420987, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  batchrunFileLoadSuccess: 0
+  simulationTimesField: {fileID: 1321274613}
+--- !u!114 &1966181421
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1966181417}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b1f1a150bf239a4dacdcac0a5dbba96, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  visualizeToggle: {fileID: 140933380}
+  leafDropdown: {fileID: 1148679503}
+  inputRatioSlider: {fileID: 171979961}
+  inputRatioText: {fileID: 199428958}
+  leafButton: {fileID: 1791777198202678, guid: 5853cabacad19ca4db4d6b79685ebf5c, type: 2}
+  listContent: {fileID: 1266682586}
 --- !u!1 &1968132234
 GameObject:
   m_ObjectHideFlags: 0

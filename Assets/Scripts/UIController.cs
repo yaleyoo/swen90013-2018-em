@@ -19,27 +19,7 @@ public class UIController : MonoBehaviour
 {
     // One of these two toggles must be on but cannot be on at the same time    
     public Toggle batchrunToggle;
-    public Toggle singlerunToggle;
-
-    public Toggle visualizeToggle;
-
-    public bool batchrunFileLoadSuccess = false;
-
-    // Dropdown menu to select types of leaves
-    public Dropdown leafDropdown;
-
-    // The list to save the selected name
-    private List<string> type = new List<string>();
-
-    // The input field and slider to set the ratio
-    public Slider inputRatioSlider;
-    public Text inputRatioText;
-
-    // Dictionary to save the type-ratio value pair
-    private Dictionary<string, int> typeWithRatio;
-
-    // Dictionary of leaf shapes and their ratio (used by LeafGenerator class)
-    public static Dictionary<LeafData, int> leavesAndRatios;
+    public Toggle singlerunToggle;      
 
     // InputField on the canvas
     public InputField leafNumField;
@@ -49,57 +29,67 @@ public class UIController : MonoBehaviour
 
     // The flag whether the user click the un limited button
     private bool isUnlimited;
-
-    // InputField for simulation times of mulitrun with same parameters
-    public InputField simulationTimesField;
-
-    // Simulation times for multirun
-    private int SimulationTimes;
-
+   
     // Component for message box
     // String to save the warning message
     private string message;
     public Image messageBox;
     public Text messageBoxConent;
-
-    // Component for ListView
-    public GameObject leafButton;
-    public Transform listContent;
-    private LeafButton leafButtonClicked;
-
-
     public Text okButtonText;
     public Button deleteButton;
 
-   
+    private BatchRunUIController batchRunUIController;
+    private SingleRunUIController singleRunUIController;
+
+    // Flag for when both ui controller initialised properly
+    public bool batchReady = false;
+    public bool singleReady = false;
+    // Flag for when commandline has been read
+    private bool readCmdLn = false;
+
+    public void setBatchRunUIController(BatchRunUIController batchRunUIController)
+    {
+        this.batchRunUIController = batchRunUIController;
+    }
+
+    public void setSingleRunUIController(SingleRunUIController singleRunUIController)
+    {
+        this.singleRunUIController = singleRunUIController;
+    }
+
+
     // Initialisation
     private void Start()
-    {
-        typeWithRatio = new Dictionary<string, int>();
-
+    {     
         isUnlimited = false;
 
         messageBox.gameObject.SetActive(false);
 
         message = "";
 
-        // Add the type to the dropdown menu
-        InitializeLeafDropdown();
-
         // Hide the progress bar canvas
         ProgressBarController.progressBar.gameObject.SetActive(false);
 
         // Set the default input value
         leafNumField.text = "5000";
-        simulationTimesField.text = "10";
-
+      
         // Reset the progress bar 
         ProgressBarController.progressBar.curProValue = 0;
         ProgressBarController.progressBar.progressImg.fillAmount = 0;
         ProgressBarController.progressBar.proText.text = ProgressBarController.progressBar.curProValue + "%";
 
-        // Scan the command line parameters, and if a batch file was passed this way, read it and being simulation auotmatically
-        RunBatchFromCommandLine();
+    }
+
+    private void Update()
+    {
+        // Since cmdline can only read once all ui controllers have loaded, do it once (and only once) once they have
+        if (singleReady && batchReady && !readCmdLn)
+        {
+            // Scan the command line parameters, and if a batch file was passed this way, read it and being simulation auotmatically
+            RunBatchFromCommandLine();
+            readCmdLn = true;
+        }
+        
     }
 
     /// <summary>
@@ -125,27 +115,29 @@ public class UIController : MonoBehaviour
         if (batchFile == "")
         {
             return;
-        // If one was passed but the file doesn't exist, warn the user, and return without starting the batch run
-        } else if (!File.Exists(batchFile))
+            // If one was passed but the file doesn't exist, warn the user, and return without starting the batch run
+        }
+        else if (!File.Exists(batchFile))
         {
             DisplayMessage("Batch file passed via commandline does not exist!");
             return;
         }
+        
 
         // If a batch filepath was supplied, try to load it with the batch run loader
         string errorMsg = "";
         // If failed, display error and don't start batch automatically
         if (BatchRunCsvLoader.LoadFile(batchFile, out errorMsg) != 0)
         {
-            batchrunFileLoadSuccess = false;
+            batchRunUIController.batchrunFileLoadSuccess = false;
             DisplayMessage(errorMsg);
         }
         // If succeeded, automatically set the batch toggle to true, the visualise toggle to false, and being the batch simulation
         else
         {
-            batchrunFileLoadSuccess = true;
+            batchRunUIController.batchrunFileLoadSuccess = true;
             batchrunToggle.isOn = true;
-            visualizeToggle.isOn = false;
+            singlerunToggle.isOn = false;
 
             // Mark that the program was run from the command line. This is checked when simulation complete, and exits the process
             // on completion if it is true (after writing results).
@@ -155,11 +147,10 @@ public class UIController : MonoBehaviour
             this.ChangeScene();
         }
     }
-
-
+		
     // Invoke when Start button clicked
     public void StartOnClick()
-    {      
+    {
         // Actions to submit the number of leaves
         // Check if input leaf limit is valid
         if (System.Int32.TryParse(leafNumField.text, out leafNum))
@@ -183,9 +174,9 @@ public class UIController : MonoBehaviour
         // Click the unlimited button, nothing in input field
         else if (isUnlimited == true)
         {
-           
+
             ChangeScene();
-            
+
         }
         else
         {
@@ -196,190 +187,19 @@ public class UIController : MonoBehaviour
             DisplayMessage(message);
         }
     }
-
-    // Click the button to choose the file
-    public void LoadBatchRunCsvClick()
-    {
-        ClearAddedLeafBox();
-        string extensions = "csv";
-        string path = FileBrowser.OpenSingleFile("Open File", "", extensions);
-        Debug.Log("Selected file: " + path);
-        batchrunToggle.isOn = true;
-        visualizeToggle.isOn = false;
-        // Click cancel or didn't choose file
-        if (path == "") {
-            batchrunFileLoadSuccess = false;
-            return;
-        }
-        string errorMsg = "";
-        if (BatchRunCsvLoader.LoadFile(path, out errorMsg) != 0)
-        {
-            batchrunFileLoadSuccess = false;
-            DisplayMessage(errorMsg);
-        }
-        else
-        {
-            batchrunFileLoadSuccess = true;
-        }                
-    }
-
-    // Simulate several times with the same ratios
-    private void MultiRun()
-    {
-        if (!System.Int32.TryParse(simulationTimesField.text, out SimulationTimes))
-        {
-            message = "Invalid simulation number. Please enter an interger.";
-            DisplayMessage(message);
-            return;
-        }
-        else
-        {
-            SimSettings.SetSimulationTimes(SimulationTimes);
-            SimSettings.ResetSimulationTimesLeft();
-        }
-    }
-
+    
     // Load the simulation
     private void ChangeScene()
     {
         // If single run toggle is choosen
         if (singlerunToggle.isOn)
-        {            
-            // To pass the dictionary leavesAndRatios to the LeafGenerator
-            // Get the LeafShap based on the leaf name
-            GetLeafShape(typeWithRatio);
-            if (leavesAndRatios.Count == 0)
-            {
-                message = "Please input leaves and ratios.";
-                DisplayMessage(message);
-                return;
-            }
-
-            SimSettings.SetSimulationTimes(1);
-            SimSettings.ResetSimulationTimesLeft();
-
-            SimSettings.SetLeafSizesAndRatios(leavesAndRatios);
-            // set visualize flag according to visualizeToggle's status
-            SimSettings.SetVisualize(visualizeToggle.isOn);            
-            SceneManager.LoadScene("Simulation");
+        {
+            singleRunUIController.run();
         }
         // If batch run toggle is choosen
         else if (batchrunToggle.isOn)
         {
-            ClearAddedLeafBox();
-
-            MultiRun();
-
-            if (!batchrunFileLoadSuccess)
-            {
-                message = "Load batch run data error.";
-                DisplayMessage(message);
-                return;
-            }
-            SimSettings.SetVisualize(false);
-            SimSettings.SetBatchrun(true);
-            int runRound = BatchRunCsvLoader.batchrunLeafAndRatio.Keys.Count - SimSettings.GetRunTimeesLeft() + 1;
-            Debug.Log("current round = " + runRound);
-            Dictionary<LeafData, int> leafSizesAndRatios;
-            BatchRunCsvLoader.batchrunLeafAndRatio.TryGetValue(runRound, out leafSizesAndRatios);
-            SimSettings.SetLeafSizesAndRatios(leafSizesAndRatios);
-            SceneManager.LoadScene("Simulation");
-        }
-    }
-
-    // Invoke when Quit button clicked
-    public void QuitOnClick()
-    {
-        Debug.Log("quit");
-        Application.Quit();
-    }
-
-    // Set the ratio of the slider
-    public void UpdateRatio()
-    {
-        //inputRatioText = GetComponent<Text>();
-        inputRatioText.text = Mathf.Round(inputRatioSlider.value).ToString();
-    }
-    
-    /* 
-     * The response of clicking add button.
-     * Display the selected type with ratio 
-     *      and add to the dictionary which just save the name and ratio.
-     */
-    public void ConfirmOnClick()
-    {
-        // The int number to save the ratio of each type
-        int ratioInt = 0;
-        // Type conversion, string to int
-        if (System.Int32.TryParse(Mathf.Round(inputRatioSlider.value).ToString(), out ratioInt))
-        {
-            
-            string typeString = leafDropdown.captionText.text;
-
-            // Check if the same leaf type is selected
-            if (typeWithRatio.ContainsKey(typeString))
-            {
-                message = "You have already chosen this type of leaf.\n" +
-                    "Please check your selection.";
-                DisplayMessage(message);
-                return;
-            }
-
-            typeWithRatio.Add(typeString, ratioInt);
-
-            // Add a leafButton
-            GameObject newButton = Instantiate(leafButton) as GameObject;
-            LeafButton button = newButton.GetComponent<LeafButton>();
-            button.leafName.text = typeString ;
-            button.leafRatio.text = ratioInt.ToString();
-            
-            newButton.transform.SetParent(listContent);
-
-            // Listen to the leaf button
-            button.onClick.AddListener(
-                    delegate ()
-                    {
-                        leafButtonClicked = button;
-                        LeafButtonClick();
-                    }
-
-                );               
-        }
-        else
-        {
-            Debug.Log("Please check the ratio.");
-            message = "Please check the ratio.";
-            DisplayMessage(message);
-        }
-
-    }
-
-    // Click the buttion to delete the selection 
-    private void LeafButtonClick()
-    {
-        message = "Are you sure you want to delete?";
-        okButtonText.text = "Cancel";
-        deleteButton.gameObject.SetActive(true);
-        DisplayMessage(message);
-    }
-
-    /*
-     * The response of clicking reset button.
-     * Reset all setting
-     * Clear the dictionary typeWithRatio and the display text
-     */
-    public void ResetOnClick()
-    {
-        typeWithRatio.Clear();
-        leafNumField.text = "";
-        isUnlimited = false;
-        GameObject[] leafButtons = GameObject.FindGameObjectsWithTag("LeafButton");
-        if (leafButtons.Length > 0)
-        {
-            foreach (GameObject o in leafButtons)
-            {
-                Destroy(o);
-            }
+            batchRunUIController.Run();
         }
     }
 
@@ -392,27 +212,24 @@ public class UIController : MonoBehaviour
         leafNumField.text = "Set as Unlimited";
     }
 
-    // Read leaf name from csv and add them to the dropdown menu
-    private void InitializeLeafDropdown()
+    // Invoke when Quit button clicked
+    public void QuitOnClick()
     {
-        // Read leaf trait csv
-        CSVImporter.ReadCsv();
+        Debug.Log("quit");
+        Application.Quit();
+    }
 
-        foreach (LeafData l in CSVImporter.Leaves)
-        {
-            type.Add(l.Name);
-        }
-
-        leafDropdown.options.Clear();
-        Dropdown.OptionData tempData;
-        for (int i = 0; i < type.Count; i++)
-        {
-            tempData = new Dropdown.OptionData();
-            tempData.text = type[i];
-            leafDropdown.options.Add(tempData);
-        }
-        // Update the name show on the label of dropdown
-        leafDropdown.captionText.text = type[0];
+    /************************
+     * Message box part start
+     * ********************
+    **/
+    // The method to disaplay the message box
+    public void DisplayMessage(string str)
+    {
+        messageBox.gameObject.SetActive(true);
+        // Bring the components to front
+        messageBox.gameObject.transform.SetAsLastSibling();
+        messageBoxConent.text = str;
     }
 
     // Cancel the deletion
@@ -421,56 +238,26 @@ public class UIController : MonoBehaviour
         messageBox.gameObject.SetActive(false);
         Debug.Log("Click Cancel button");
     }
+    /************************
+     * Message box part end
+     * *********************
+    **/
 
-    // Confirm the deletion 
-    public void DeleteOnClick()
-    {
-        okButtonText.text = "OK";
-        deleteButton.gameObject.SetActive(false);
-        messageBox.gameObject.SetActive(false);
-        Destroy(leafButtonClicked.gameObject);
-        typeWithRatio.Remove(leafButtonClicked.leafName.text);
-        Debug.Log("Delete Delete button");
+    /*
+     * The response of clicking reset button.
+     * Reset all setting
+     * Clear the dictionary typeWithRatio and the display text
+     */
+    public void ResetOnClick()
+    {        
+        leafNumField.text = "";
+        isUnlimited = false;
+        singleRunUIController.Reset();
     }
 
-    // Get the the selected LeafData according to the name and saved as an dictionary
-    private void GetLeafShape(Dictionary<string, int> nameDictionary)
+    // Clear the dictionary typeWithRatio and selected leaf types
+    public void ResetSingleRun()
     {
-        leavesAndRatios = new Dictionary<LeafData, int>();
-        LeafData temp;
-
-        foreach (KeyValuePair<string, int> pair in typeWithRatio)
-        {
-            temp = CSVImporter.Leaves.Find((LeafData l) => l.Name == pair.Key);
-            leavesAndRatios.Add(temp, pair.Value);
-            Debug.Log(temp.Name + ":" + pair.Value);
-        }
-    }
-
-    // The method to disaplay the message box
-    private void DisplayMessage(string str)
-    {
-        messageBox.gameObject.SetActive(true);
-        // Bring the components to front
-        messageBox.gameObject.transform.SetAsLastSibling();
-        messageBoxConent.text = str;
-    }
-
-    public void OnBatchrunToggleChanged(bool check)
-    {
-        ClearAddedLeafBox();
-    }
-
-    private void ClearAddedLeafBox()
-    {
-        typeWithRatio.Clear();
-        GameObject[] leafButtons = GameObject.FindGameObjectsWithTag("LeafButton");
-        if (leafButtons.Length > 0)
-        {
-            foreach (GameObject o in leafButtons)
-            {
-                Destroy(o);
-            }
-        }
+        singleRunUIController.Reset();
     }
 }

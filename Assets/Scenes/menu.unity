@@ -6164,7 +6164,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 1865651188535138, guid: fda5d4f927b5b154e8a831c6abfa20d2, type: 2}
       propertyPath: m_Name
-      value: AddedLeafTypeListView
+      value: AddedLeafsListView
       objectReference: {fileID: 0}
     - target: {fileID: 224437864140497010, guid: fda5d4f927b5b154e8a831c6abfa20d2,
         type: 2}
@@ -7641,7 +7641,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1814697673
 MonoBehaviour:
   m_ObjectHideFlags: 0

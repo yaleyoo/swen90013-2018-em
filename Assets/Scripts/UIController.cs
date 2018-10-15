@@ -71,7 +71,7 @@ public class UIController : MonoBehaviour
         ProgressBarController.progressBar.progressImg.fillAmount = 0;
         ProgressBarController.progressBar.proText.text = ProgressBarController.progressBar.curProValue + "%";
     }
-
+		
     // Invoke when Start button clicked
     public void StartOnClick()
     {

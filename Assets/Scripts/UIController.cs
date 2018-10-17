@@ -19,7 +19,11 @@ public class UIController : MonoBehaviour
 {
     // One of these two toggles must be on but cannot be on at the same time    
     public Toggle batchrunToggle;
-    public Toggle singlerunToggle;      
+    public Toggle singlerunToggle;
+
+    // Panels seperating batch run and single run
+    public GameObject singleRunPanel;
+    public GameObject batchRunPanel;
 
     // InputField on the canvas
     public InputField leafNumField;
@@ -66,6 +70,10 @@ public class UIController : MonoBehaviour
         messageBox.gameObject.SetActive(false);
 
         message = "";
+
+        // Setting up which panel need to be default at the begining
+        batchRunPanel.gameObject.SetActive(false);
+        singleRunPanel.gameObject.SetActive(true);
 
         // Hide the progress bar canvas
         ProgressBarController.progressBar.gameObject.SetActive(false);
@@ -187,7 +195,21 @@ public class UIController : MonoBehaviour
             DisplayMessage(message);
         }
     }
-    
+
+    //Batch run toggle click
+    public void BatchRunToggleClick()
+    {
+        batchRunPanel.gameObject.SetActive(true);
+        singleRunPanel.gameObject.SetActive(false);
+    }
+
+    //Single run toggle click
+    public void SingleToggleClick()
+    {
+        batchRunPanel.gameObject.SetActive(false);
+        singleRunPanel.gameObject.SetActive(true);
+    }
+
     // Load the simulation
     private void ChangeScene()
     {

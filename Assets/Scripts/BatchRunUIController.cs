@@ -27,6 +27,9 @@ public class BatchRunUIController : MonoBehaviour {
         uiController.setBatchRunUIController(this);
         // Set the default input value
         simulationTimesField.text = "10";
+
+        // Tel main controller this one is ready
+        uiController.batchReady = true;
     }
 
     // Click the button to choose the file

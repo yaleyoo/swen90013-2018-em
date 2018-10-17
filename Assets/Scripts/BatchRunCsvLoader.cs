@@ -45,7 +45,7 @@ public class BatchRunCsvLoader
                         if (lineNum == 0)
                         {
                             // get leaf object by name.
-                            LeafData shape = CSVImporter.Leaves.Find((LeafData l) => l.Name == columnData);
+							LeafData shape = DataImporter.Leaves.Find((LeafData l) => l.Name == columnData);
                             if (shape == null || shape.Name == "")
                             {
                                 errorMsg = "Cannot find leaf with name " + columnData;
@@ -105,6 +105,13 @@ public class BatchRunCsvLoader
             batchrunLeafAndRatio.Clear();
             return -1;
         }
+
+		// Passing input data (LeafData and ratios) to DatabaseOperator
+		Dictionary<LeafData, int> leafAndRatios;
+		for (int i = 1; i <= batchrunLeafAndRatio.Keys.Count; i++) {
+			batchrunLeafAndRatio.TryGetValue (i, out leafAndRatios);
+			DatabaseOperator.RecordLeafTypeAndRatio (leafAndRatios);
+		}
         // set runtimes
         SimSettings.SetRunTimesLeft(batchrunLeafAndRatio.Count);
         Debug.Log("GetRunTimes = " + SimSettings.GetRunTimeesLeft());            

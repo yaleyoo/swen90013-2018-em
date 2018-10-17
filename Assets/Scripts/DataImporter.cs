@@ -1,6 +1,6 @@
 ﻿/*
- * Created by Marko Ristic
- * Imports the leaf trait CSV and converts the leaves into the LeafData class for passing
+ * Created by Marko Ristic, modified by Jing Bi
+ * Imports the leaf trait database table and converts the leaves into the LeafData class for passing
  * to the leaf generation script
  */
 
@@ -9,26 +9,60 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using UnityEngine;
+using Mono.Data.Sqlite; 
 
-public class CSVImporter {
+public class DataImporter {
 
-    // Name of the csv file; must be located in the Resources folder
-    private static string CSV_PATH = "Data/LeafTraits";
+	// Path for database location
+	private static string dbPath;
 
     // Scaling factor of leaf sizes to our simulation units
     private static float SCALE = 0.1f;
 
-    // Where to store csv data
+    // Where to store database data
     public static List<LeafData> Leaves { get; set; }
 
-    // Method to read leaf trait csv into LeafData array, and return it
-    public static List<LeafData> ReadCsv() {
-        // Initialise leaf list, this will also reset the list if being called again to re-load from csv
-        CSVImporter.Leaves = new List<LeafData>();
+    // Method to read leaf trait database table into LeafData array, and return it
+    public static List<LeafData> ReadDatabase() {
+        // Initialise leaf list, this will also reset the list if being called again to re-load from database
+		DataImporter.Leaves = new List<LeafData>();
+		// Lines for saving data in each row
+		string[] lines;
+		// Temporary List for dealing with different types between SqliteDataReader and list
+		List<string> lineList = new List<string>();
+		// Form the path of database
+		dbPath = "data source=" + Application.dataPath + "/database.db";
+		// Create the database connection
+		DatabaseOperator.ConnAndOpenDB (dbPath);
+		// Read leaf traits from table LeafType
+		SqliteDataReader dbReader = DatabaseOperator.ReadLeafTraits("LeafType");
+		// Add the first row into the list
+		lineList.Add ("Name,Leaf Form,Thickness,Thickness_Range,Width,Width_Range,Length,Length_Range");
 
-        // Read csv and split into lines
-        TextAsset data = Resources.Load(CSV_PATH) as TextAsset;
-        string[] lines = data.text.Split('\n');
+		while (dbReader.Read ()) {
+			// Form a record to a line
+			string line = "";
+			for (int i = 0; i < dbReader.FieldCount - 1; i++) {
+				// Directly transfer the first two columns to string 
+				if(i < 2)						
+					line += dbReader[i].ToString () + ",";
+				else
+					// Keep the precision of the double type 
+					line += dbReader.GetDouble(i).ToString("0.#########") + ",";
+			}
+			// Add the last data row without comma
+			line += dbReader.GetDouble(dbReader.FieldCount - 1).ToString("0.#########");
+
+			// Save each record into lineList
+			lineList.Add (line);
+		}
+
+		// Close database
+		DatabaseOperator.CloseConnection ();
+		// Keep the null row for line ending encoding and transfer list into string[]
+		lineList.Add ("");
+		lines = lineList.ToArray ();
+		Debug.Log("Leaf traits loading completed. \n");
 
         // For each line except first (header) parse individual sections, and add a new leaf shape to the list
         foreach (string line in lines.Skip(1)) {
@@ -38,7 +72,7 @@ public class CSVImporter {
                 continue;
             }
 
-            CSVImporter.Leaves.Add(new LeafData(
+			DataImporter.Leaves.Add(new LeafData(
                                         // Name
                                         parts[0].Trim(),
                                         // Leaf form (lower case for consistency)
@@ -59,13 +93,13 @@ public class CSVImporter {
         }
 
         // Return the list of leaves
-        return CSVImporter.Leaves;
+		return DataImporter.Leaves;
     }
 
     // Debugging method to print all leaves in list on seperate lines
     public static void PrintLeaves() {
 
-        foreach (LeafData l in CSVImporter.Leaves) {
+		foreach (LeafData l in DataImporter.Leaves) {
             Debug.Log(string.Format("{0} - {1} - {2} {3} {4} {5} {6} {7}", 
                                     l.Name, 
                                     l.LeafForm, 

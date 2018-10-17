@@ -1,6 +1,6 @@
 ﻿/**
  * Created by Chao Li
- * Unit test for csv importer
+ * Unit test for data importer
  **/
 using UnityEngine;
 using UnityEditor;
@@ -12,7 +12,7 @@ public class CsvImporterTest {
 
     [Test]
     public void CsvImporterRead() {
-        CSVImporter.ReadCsv();
-        CSVImporter.PrintLeaves();
+		DataImporter.ReadDatabase();
+		DataImporter.PrintLeaves();
     }
 }
